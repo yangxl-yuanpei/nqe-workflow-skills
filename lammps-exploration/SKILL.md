@@ -73,6 +73,8 @@ Use this skill for LAMMPS-based exploration in DP-GEN and related MLFF sampling 
 
 ## References
 
+- Read `../common/references/command-help.md` when an executable name, command option, subcommand, or version-specific syntax is missing; use official docs and local `-h`/`--help`/`help` output instead of guessing.
+
 - Read `references/lammps-official-notes.md` for official LAMMPS and DeePMD-kit documentation entry points.
 - Read `references/lammps-exploration-checklist.md` for workflow-specific checks.
 - Read `references/lammps-dpgen-handoff.md` for how LAMMPS templates connect to DP-GEN `model_devi_jobs`.

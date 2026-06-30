@@ -55,6 +55,22 @@ User approval is required for:
 - model-deviation analysis is available when DP-GEN exploration depends on an ensemble
 - selected production model has documented provenance: dataset, training input, random seed, software version, and validation evidence
 
+
+## Freeze, Test, And Final Model Selection
+
+- Freezing/exporting a model makes it usable by downstream tools, but does not certify scientific reliability.
+- Use `dp test` or the version-appropriate DeePMD-kit test command to compare frozen models on the same documented test dataset.
+- If several final models exist, compare energy, force, and virial errors when available, then combine those results with model-deviation behavior, LAMMPS exploration stability, and reaction-coordinate coverage.
+- Do not select a production model without user-approved acceptance criteria.
+- Record the freeze checkpoint, frozen model path, test dataset, test command/options, software version, and final selection rationale.
+
+## DP-GEN Model Deviation
+
+- In DP-GEN, LAMMPS exploration with a DeePMD ensemble computes model deviation automatically.
+- DP-GEN classifies explored configurations using user-provided trust thresholds such as `trust_lo`/`trust_hi` or version-specific equivalents.
+- Treat categories such as accurate, candidate, and failed as DP-GEN selection diagnostics, not standalone proof of model reliability.
+- Candidate configurations may be sent to ABACUS labeling according to the user-approved DP-GEN policy.
+
 ## Downstream Handoff
 
 A DeePMD frozen model can be handed to CHMC/CPIHMC only after user acceptance. The handoff should record:

@@ -32,6 +32,8 @@ Use this skill for DeePMD-kit training and model validation within the NQE H2 fo
 - Inspect `input.json` for missing or undocumented sections using official DeePMD-kit documentation for field meanings.
 - Inspect training logs such as `lcurve.out` for obvious divergence, NaNs, or missing metrics. Use `scripts/parse_lcurve.py` for deterministic first-pass log summaries when a log file is available.
 - Explain how ensemble models from different random seeds support DP-GEN model-deviation estimates.
+- Use dp test results to compare multiple final models only when the test dataset, metrics, and user-approved selection criteria are documented.
+- Use `dp test` results to compare multiple final models only when the test dataset, metrics, and user-approved selection criteria are documented.
 - Produce TODO lists for user-approved training settings and validation criteria.
 
 ## What This Skill Must Not Do
@@ -62,12 +64,16 @@ Use this skill for DeePMD-kit training and model validation within the NQE H2 fo
 ## Templates
 
 - Use `templates/input.json.template` as a teaching scaffold for DeePMD-kit training input.
+- Read `templates/reference-examples/corr-deepmd/README.md` when a real DeePMD training example is useful for file organization, lcurve shape, or train.log interpretation.
 - Treat every `TODO_USER_APPROVAL` token as a required user-approved value.
 - Verify field names, descriptor options, and command behavior against the official DeePMD-kit documentation for the installed version before running.
 
 ## References
 
+- Read `../common/references/command-help.md` when an executable name, command option, subcommand, or version-specific syntax is missing; use official docs and local `-h`/`--help`/`help` output instead of guessing.
+
 - Read `references/deepmd-official-notes.md` for official DeePMD-kit documentation entry points for data, train, freeze, test, and model deviation.
 - Read `references/deepmd-training-checklist.md` for local workflow-specific checks.
 - Use `scripts/parse_lcurve.py` to summarize DeePMD-kit `lcurve.out`-style training logs; treat its output as diagnostics, not model certification.
+- Read `references/deepmd-freeze-test-selection.md` when the user asks about freeze/export, `dp test`, final model selection, or DP-GEN model-deviation categories.
 - Use the official DeePMD-kit documentation for data, train, freeze, test, and model-deviation command meanings: https://docs.deepmodeling.com/projects/deepmd/en/latest/

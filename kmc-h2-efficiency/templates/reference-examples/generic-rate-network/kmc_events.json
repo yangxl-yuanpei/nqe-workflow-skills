@@ -1,0 +1,26 @@
+{
+  "schema": "generic_kmc_events_v0",
+  "units": { "rate": "s^-1 or user-defined per-site/per-pair units" },
+  "events": [
+    {
+      "event_id": "example_forward_step",
+      "description": "Generic elementary transition from state A to state B",
+      "preconditions": ["site_or_state_matches_A"],
+      "postconditions": ["site_or_state_becomes_B"],
+      "rate_constant": "TODO_FROM_TST_OR_USER_TABLE",
+      "rate_source": "ti-tst-rate/templates/tst_rates.csv.template",
+      "temperature_K": "TODO_USER_APPROVAL",
+      "notes": "Replace with a system-specific event; do not treat as a production network"
+    },
+    {
+      "event_id": "example_reverse_step",
+      "description": "Generic reverse transition from state B to state A",
+      "preconditions": ["site_or_state_matches_B"],
+      "postconditions": ["site_or_state_becomes_A"],
+      "rate_constant": "TODO_FROM_TST_OR_USER_TABLE",
+      "rate_source": "TODO_USER_APPROVAL",
+      "temperature_K": "TODO_USER_APPROVAL",
+      "notes": "Included to show that KMC networks usually need competing events"
+    }
+  ]
+}

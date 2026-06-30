@@ -1,120 +1,148 @@
 # NQE Workflow Skills
 
-This directory contains agent-readable skills for teaching and inspecting the NQE H2 formation workflow. The skills are designed to help an agent explain the workflow, preserve scientific boundaries, route questions to the right stage, and check readiness before any production calculation is claimed.
+This repository contains agent-readable skills for teaching, inspecting, and partially post-processing an atomistic NQE workflow. The workflow runs from structure/DFT preparation through DP-GEN, DeePMD, CHMC/CPIHMC sampling, thermodynamic integration, TST rate estimation, and KMC reasoning.
 
-This is currently a teaching and guidance skills library, not a one-click production automation pipeline.
+The current repository is a teaching and guidance skills library. It is not yet a one-click production automation pipeline.
 
 ## Workflow Scope
-
-The documented workflow is:
 
 ```text
 initial DFT-labeled dataset
   -> DP-GEN active learning
-    -> DeePMD/MLFF model
-      -> CHMC/CPIHMC mean-force sampling
-        -> thermodynamic integration
-          -> activation free energy
-            -> TST elementary rates
-              -> KMC H2 formation efficiency
+    -> LAMMPS/PLUMED exploration
+      -> ABACUS DFT labeling
+        -> DeePMD/MLFF training
+          -> CHMC/CPIHMC mean-force sampling
+            -> thermodynamic integration
+              -> activation free energy
+                -> TST elementary rates
+                  -> KMC event-network reasoning
 ```
 
-ABACUS is the documented DFT backend for this teaching repository. DeePMD-kit and DP-GEN provide the MLFF and active-learning layer. GC-Constrained-PIHMC is the public reference implementation for the CHMC/CPIHMC sampling layer.
+ABACUS is the documented open DFT backend in this teaching repository. DeePMD-kit and DP-GEN provide the MLFF and active-learning layer. LAMMPS and PLUMED are documented as exploration/CV tools. GC-Constrained-PIHMC is the public reference implementation for the CHMC/CPIHMC sampling layer.
 
-## Skills Index
+## Completed Skills
 
-| Skill | Purpose | Status |
+| Skill | Current role | Status |
 |---|---|---|
-| `nqe-boundaries` | Terminology and behavior guardrails for NQE, DP-GEN, CHMC/CPIHMC, TI/TST/KMC, and undocumented parameters | ready |
-| `nqe-h2-workflow` | Top-level navigation across the end-to-end workflow | ready |
-| `initial-dft-dataset` | Strategies and checks for the user-prepared initial DFT-labeled dataset | ready |
-| `abacus-dft-labeling` | ABACUS input/output and DFT labeling checks | ready |
-| `dpgen-active-learning` | DP-GEN train -> exploration -> labeling loop, model deviation, and convergence checks | ready |
-| `lammps-exploration` | LAMMPS exploration scripts, trajectory sanity checks, and DP-GEN model-deviation handoff | ready |
-| `deepmd-training` | DeePMD-kit data, training, freeze/test, model-deviation, and model-readiness checks | ready |
-| `chmc-cpihmc-sampling` | CHMC/CPIHMC constrained sampling, reaction-coordinate, bead, and mean-force checks | ready |
-| `ti-tst-rate` | Mean force -> free energy -> activation barrier -> TST rate handoff | ready |
-| `kmc-h2-efficiency` | Elementary rates -> KMC event network -> H2 formation efficiency checks | ready |
+| `nqe-boundaries` | Shared terminology, scientific boundaries, and anti-overclaiming rules | ready |
+| `nqe-h2-workflow` | End-to-end workflow routing and stage map | ready |
+| `initial-dft-dataset` | Initial DFT-labeled dataset preparation strategy and checks | ready |
+| `abacus-dft-labeling` | ABACUS input scaffolds, labeling checks, and official-doc references | ready |
+| `dpgen-active-learning` | DP-GEN training, exploration, labeling loop, trust-region boundaries, and staged exploration guidance | ready |
+| `lammps-exploration` | LAMMPS/PLUMED exploration templates, model-deviation handoff, and transfer boundaries | ready |
+| `deepmd-training` | DeePMD-kit training, freeze/test/model-selection boundaries, and diagnostics | ready |
+| `chmc-cpihmc-sampling` | CHMC/CPIHMC input/output templates, mean-force sampling checks, and grand-canonical notes | ready |
+| `ti-tst-rate` | Mean-force extraction, TI integration, free-energy barrier extraction, TST rate calculation, and plotting guidance | ready |
+| `kmc-h2-efficiency` | General KMC event-network logic and H2-efficiency-specific boundaries | teaching-ready |
 
-## General Versus NQE-Specific Layers
+## Real Reference Examples
 
-Some skills are reusable beyond this H2 workflow:
+These examples are included to show real file shapes, naming patterns, and transfer boundaries. They are not production defaults for a new H2/graphene calculation.
 
-- `initial-dft-dataset`
-- `abacus-dft-labeling`
-- `dpgen-active-learning`
-- `deepmd-training`
-- `lammps-exploration`
+| Area | Reference example | What it is useful for | What not to copy blindly |
+|---|---|---|---|
+| ABACUS | `abacus-dft-labeling/templates/reference-examples/corr/` | Real `INPUT_sp`, `INPUT_opt`, `INPUT_aimd`, `STRU_opt`, and `KPT` style examples from a CORR project | Structure, cell, pseudopotentials, basis files, k mesh, charge/electric-field settings, convergence thresholds |
+| DP-GEN | `dpgen-active-learning/templates/reference-examples/corr-dpgen/` | Real `run_param.json` exploration scheduling pattern and redacted `machine.json` organization | Exact systems, trust levels, temperatures, run lengths, HPC resources, labels, paths |
+| LAMMPS/PLUMED | `lammps-exploration/templates/reference-examples/corr-lammps-plumed/` | Real `input.lammps` and `input.plumed_1` coupling style | Atom indices, CV definitions, restraint centers, force constants, strides, units |
+| DeePMD | `deepmd-training/templates/reference-examples/corr-deepmd/` | Real `input.json` and `lcurve.out` examples for training diagnostics | Architecture, cutoffs, learning rate schedule, data paths, stopping criteria |
+| CHMC/CPIHMC | `chmc-cpihmc-sampling/templates/reference-examples/corr-gc-cpihmc/` | Real `INPUT`, `BEADS`, `ALL_INPUT`, and `PHY_QUANT` examples for GC-CPIHMC output shape | Reaction coordinates, bead count, HMC/MC settings, electron-number settings, units/sign conventions |
+| TI/TST | `ti-tst-rate/templates/reference-examples/corr-phy-quant-handoff/` | Semi-real handoff CSVs: `mean_force_table.csv`, `free_energy_profile.csv`, `tst_rates.csv` | Final barriers/rates for a new target system |
+| KMC | `kmc-h2-efficiency/templates/reference-examples/generic-rate-network/` | Generic event-network input shape | A complete H2/graphene production KMC model |
 
-These contain `Scope` and `Reusable Beyond This Workflow` sections that distinguish general DFT/MLFF workflow checks from NQE H2-specific requirements.
+There is also a `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` folder kept as a placeholder/example shape. Prefer the documented CORR example when discussing real DP-GEN transfer.
 
-Other skills are intentionally workflow-specific:
+## Available Scripts
 
-- `nqe-boundaries`
-- `nqe-h2-workflow`
-- `chmc-cpihmc-sampling`
-- `ti-tst-rate`
-- `kmc-h2-efficiency`
+The scripts are deterministic helpers for diagnostics and post-processing. They do not replace expert review.
 
-These preserve the scientific identity of the workflow: nuclear quantum effects, CHMC/CPIHMC mean-force sampling, TI/TST, and KMC formation efficiency.
+| Script | Purpose | Output |
+|---|---|---|
+| `deepmd-training/scripts/parse_lcurve.py` | Parse DeePMD `lcurve.out`-style logs for first-pass diagnostics | Summary of columns, final values, and basic warnings |
+| `ti-tst-rate/scripts/extract_mean_force.py` | Extract one CHMC/CPIHMC sampling output/window into one mean-force CSV row | `mean_force_table.csv` |
+| `ti-tst-rate/scripts/integrate_free_energy.py` | Integrate collected mean-force windows into a relative free-energy profile | `free_energy_profile.csv` |
+| `ti-tst-rate/scripts/compute_tst_rates.py` | Extract an activation free-energy barrier and compute one TST rate | `tst_rates.csv` |
+| `ti-tst-rate/scripts/plot_mean_force.py` | Plot one or more mean-force curves versus reaction coordinate | image file |
+| `ti-tst-rate/scripts/plot_free_energy.py` | Plot one or more free-energy curves versus reaction coordinate | image file |
 
-## Official Documentation References
+Most TI/TST scripts require `--confirm-parameters`. This is intentional. The agent or user must confirm columns, unit conversions, equilibration discard, mean-force sign convention, integration direction, free-energy zero, initial/transition-state selection, and prefactor model before treating the result as meaningful.
 
-The software-facing skills include official documentation notes:
+## Templates
 
-- `abacus-dft-labeling/references/abacus-official-notes.md`
-- `dpgen-active-learning/references/dpgen-official-notes.md`
-- `deepmd-training/references/deepmd-official-notes.md`
-- `chmc-cpihmc-sampling/references/gc-constrained-pihmc-official-notes.md`
+The repository includes templates for major workflow stages:
 
-Use these references as roadmaps to official documentation. They are not copies of the full manuals and should not be treated as production parameter defaults.
+- ABACUS: `abacus-dft-labeling/templates/INPUT.template`, `STRU.template`, `KPT.template`
+- DP-GEN: `dpgen-active-learning/templates/param.json.template`, `machine.json.template`
+- LAMMPS/PLUMED: `lammps-exploration/templates/input.lammps.template`, `input.plumed.template`
+- DeePMD: `deepmd-training/templates/input.json.template`
+- CHMC/CPIHMC: `chmc-cpihmc-sampling/templates/INPUT.template`, `STRU.template`, `BEADS.template`, `PHY_QUANT.template`, `MODEL_DEVI.template`
+- TI/TST: `ti-tst-rate/templates/mean_force_table.csv.template`, `free_energy_profile.csv.template`, `tst_rates.csv.template`
+- KMC: `kmc-h2-efficiency/templates/kmc_events.json.template`, `kmc_parameters.json.template`, `kmc_output_summary.csv.template`
 
-## Current Boundaries
+Templates use explicit placeholders and should be filled only with user-approved or project-documented choices.
 
-The agent may:
-
-- explain workflow stages and physical meaning
-- route a question to the correct skill
-- inspect whether required files, settings, metadata, or diagnostics are missing
-- produce TODO lists and readiness checklists
-- use official documentation notes to avoid inventing software behavior
-
-The agent must not:
-
-- invent numerical parameters, commands, paths, thresholds, or file formats
-- choose DFT settings, DP-GEN trust levels, DeePMD hyperparameters, reaction coordinates, CPIHMC bead numbers, HMC settings, or KMC event lists without user approval
-- claim the teaching scaffold is a production automation pipeline
-- claim CPIHMC directly outputs H2 formation efficiency
-- claim KMC can use raw CHMC/CPIHMC mean force or trajectories directly
-
-## Tests
+## How To Test
 
 Manual behavior tests live in:
 
 ```text
-skills/tests/manual_prompts.md
+tests/manual_prompts.md
 ```
 
-Run these prompts in a fresh agent/conversation to check whether the skills preserve boundaries, consult official documentation, and avoid overclaiming.
+Recommended manual test process:
 
-## Scripts
+1. Open a fresh agent or fresh conversation.
+2. Ask the prompt exactly as written in `tests/manual_prompts.md`.
+3. Check whether the answer follows the expected behavior.
+4. Pay special attention to whether the agent invents numerical parameters, silently chooses production settings, or overclaims readiness.
+5. Repeat after updating any `SKILL.md`, reference file, template, or script.
 
-The first diagnostic script is available at:
+Useful script smoke tests:
 
-```text
-skills/deepmd-training/scripts/parse_lcurve.py
+```bash
+python deepmd-training/scripts/parse_lcurve.py --help
+python ti-tst-rate/scripts/extract_mean_force.py --print-defaults
+python ti-tst-rate/scripts/integrate_free_energy.py --print-defaults
+python ti-tst-rate/scripts/compute_tst_rates.py --print-defaults
+python ti-tst-rate/scripts/plot_mean_force.py --help
+python ti-tst-rate/scripts/plot_free_energy.py --help
 ```
 
-This script parses DeePMD-kit `lcurve.out`-style logs for basic diagnostics. It does not certify model readiness. More scripts should be added only after the corresponding teaching content and templates are stable.
+For production-like tests, use copies of real or mock data and keep the expected behavior conservative: the scripts can summarize, extract, integrate, compute, and plot, but the user still confirms physical interpretation.
 
-## Recommended Next Work
+## Current Boundaries
 
-1. Expand teaching docs such as `docs/glossary.md` and `docs/troubleshooting.md`.
-2. Add input templates with explicit user-approved placeholders for ABACUS, DP-GEN, and DeePMD-kit.
-3. Add CHMC/CPIHMC and KMC templates after their concrete input formats and physical assumptions are confirmed.
-4. Add deterministic checking scripts for templates and outputs.
-5. Build a mock demonstration example for external users.
+The skills can help an agent:
 
-## Design Principle
+- explain each workflow stage and its physical meaning
+- route questions to the correct stage
+- inspect whether required inputs, outputs, metadata, or diagnostics are missing
+- use official-documentation notes instead of inventing software behavior
+- distinguish reusable patterns from project-specific numerical settings
+- generate TODO lists, readiness checklists, and conservative draft templates
+- run available diagnostic/post-processing scripts when the user confirms assumptions
 
-The library should make an agent careful before it becomes automated. The first job is to teach the workflow and preserve expert judgment; execution scripts and production templates come after the scientific boundaries are clear.
+The skills must not let an agent:
+
+- invent DFT settings, DP-GEN trust levels, DeePMD hyperparameters, reaction coordinates, CPIHMC bead counts, HMC/MC settings, TST prefactors, or KMC event networks
+- copy CORR reference parameters directly into H2/graphene or another target system
+- claim that a template, frozen model, `PHY_QUANT`, or one CSV file proves production readiness
+- claim that CPIHMC directly outputs H2 formation efficiency
+- claim that KMC can consume raw CHMC/CPIHMC trajectories or mean-force files directly
+- describe this repository as a fully automated production workflow
+
+## Not Yet A Production Automation Pipeline
+
+This repository currently teaches the workflow and provides guarded scaffolds. A production pipeline would still need:
+
+- target-system-specific ABACUS input files and convergence-tested settings
+- validated initial structures and DFT-labeled datasets
+- project-approved DP-GEN exploration schedules, trust thresholds, and machine settings
+- validated DeePMD model-selection criteria and frozen models
+- confirmed CHMC/CPIHMC reaction coordinates, windows, units, signs, sampling length, and convergence evidence
+- statistically checked TI uncertainty propagation
+- project-specific TST prefactors and elementary-step definitions
+- a complete KMC state model, event list, rate table, stopping rule, and output definitions
+- executable orchestration that connects stages, checks failures, records provenance, and prevents accidental reuse of incompatible examples
+
+The design goal is to make an agent careful and useful before making it automatic.

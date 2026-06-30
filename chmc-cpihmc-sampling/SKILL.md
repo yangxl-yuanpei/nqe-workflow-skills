@@ -36,6 +36,15 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 - Do not claim CPIHMC directly outputs H2 formation efficiency.
 - Do not claim CPIHMC is a replacement for LAMMPS or more accurate than LAMMPS.
 - Do not invent in-house code input fields, commands, paths, or file formats.
+- Do not treat `PHY_QUANT` or `MODEL_DEVI` as input files; they are output/diagnostic files for TI handoff and model-deviation review.
+- Do not enable grand-canonical or constant-potential assumptions for a target system unless the user explicitly documents that physics.
+
+## Grand-Canonical / Constant-Potential Capability
+
+- Recognize grand-canonical CHMC/CPIHMC as an important capability of the GC-Constrained-PIHMC package.
+- Explain that grand-canonical electron-number sampling can be used to model electrochemical/constant-potential-like conditions when the method, parameters, and system context are documented.
+- Keep this capability separate from the current workflow unless the user explicitly adds electrochemical or constant-potential assumptions. This is a package capability, not a default assumption for an arbitrary target system.
+- Require user approval for `Elec_Num_Ratio`, `Mu`, `Elec_Num_Range`, `Elec_Num_Width`, initial electron number in `STRU`, and any interpretation as constant-potential sampling.
 
 ## Input Checks
 
@@ -55,9 +64,18 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 - Check output format is compatible with thermodynamic integration.
 - Report missing diagnostics as TODO rather than declaring convergence.
 
+## Templates
+
+- Use `templates/INPUT.template`, `templates/STRU.template`, and `templates/BEADS.template` as teaching scaffolds for CHMC/CPIHMC inputs.
+- Use `templates/PHY_QUANT.template` and `templates/MODEL_DEVI.template` only as output-shape scaffolds for diagnostics and downstream TI handoff.
+- Treat every `TODO_USER_APPROVAL` token as a required user-approved value.
+- Read `templates/README.md` and `references/chmc-cpihmc-template-transfer-notes.md` before adapting real or template inputs.
+- Read `templates/reference-examples/README.md` when the user provides real CHMC/CPIHMC inputs or outputs from another project.
+- Read `references/chmc-cpihmc-real-output-notes.md` when interpreting `ALL_INPUT`, `BEADS`, `PHY_QUANT`, or real CHMC/CPIHMC output files.
+
 ## References
+
+- Read `../common/references/command-help.md` when an executable name, command option, subcommand, or version-specific syntax is missing; use official docs and local `-h`/`--help`/`help` output instead of guessing.
 
 - Read `references/gc-constrained-pihmc-official-notes.md` for the public GC-Constrained-PIHMC repository documentation, input/output files, units, and recognized parameters.
 - Read `references/sampling-checklist.md` for local workflow-specific checks.
-- Read repository file `templates/chmc_cpihmc/README.md` for the current placeholder template plan and software-boundary statements.
-- Read repository file `docs/overview.md` for the full CHMC/CPIHMC role in the workflow.

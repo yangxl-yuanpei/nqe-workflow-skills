@@ -1,0 +1,64 @@
+# INPUT template for CHMC/CPIHMC sampling
+# Teaching scaffold only. Verify keyword names and supported values against sxu39/GC-Constrained-PIHMC README and local executable help.
+# Replace every TODO_USER_APPROVAL before running.
+
+# ---- Files and potential ----
+Stru_File              STRU
+Pot_Type               DP
+Deep_Pot_Model         TODO_USER_APPROVAL
+
+# ---- Simulation mode ----
+# Simu_Type choices documented by the public README include MD, HMC, CHMC.
+# CPIHMC/path-integral behavior requires bead-related settings documented by the code.
+Simu_Type              TODO_USER_APPROVAL
+Steps                  TODO_USER_APPROVAL
+Temp                   TODO_USER_APPROVAL
+
+# ---- Element/type mapping for DP ----
+N_Type                 TODO_USER_APPROVAL
+Element_Type           TODO_USER_APPROVAL
+Element_Index          TODO_USER_APPROVAL
+
+# ---- HMC / MC controls ----
+Time_Step              TODO_USER_APPROVAL
+N_Evol_Step            TODO_USER_APPROVAL
+Mass_Scal              TODO_USER_APPROVAL
+# Ratio of centroid moves attempted by HMC rather than MC components.
+# MC can include electron-number, bead, and reaction-coordinate-related angular/free-degree moves.
+# HMC mainly samples 3D degrees of freedom not directly tied to the reaction coordinate.
+Hybrid_Monte_Carlo_Ratio TODO_USER_APPROVAL
+
+# ---- Reaction coordinate / constraints ----
+# Rxn_Coord choices documented by the README include DIST and DIFF.
+Virt_Atom              TODO_USER_APPROVAL
+Rxn_Coord              TODO_USER_APPROVAL
+Wall                   TODO_USER_APPROVAL
+Group                  TODO_USER_APPROVAL
+
+# ---- CPIHMC / path-integral controls ----
+# Include these only when doing path-integral/CPIHMC sampling.
+Beads_File             TODO_USER_APPROVAL
+N_Bead                 TODO_USER_APPROVAL
+N_Change_Bead          TODO_USER_APPROVAL
+Bead_Index             TODO_USER_APPROVAL
+
+
+# ---- Grand-canonical / constant-potential-like controls ----
+# Important GC-Constrained-PIHMC capability. Include only when the target physics uses variable electron number / electrochemical potential control.
+# Do not enable by default for any target-system teaching example.
+# ---- Grand-canonical / electron-number controls ----
+# Include only if the target calculation uses GC controls.
+Elec_Num_Ratio         TODO_USER_APPROVAL
+Mu                     TODO_USER_APPROVAL
+Elec_Num_Range         TODO_USER_APPROVAL
+Elec_Num_Width         TODO_USER_APPROVAL
+
+# ---- Output controls ----
+Phy_Quant_File         PHY_QUANT
+Out_Phy_Quant          TODO_USER_APPROVAL
+Phy_Quant_Intvl        TODO_USER_APPROVAL
+
+# ---- Model deviation diagnostics ----
+Model_Devi_Deep_Pot_Models TODO_USER_APPROVAL
+Model_Devi_Intvl       TODO_USER_APPROVAL
+Model_Devi_File        MODEL_DEVI

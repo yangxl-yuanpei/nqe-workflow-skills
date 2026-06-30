@@ -1,0 +1,18 @@
+{
+  "schema": "generic_kmc_events_v0",
+  "units": {
+    "rate": "TODO_USER_APPROVAL"
+  },
+  "events": [
+    {
+      "event_id": "TODO_USER_APPROVAL_EVENT_ID",
+      "description": "TODO_USER_APPROVAL_DESCRIPTION",
+      "preconditions": ["TODO_USER_APPROVAL_PRECONDITION"],
+      "postconditions": ["TODO_USER_APPROVAL_POSTCONDITION"],
+      "rate_constant": "TODO_USER_APPROVAL_RATE",
+      "rate_source": "TODO_USER_APPROVAL_TST_OR_OTHER_SOURCE",
+      "temperature_K": "TODO_USER_APPROVAL_TEMPERATURE",
+      "notes": "TODO_USER_APPROVAL_NOTES"
+    }
+  ]
+}

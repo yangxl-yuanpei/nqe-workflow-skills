@@ -81,6 +81,8 @@ Treat model-deviation selection as an internal filtering mechanism within or imm
 
 ## References
 
+- Read `../common/references/command-help.md` when an executable name, command option, subcommand, or version-specific syntax is missing; use official docs and local `-h`/`--help`/`help` output instead of guessing.
+
 - Read `references/dpgen-exploration-strategy.md` when the user asks how to design exploration jobs, stage temperatures/trajectory lengths, or interpret `model_devi_jobs`.
 
 - Read `references/dpgen-official-notes.md` for official DP-GEN documentation entry points for `dpgen run`, `param.json`, and `machine.json`.

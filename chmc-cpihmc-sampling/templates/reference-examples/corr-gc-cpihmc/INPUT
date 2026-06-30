@@ -1,0 +1,30 @@
+INPUT_PARAMETERS
+#Parameters (General)
+Deep_Pot_Model            graph-compressed.pb
+Steps                     100000
+#Parameters (System)
+Temp                      100
+N_type                    4
+Element_type              Cu C O H
+Element_index             0 1 2 3
+#Parameters (Hamiltonian Monte Carlo)
+Time_Step                 1.6
+Hybrid_Monte_Cralo_Ratio  0.95
+N_Evol_Step               3
+Virt_Atom Cent_0 59 63 39
+Rxn_Coord                 DIFF 91 141 64 0.4 0.3 0.1309 1.0472 #2.0
+Rxn_Coord                 DIST 91 147 1.7 0.3 #3.79
+#Parameters (Path Intiegral)
+N_Bead                    32
+N_Change_Bead             5
+Bead_Index                64 65 141 147
+#Parameters (Grand Canonical Ensemble)
+Elec_Num_Range            -10 10
+Elec_Num_width            0.18
+Elec_Num_Ratio            0.4
+Mu                        -4
+#OUTPUT
+#Phy_Quant_File            energy.dat
+Out_Phy_Quant             ke pe etotal dedn ne rc_0 rc_1 mf_0 mf_1
+Stru_Intvl                100
+Col_Width                 15

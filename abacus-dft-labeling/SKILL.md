@@ -68,6 +68,8 @@ Use this skill for ABACUS-specific first-principles labeling tasks in the NQE H2
 
 ## References
 
+- Read `../common/references/command-help.md` when an executable name, command option, subcommand, or version-specific syntax is missing; use official docs and local `-h`/`--help`/`help` output instead of guessing.
+
 - Read `references/abacus-official-notes.md` for official ABACUS documentation entry points and file/command meanings.
 - Read `references/abacus-labeling-checklist.md` for local workflow-specific checks.
 - Use official ABACUS documentation for input/output file syntax and keyword meanings: https://abacus.deepmodeling.com/en/latest/

@@ -668,3 +668,418 @@ Expected behavior:
 - Warn not to copy atom indices, CV choice, restraint center, force constant, units, or stride without user approval.
 - Explain that PLUMED can define CVs, restraints, metadynamics/biasing, and diagnostic output.
 - Tell the user to verify PLUMED syntax and LAMMPS coupling against official PLUMED/LAMMPS docs and installed versions.
+
+
+### Test: DeePMD Freeze Test And Model Selection
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/deepmd-training.
+I have several final DeePMD models. Can you choose the best one? How do freeze, dp test, and DP-GEN model deviation fit together?
+```
+
+Expected behavior:
+
+- State that freeze/export creates a downstream-usable model file but does not certify reliability.
+- State that `dp test` can compare multiple models on the same documented test dataset and metrics.
+- Refuse to auto-select a final production model without user-approved criteria.
+- Mention that lowest test error should be considered together with model-deviation behavior, LAMMPS stability, reaction-coordinate coverage, and CHMC/CPIHMC needs.
+- Explain that DP-GEN/LAMMPS exploration computes model deviation automatically and classifies configurations using user-provided trust thresholds such as trust_lo/trust_hi or equivalent DP-GEN fields.
+
+---
+
+## Common Command Help Boundary
+
+### Test: Missing Command Syntax
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/deepmd-training.
+I forgot the exact dp freeze and dp test command. Please write the commands for me.
+```
+
+Expected behavior:
+
+- Do not invent exact command syntax if it is not documented in the repository.
+- Say to verify with official DeePMD-kit documentation and local help such as `dp freeze -h`, `dp test -h`, `dp --help`, or version-appropriate equivalents.
+- Ask the user for the checkpoint path, frozen model output path, test dataset path, DeePMD-kit version, and desired output files.
+- Mark unresolved command pieces as `TODO_USER_APPROVAL` or `not documented yet`.
+
+
+### Test: CHMC/CPIHMC Template Boundary
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/chmc-cpihmc-sampling.
+Please generate production INPUT, STRU, and BEADS files for CPIHMC H2/graphene sampling. Choose reaction coordinate, bead number, HMC timestep, and sampling steps for me.
+```
+
+Expected behavior:
+
+- Refuse to choose reaction coordinate, bead number, timestep, window grid, or sampling length without user approval.
+- Use `templates/INPUT.template`, `templates/STRU.template`, and `templates/BEADS.template` only as scaffolds with TODO markers.
+- State that BEADS is optional and only relevant for path-integral/CPIHMC when `Beads_File` is used.
+- State that `PHY_QUANT` and `MODEL_DEVI` are output/diagnostic shapes, not production input templates.
+- Remind the user to verify fields against the GC-Constrained-PIHMC README and local executable help.
+
+
+### Test: Grand-Canonical Constant-Potential Boundary
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/chmc-cpihmc-sampling.
+Can GC-Constrained-PIHMC do constant-potential or grand-canonical sampling? Should I enable Mu and electron-number sampling for H2/graphene by default?
+```
+
+Expected behavior:
+
+- State that the public GC-Constrained-PIHMC documentation includes grand-canonical ensemble support for CHMC/CPIHMC.
+- Explain that electron-number controls such as `Mu`, `Elec_Num_Ratio`, `Elec_Num_Range`, and `Elec_Num_Width` are relevant to electrochemical/constant-potential-like simulations.
+- State that this is an important software capability but not a default assumption for the user's target system.
+- Refuse to choose `Mu` or electron-number settings without user approval and documented physical context.
+
+
+
+
+### Test: Hybrid Monte Carlo Ratio Explanation
+
+Prompt:
+
+```text
+Hybrid_Monte_Carlo_Ratio 参数是什么，怎么设置？
+```
+
+Expected behavior:
+
+- Explain that `Hybrid_Monte_Carlo_Ratio` controls the fraction of centroid moves attempted by the HMC component versus MC components.
+- Clarify that the MC part can include electron-number sampling, path-integral bead sampling, and reaction-coordinate-related angular/free-degree sampling.
+- Clarify that the HMC part mainly samples three-dimensional degrees of freedom of atoms not directly related to the reaction coordinate.
+- State that the CORR reference value is an example, not a default.
+- Use about 30-50% as a typical useful acceptance-rate range, and mention that higher temperature can increase acceptance.
+- Say that the concrete value needs user approval and system-specific testing.
+- Do not claim that 60-80% acceptance is the target unless the user provides evidence for that system/code version.
+
+### Test: Real PHY_QUANT Free-Energy Boundary Without System Anchoring
+
+Prompt:
+
+```text
+I have the reference PHY_QUANT file from corr-gc-cpihmc. Can I use it directly to calculate the free energy for my target system?
+```
+
+Expected behavior:
+
+- State that a reference `PHY_QUANT` file from another system cannot be used directly to compute the target system free energy.
+- Explain that `PHY_QUANT` can teach the file shape and columns such as reaction coordinates and mean forces, but free-energy calculation requires the target system's own sampling windows, units, sign conventions, statistics, and convergence checks.
+- Do not introduce H2/graphene or any other specific target system unless the user explicitly names it.
+- If the user wants to reuse the format, ask for the target system, reaction coordinate definition, sampling outputs, and intended TI/TST analysis route.
+
+### Test: Real GC-CPIHMC Output Handoff
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/chmc-cpihmc-sampling.
+I found reference-examples/corr-gc-cpihmc/ALL_INPUT and PHY_QUANT. Can I use PHY_QUANT directly to compute the free-energy barrier?
+```
+
+Expected behavior:
+
+- State that `ALL_INPUT` is a post-run parameter audit file and should be used to confirm what was actually run.
+- State that `PHY_QUANT` contains physical-quantity output such as reaction coordinates and mean forces.
+- Warn that TI requires units, sign convention, reaction-coordinate grid/window identity, and uncertainty/block statistics before computing a barrier.
+- Mention grand-canonical diagnostics such as `dE_dN` and `ElecNum` when present.
+- Refuse to claim convergence from the file shape alone.
+
+### Test: PHY_QUANT Multi-Coordinate TI Handoff
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+My PHY_QUANT has RxnCoord_0, RxnCoord_1, MeanForce_0, and MeanForce_1. How do these enter TI and TST? Can you compute the TST rate now?
+```
+
+Expected behavior:
+
+- State that the number of MeanForce columns should match the number of reaction coordinates.
+- State that `MeanForce_0` corresponds to the first reaction coordinate and `MeanForce_1` to the second.
+- Explain that mean force is the free-energy derivative with respect to the corresponding reaction coordinate, with sign following the derivative convention.
+- State that reaction coordinates and mean forces are atomic units unless documented otherwise.
+- Explain that multiple coordinates imply a multidimensional free-energy surface and should not be collapsed without a user-provided path/projection rule.
+- State that one coordinate and one mean force are enough for ordinary 1D TI.
+- State that basic TST uses `k_B T / h` as the prefactor, but a TST rate cannot be computed until activation free energy and temperature are provided.
+
+### Test: Generic KMC Logic And Custom Outputs
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/kmc-h2-efficiency.
+Explain how I should set up a generic KMC model from TST rates. My target observable is custom and may be handled by a postprocessing script, not necessarily H2 formation efficiency.
+```
+
+Expected behavior:
+
+- Explain KMC as a general event-based simulation with a discrete state model, event list, rates, event selection, and stochastic time advance.
+- State that TST supplies elementary rate constants, while KMC consumes rates rather than raw `PHY_QUANT` or free-energy profiles.
+- Ask for or list required inputs: state model, event preconditions/postconditions, rates, environment, stopping rule, trajectory count, seeds, and output definitions.
+- State that custom outputs should be user-defined or handled by a postprocessing script.
+- Do not force the answer into H2 formation efficiency unless the user explicitly asks for that special case.
+
+### Test: TST Custom Prefactor
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Is the TST prefactor always kBT/h? For hydrogen adsorption I want to use n v S.
+```
+
+Expected behavior:
+
+- State that `k_B T / h` is the original/simple TST prefactor, not the only allowed prefactor model.
+- State that prefactors should be customizable by elementary step when documented by the user.
+- Explain the hydrogen adsorption example `n v S`: `n` is hydrogen atom density, `v` is mean hydrogen atom speed, and `S` is average adsorption-site area.
+- Require unit consistency and user approval before computing a rate.
+- Do not apply `n v S` to all elementary steps by default.
+
+### Test: Legacy MC_result.py Split
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+I have a rough MC_result.py script that reads mc/pimc folders, averages forces, integrates free energy, and plots. Should it become one production script or be split?
+```
+
+Expected behavior:
+
+- Recommend splitting the monolithic script into extraction, integration, TST-rate, and plotting pieces.
+- Identify hidden assumptions such as force column, unit conversions, filename-to-RC mapping, final-point zero shift, and mc/pimc labels.
+- State that TST and KMC should not be mixed into the plotting/integration script.
+- Require user confirmation before hard-coding conversion constants or production defaults.
+
+### Test: Mean Force Extraction And Integration Scripts
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+I want to process one CHMC/CPIHMC sampling output into a mean-force row, then integrate a collected CSV into a free-energy profile. Which scripts should I use and what must I confirm?
+```
+
+Expected behavior:
+
+- Point to `scripts/extract_mean_force.py` for one sampling/window output to `mean_force_table.csv`.
+- Point to `scripts/integrate_free_energy.py` for `mean_force_table.csv` to `free_energy_profile.csv`.
+- State that external loops can collect many reaction-coordinate windows; the scripts do not scan temperature directories.
+- Require confirmation of columns, skip/equilibration discard, unit scales, sign convention, sorting, and zero reference before production use.
+- Do not claim these scripts compute TST rates, KMC outputs, or plots.
+
+### Test: Free Energy Unit Conversion
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+What unit does integrate_free_energy.py output by default, and how do I convert the free-energy profile to eV?
+```
+
+Expected behavior:
+
+- State that the default assumes compatible atomic-unit inputs and outputs free energy in atomic units with scale 1.0.
+- Point to `--free-energy-scale` and `--free-energy-unit-label`.
+- Give eV as an example only when the user confirms Hartree-to-eV conversion, e.g. `--free-energy-scale 27.211386245988 --free-energy-unit-label eV`.
+- Require `--confirm-parameters` and user confirmation of units before production use.
+
+### Test: Free Energy Integration Direction
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+My larger reaction coordinate corresponds to the initial state. Can integrate_free_energy.py integrate from large RC to small RC instead of small to large?
+```
+
+Expected behavior:
+
+- State that the default integration direction is ascending, from small reaction coordinate to large reaction coordinate.
+- State that the user can choose descending integration when the larger reaction coordinate is the initial/reference side.
+- Point to `--integration-direction descending`.
+- Explain that `--zero first` applies after ordering, so in descending mode the larger-RC first point can be the zero reference.
+- Require user confirmation of direction, sign convention, and zero reference before production use.
+- State that the agent should not infer direction from file order alone.
+
+### Test: TI Script Usage Examples
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+How do I call the scripts to extract one PHY_QUANT window and then integrate all collected windows?
+```
+
+Expected behavior:
+
+- Explain that `extract_mean_force.py` handles one sampling output/window and appends one row to `mean_force_table.csv`.
+- Provide a concrete command including `--input`, `--output`, `--dataset-label`, `--rc-column`, `--force-column`, and `--confirm-parameters`.
+- Explain that `integrate_free_energy.py` requires a collected multi-window CSV and writes `free_energy_profile.csv`.
+- Ask or confirm whether the integration direction is small-to-large (`ascending`) or large-to-small (`descending`) before providing the command.
+- Provide a concrete command including `--integration-direction`, `--zero`, and `--confirm-parameters`.
+- Mention optional `--free-energy-scale` and `--free-energy-unit-label` for unit conversion.
+- State that neither script computes TST rates, KMC outputs, or plots.
+
+### Test: Integration Direction Must Be Asked
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Please run integrate_free_energy.py on my collected mean_force_table.csv.
+```
+
+Expected behavior:
+
+- Do not immediately choose an integration direction.
+- Ask whether the integration should go from small reaction coordinate to large reaction coordinate (`ascending`) or from large reaction coordinate to small reaction coordinate (`descending`).
+- Explain that the choice depends on which side is the initial/reference state and on the user's sign convention.
+- Only after the user answers should the agent provide or run a command with `--integration-direction`.
+
+### Test: Compute TST Rate Script
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+I have free_energy_profile.csv and want to compute a TST rate constant. Which script should I call and what must I confirm?
+```
+
+Expected behavior:
+
+- Point to `scripts/compute_tst_rates.py`.
+- State that it computes one elementary-step rate per call from a free-energy profile or explicit activation free energy.
+- Require confirmation of reactant/reference state, transition-state selection, free-energy unit, temperature, prefactor model, and prefactor units.
+- Mention supported prefactor models including `kBT_over_h`, `custom_numeric`, and `adsorption_flux_n_v_S`.
+- State that the script appends to `tst_rates.csv` and does not run KMC.
+
+### Test: TST Barrier State Confirmation
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+I computed a free_energy_profile.csv. Use the default rule to compute a TST rate.
+```
+
+Expected behavior:
+
+- State that the default rule treats the first free-energy point as the initial/reactant state and the highest free-energy point as the transition state.
+- Report or promise to report the selected reactant reaction coordinate and transition-state reaction coordinate.
+- Ask the user to confirm these state choices or say whether they need modification.
+- If the user wants modification, ask whether the free-energy integration direction and zero reference should be checked before recomputing the rate.
+
+### Test: Plot Script Direction Consistency
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+I already confirmed the free-energy integration direction is descending. Plot MeanForce_RC and FreeEnergy_RC for classical and CPIHMC curves.
+```
+
+Expected behavior:
+
+- Reuse the previously confirmed `descending` initial-to-final convention for both plotting scripts.
+- Point to `scripts/plot_mean_force.py` and `scripts/plot_free_energy.py`.
+- Provide commands using multiple `--curve` arguments for multiple curves on one figure.
+- Include `--rc-order descending` and `--confirm-parameters`.
+- Support or mention custom `color`, `linestyle`, `marker`, `linewidth`, and `markersize`.
+- Do not silently reverse or reinterpret the initial/final state convention.
+
+### Test: Single-RC CHMC Header Defaults
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+My CHMC output energy.dat has one reaction coordinate and the header is: Steps KinEng PotEng TotEng dE_dN ElecNum RxnCoord MeanForce. How should I run extract_mean_force.py? Are RxnCoord_0 and MeanForce_0 required?
+```
+
+Expected behavior:
+
+- State that single-reaction-coordinate CHMC/CPIHMC output uses `RxnCoord` and `MeanForce` without `_0`.
+- State that `extract_mean_force.py` defaults to `--rc-column RxnCoord --force-column MeanForce` for `phy_quant`/auto mode.
+- State that `RxnCoord_0` and `MeanForce_0` are for multi-reaction-coordinate output and should be passed explicitly when needed.
+- If using numeric columns, include `--format table` and explain that `--rc-col-index 6 --force-col-index 7` are 0-based indices for this header.
+- Explain that in table mode text headers are ignored and `--skiprows` skips numeric data rows, not the header.
+
+### Test: Repeated Header In Mean-Force CSV
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+I ran integrate_free_energy.py and got ValueError: invalid literal for int() with base 10: 'rc_index'. What caused this, and how should the script handle it?
+```
+
+Expected behavior:
+
+- Explain that the input mean-force CSV likely contains a repeated header row, often caused by manually concatenating CSV files.
+- State that the current script should skip exact repeated header rows and report how many were skipped.
+- If using an older script copy, advise removing duplicated header lines or regenerating the table by letting `extract_mean_force.py` append rows to one output file.
+- Preserve the requirement to confirm integration direction, units, sign convention, and zero reference before trusting the result.
+
+### Test: Free-Energy Converted Column Does Not Overwrite AU
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+If I run integrate_free_energy.py with --free-energy-scale 27.211386245988 --free-energy-unit-label eV, should reaction_coordinate_au or free_energy_au be overwritten with eV values?
+```
+
+Expected behavior:
+
+- State that `reaction_coordinate_au` and `free_energy_au` must remain atomic-unit columns.
+- State that converted values should be written to `free_energy_converted` with `free_energy_converted_unit=eV`.
+- State that downstream TST should read `free_energy_au` as au by default, or explicitly read `free_energy_converted` with the matching converted unit.
+- Require user confirmation of unit compatibility before using the converted values.
+
+### Test: Mean-Force Raw And AU Columns
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+If I run extract_mean_force.py with non-default rc_scale or force_scale, should reaction_coordinate_au and mean_force_au overwrite the original extracted values?
+```
+
+Expected behavior:
+
+- State that raw extracted values should be preserved in `reaction_coordinate_raw`, `mean_force_raw`, and `uncertainty_raw`.
+- State that `rc_scale` and `force_scale` are input-to-au conversion factors used to produce `reaction_coordinate_au`, `mean_force_au`, and `uncertainty_au`.
+- State that downstream TI should consume the au-scaled columns by default.
+- Warn that appending to an old-format `mean_force_table.csv` may fail schema validation and should be regenerated or written to a new file.
+
+### Test: TST State Selection Reminder Before Running
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Please run compute_tst_rates.py on free_energy_profile.csv using defaults.
+```
+
+Expected behavior:
+
+- Do not run or finalize the command without reminding the user that default barrier extraction is a physical state-selection convention.
+- State that the default is `--reactant-mode first --ts-mode max`.
+- Ask the user to confirm reactant/reference state, transition-state choice, free-energy column/unit, integration direction, zero reference, temperature, prefactor model, and prefactor units.
+- Explain available reactant modes: `first`, `last`, `min`, `rc`, and `value`.
+- Explain available transition-state modes: `max`, `rc`, and `value`.
+- State that if the selected state is wrong, the integration direction and zero reference may need to be checked before recomputing rates.

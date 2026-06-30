@@ -1,0 +1,37 @@
+INPUT_PARAMETERS
+#Parameters (General)
+Stru_File                       STRU # The structure file.
+Pot_Type                        DP # The type of potential energy and force calculator.
+Deep_Pot_Model                  graph-compressed.pb # The DP potential for the system.
+Simu_Type                       CHMC # The type of the simulation.
+Steps                           100000 # The number of the simulation steps.
+#Parameters (System)
+Temp                            100 # The temperature of the system.
+N_Type                          4 # The number of element(s).
+Element_Type                    Cu C O H # Different element type(s) at the order in DP potential when the paramter "Element_Index" is not set.
+Element_Index                   0 1 2 3 # Different element index(s) used in DP potential mapping to element type(s) one by one.
+#Parameters (Hybrid Monte Carlo)
+N_Evol_Step                     3 # The number of evolution steps between two judges in the HMC scheme.
+Time_Step                       1.6 # The time step of the HMC scheme.
+Mass_Scal                       1 # The mass scaling coefficient used in the HMC scheme.
+#Parameters (Constraint)
+Hybrid_Monte_Carlo_Ratio        0.8 # The ratio of the HMC part in the centroid move.
+Virt_Atom                       Cent_0 59 63 39 # The virtual atom(s) used in the constraint.
+Rxn_Coord                       DIFF 91 141 64 0.4 0.3 0.1309 1.0472 DIST 91 147 1.7 0.3 # The reaction coordinate(s) used as the constraint.
+#Parameters (Grand Canonical Ensemble)
+Elec_Num_Ratio                  0.4 # The ratio of the electron number change part in all moves.
+Mu                              -4 # The parameter `mu` for the grand canonical ensemble.
+Elec_Num_Range                  -10 10 # The range of the electron number.
+Elec_Num_Width                  0.18 # The change width of the electron number.
+#Parameters (Path Integral)
+Beads_File                       # The initial beads coordinates file.
+N_Bead                          32 # The number of beads.
+N_Change_Bead                   5 # The number of bead(s) changed in each step.
+Bead_Index                      64 65 141 147 # The index(s) of different bead(s) in coordinates.
+#Parameters (Output)
+Phy_Quant_File                  energy.dat # The file to output the result.
+Col_Width                       15 # The width of the column in the file to output the result.
+Out_Phy_Quant                   ke pe etotal dedn ne rc_0 rc_1 mf_0 mf_1 # The physical quantity(ies) to be output.
+Phy_Quant_Digits                ke 6 pe 6 etotal 6 dedn 4 ne 4 rc_0 2 rc_1 2 mf_0 6 mf_1 6 # The decimal digits of physical quantity(ies) to be output.
+Phy_Quant_Intvl                 1 # The number of steps in the interval to output the physical quantity(ies).
+Stru_Intvl                      100 # The number of steps in the interval to output the structure.

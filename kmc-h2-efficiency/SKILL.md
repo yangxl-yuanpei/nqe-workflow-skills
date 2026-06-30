@@ -1,17 +1,24 @@
 ---
 name: kmc-h2-efficiency
-description: Guidance and checks for kinetic Monte Carlo simulation of H2 formation efficiency in the NQE H2 workflow. Use when a user asks how TST elementary rates enter KMC, how to build event lists, lattice or surface models, adsorption/desorption/hopping/association networks, gas-dust assumptions, temperature/density grids, statistical convergence, or whether KMC outputs can be interpreted as H2 formation rate or efficiency.
+description: Guidance and checks for kinetic Monte Carlo simulation and H2 formation-efficiency postprocessing in the NQE workflow. Use when a user asks how TST elementary rates enter KMC, how to build event lists, lattice or surface models, generic KMC state/event logic, adsorption/desorption/hopping/association networks, gas-dust assumptions, temperature/density grids, statistical convergence, custom observables, or whether KMC outputs can be interpreted as H2 formation rate or efficiency.
 ---
 
-# KMC H2 Efficiency
+# KMC And Custom Efficiency Outputs
 
-Use this skill for the final kinetic Monte Carlo stage that converts elementary step rate constants into grain-scale H2 formation rates and efficiencies.
+Use this skill for kinetic Monte Carlo as a general event-based simulation stage. In the H2 workflow, KMC converts elementary step rate constants into grain-scale H2 formation rates and efficiencies, but the KMC logic itself is not limited to H2.
 
 ## Required Boundary Skills
 
 - Apply `nqe-boundaries` before explaining what KMC consumes or what CPIHMC outputs.
 - Use `ti-tst-rate` when the question concerns rate constants derived from activation free energies.
 - Use `nqe-h2-workflow` when the user asks where KMC fits in the full pipeline.
+
+## General KMC Logic
+
+- Represent the system as a discrete state model such as a lattice, graph, site list, coverage vector, or other user-approved state representation.
+- Define an event network with preconditions, postconditions, and rate constants.
+- Select events with probability proportional to their rates and advance the stochastic clock using the total rate.
+- Treat observables such as formation efficiency, selectivity, or product rates as user-defined outputs or postprocessing scripts.
 
 ## Roles In This Workflow
 
@@ -53,8 +60,16 @@ Use this skill for the final kinetic Monte Carlo stage that converts elementary 
 - Check uncertainty estimates and sensitivity to missing or uncertain elementary rates.
 - Preserve missing-rate TODOs instead of filling them silently.
 
+## Templates
+
+- Use `templates/kmc_events.json.template` for a generic KMC event-list scaffold.
+- Use `templates/kmc_parameters.json.template` for the state model, environment, stopping rules, seeds, and observable definitions.
+- Use `templates/kmc_output_summary.csv.template` for generic or custom postprocessed outputs.
+- Use `templates/reference-examples/generic-rate-network/` as a non-H2-specific example of event-network shape.
+
 ## References
 
+- Read `references/kmc-general-logic.md` when explaining KMC principles, generic event selection, custom observables, and non-H2 use cases.
 - Read `references/kmc-checklist.md` for local workflow-specific checks.
 - Read repository file `templates/kmc/README.md` for the current placeholder template plan and KMC handoff boundaries.
 - Read repository files `docs/overview.md` and `workflow.yaml` for the full workflow context.

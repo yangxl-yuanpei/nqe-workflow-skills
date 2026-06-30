@@ -1,0 +1,5 @@
+# PHY_QUANT output-shape template
+# This is not an input file. It documents expected diagnostics for TI handoff.
+
+# step  reaction_coordinate  mean_force  uncertainty  acceptance_rate  notes
+TODO_USER_APPROVAL_STEP TODO_USER_APPROVAL_XI TODO_USER_APPROVAL_MEAN_FORCE TODO_USER_APPROVAL_UNCERTAINTY TODO_USER_APPROVAL_ACCEPTANCE TODO_USER_APPROVAL_NOTES

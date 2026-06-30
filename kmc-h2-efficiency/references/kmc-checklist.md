@@ -1,6 +1,6 @@
-# KMC H2 Efficiency Checklist
+# KMC Checklist
 
-This reference summarizes KMC checks for the NQE H2 formation workflow. It is not a production KMC input template.
+This reference summarizes general KMC checks and H2 formation-efficiency handoff checks for the NQE workflow. KMC is a general event-based simulation method; H2 formation efficiency is one custom observable, not the only possible output. It is not a production KMC input template.
 
 ## Required Upstream Inputs
 
@@ -64,3 +64,7 @@ KMC receives rate constants. It does not directly consume:
 - raw free-energy profiles without extracted elementary rates
 
 Missing elementary rates should be listed as TODOs rather than invented.
+
+## Custom Outputs And Postprocessing
+
+Custom outputs such as H2 formation efficiency should be defined by the user or by a dedicated postprocessing script. The skill may check whether the output definition, normalization, units, and source KMC files are documented, but it should not invent a formula or hard-code H2 as the only KMC use case.

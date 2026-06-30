@@ -1,0 +1,22 @@
+{
+  "schema": "generic_kmc_parameters_v0",
+  "state_model": "generic discrete state model; replace with user-approved lattice/graph/sites",
+  "boundary_conditions": "TODO_USER_APPROVAL",
+  "initial_state": "TODO_USER_APPROVAL",
+  "environment": {
+    "temperature_K": "TODO_USER_APPROVAL",
+    "pressure_or_density": "TODO_USER_APPROVAL_OR_NOT_APPLICABLE"
+  },
+  "simulation_controls": {
+    "stopping_rule": "TODO_USER_APPROVAL",
+    "n_trajectories": "TODO_USER_APPROVAL",
+    "random_seeds": "TODO_USER_APPROVAL",
+    "output_interval": "TODO_USER_APPROVAL"
+  },
+  "observable_definitions": [
+    {
+      "observable": "custom_efficiency_or_rate",
+      "definition": "user-defined postprocessing script or formula required"
+    }
+  ]
+}

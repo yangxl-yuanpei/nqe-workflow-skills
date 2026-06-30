@@ -13,6 +13,7 @@ Use this skill as the guardrail layer for the NQE H2 formation workflow. Apply i
 - Say `not documented yet` or mark TODO when a numerical parameter, command, threshold, file path, convergence criterion, or implementation detail is not documented in the repository.
 - Do not claim a step is automated unless an actual script, tool, or workflow specification exists.
 - Do not choose DFT settings, reaction coordinates, DP-GEN trust levels, DeePMD architecture, CPIHMC bead number, HMC sampling parameters, or KMC event lists without explicit user-provided values.
+- Do not invent software commands or options. If a command is missing, use official documentation, project logs, or local `-h`/`--help`/`help` output; otherwise mark it `not documented yet`.
 - Prefer ABACUS as the documented DFT backend for this teaching workflow.
 
 ## Terminology

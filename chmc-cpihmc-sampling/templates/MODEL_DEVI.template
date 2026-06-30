@@ -1,0 +1,5 @@
+# MODEL_DEVI output-shape template
+# This is not an input file. It documents expected model-deviation diagnostics when enabled.
+
+# step  max_force_deviation  max_virial_deviation  flagged_atoms_or_window  notes
+TODO_USER_APPROVAL_STEP TODO_USER_APPROVAL_FORCE_DEVI TODO_USER_APPROVAL_VIRIAL_DEVI TODO_USER_APPROVAL_FLAG TODO_USER_APPROVAL_NOTES

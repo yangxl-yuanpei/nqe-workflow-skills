@@ -56,7 +56,7 @@ Always check unit conversions before handing mean-force output to thermodynamic 
 - `Wall`: hard walls to limit atom coordinates; not available for MD simulations according to the README.
 - `Group`: atom groups by index ranges.
 - `Time_Step`, `N_Evol_Step`, `Mass_Scal`: MD/HMC stepping controls.
-- `Hybrid_Monte_Carlo_Ratio`: HMC ratio in centroid moves.
+- `Hybrid_Monte_Carlo_Ratio`: HMC ratio in centroid moves. See the tuning notes below before explaining or setting this parameter.
 - `Virt_Atom`: virtual atoms for reaction-coordinate definitions.
 - `Rxn_Coord`: constrained reaction coordinate. README choices include `DIST` and `DIFF`.
 - `Elec_Num_Ratio`, `Mu`, `Elec_Num_Range`, `Elec_Num_Width`: grand-canonical electron-number controls.
@@ -70,6 +70,23 @@ Always check unit conversions before handing mean-force output to thermodynamic 
 - `DIFF` represents a signed difference of distances involving three particles or virtual atoms.
 - The README examples show virtual atoms can be used in reaction-coordinate definitions.
 - Reaction-coordinate choice remains a physical decision and must be user-approved for the NQE H2 workflow.
+
+## Hybrid Monte Carlo Ratio Interpretation
+
+Use this interpretation when users ask what `Hybrid_Monte_Carlo_Ratio` means or how to tune it:
+
+- `Hybrid_Monte_Carlo_Ratio` controls the fraction of centroid moves attempted with the HMC component rather than pure MC components.
+- In this workflow, the MC part can include electron-number sampling, path-integral bead sampling, and reaction-coordinate-related angular/free-degree sampling.
+- The HMC part mainly samples the three-dimensional degrees of freedom of atoms not directly tied to the reaction coordinate.
+- Do not describe MC as only a simple random displacement or as merely "no MD evolution"; list the relevant MC move classes when known from the input/workflow.
+- Treat the CORR value in `ALL_INPUT` (0.8) as a real reference value, not a general default. The raw `INPUT` also preserves a spelling/value mismatch, so audit `ALL_INPUT` before reproducing.
+- A typical useful acceptance-rate range is about 30-50%, not 60-80%. Tune `Time_Step`, `N_Evol_Step`, mass scaling, and move ratios against acceptance and mixing.
+- Higher temperature can increase acceptance, so compare acceptance rates only together with temperature, step size, and the move schedule.
+- Do not choose a final ratio for the user without their approval and system-specific testing.
+
+## Constant-Potential-Like / Electrochemical Context
+
+The public README documents grand-canonical ensemble support for CHMC/CPIHMC and parameters controlling electron-number variation and electrochemical potential. This is an important capability for electrochemical or constant-potential-like simulations. It should be described as package capability, not as a default assumption for an arbitrary target workflow.
 
 ## Settings Requiring User Approval
 

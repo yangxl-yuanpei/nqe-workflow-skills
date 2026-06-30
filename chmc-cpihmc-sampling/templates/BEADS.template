@@ -1,0 +1,7 @@
+# BEADS template for CPIHMC/path-integral initial bead coordinates
+# Teaching scaffold only. The public README warns that BEADS coordinates are in Bohr.
+# Only use when Beads_File is set in INPUT and CPIHMC/path-integral sampling is intended.
+
+# Suggested placeholder layout; verify exact format against the installed code/examples.
+# bead_index atom_index x(Bohr) y(Bohr) z(Bohr)
+TODO_USER_APPROVAL_BEAD_INDEX TODO_USER_APPROVAL_ATOM_INDEX TODO_USER_APPROVAL_X TODO_USER_APPROVAL_Y TODO_USER_APPROVAL_Z
