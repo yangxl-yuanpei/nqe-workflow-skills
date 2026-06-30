@@ -81,3 +81,18 @@ NQE H2-specific parts:
 - requiring exploration coverage relevant to H2 formation reaction coordinates
 - keeping ABACUS labeling and DeePMD training aligned with this repository's workflow
 - handing accepted models toward CHMC/CPIHMC rather than generic production MD only
+
+## Staged Exploration Strategy
+
+When planning DP-GEN exploration, prefer a staged strategy unless the user documents another plan. Start with conservative exploration and increase sampling intensity only after model-deviation behavior, labeling success, and training stability look reasonable.
+
+Common escalation knobs include:
+
+- lower to higher temperatures
+- shorter to longer trajectories
+- narrower to broader system/configuration coverage
+- weaker to stronger biasing or additional PLUMED templates
+- cheaper early exploration before expensive long runs
+
+Do not convert this strategy into fixed default values. Temperature, pressure, timestep, trajectory length, trust levels, and system coverage are project-specific.
+

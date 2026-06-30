@@ -1,0 +1,36 @@
+{
+  "_comment": "Teaching template only. Confirm field names and scheduler syntax against the official DP-GEN docs and your HPC site policy.",
+  "api_version": "TODO_USER_APPROVAL",
+  "train": [
+    {
+      "command": "TODO_USER_APPROVAL",
+      "machine": {
+        "batch_type": "TODO_USER_APPROVAL",
+        "context_type": "TODO_USER_APPROVAL",
+        "local_root": "TODO_USER_APPROVAL",
+        "remote_root": "TODO_USER_APPROVAL"
+      },
+      "resources": {
+        "number_node": "TODO_USER_APPROVAL",
+        "cpu_per_node": "TODO_USER_APPROVAL",
+        "gpu_per_node": "TODO_USER_APPROVAL",
+        "queue_name": "TODO_USER_APPROVAL",
+        "group_size": "TODO_USER_APPROVAL"
+      }
+    }
+  ],
+  "model_devi": [
+    {
+      "command": "TODO_USER_APPROVAL",
+      "machine": "TODO_USER_APPROVAL",
+      "resources": "TODO_USER_APPROVAL"
+    }
+  ],
+  "fp": [
+    {
+      "command": "TODO_USER_APPROVAL",
+      "machine": "TODO_USER_APPROVAL",
+      "resources": "TODO_USER_APPROVAL"
+    }
+  ]
+}

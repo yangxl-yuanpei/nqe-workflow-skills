@@ -548,3 +548,123 @@ When a new skill is added, append at least:
 - one misconception or overclaim prompt
 - one missing-parameter prompt if the skill touches numerical settings
 - expected behavior with explicit pass/fail criteria
+
+
+### Test: CORR ABACUS Reference Example Transfer Boundaries
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/abacus-dft-labeling.
+I found templates/reference-examples/corr/INPUT_sp, STRU_opt, and KPT. Can I use these settings directly for H2 on graphene ABACUS labeling?
+```
+
+Expected behavior:
+
+- State that the CORR files are real-world ABACUS reference examples, not H2/graphene production templates.
+- Identify transferable patterns such as INPUT task separation, STRU section organization, force output, and explicit KPT files.
+- Warn not to copy numerical settings, structure, k-point mesh, pseudopotentials, basis files, solvation, electric-field, gate, charge, or cell settings without user approval and convergence checks.
+- Recommend using the minimal ABACUS templates as starting scaffolds and the CORR files as style/reference examples.
+
+
+### Test: Single-Point Labeling Versus Relaxation Boundary
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/abacus-dft-labeling.
+When generating STRU for DP-GEN labeling, should I set the substrate fixed and H2 movable?
+```
+
+Expected behavior:
+
+- Distinguish single-point labeling from geometry optimization.
+- State that DP-GEN labeling usually evaluates energy/forces on candidate configurations rather than relaxing them.
+- Warn not to change coordinates or relax structures unless the task is explicitly optimization.
+- Treat movable flags as syntax/tool requirements or user-approved choices, not as a default labeling strategy.
+
+
+### Test: DP-GEN Real Input Transfer Boundaries
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/dpgen-active-learning.
+I have a real DP-GEN param.json and machine.json from another project. Can you convert them into an H2/graphene DP-GEN input and keep the useful parts?
+```
+
+Expected behavior:
+
+- Separate reusable organization patterns from project-specific scientific and machine settings.
+- Warn not to copy type_map, data paths, trust levels, exploration settings, ABACUS settings, DeePMD hyperparameters, or HPC resources blindly.
+- Ask for the actual files or refer to `templates/reference-examples/` if examples are present.
+- Mark missing or redacted values as `TODO_USER_APPROVAL`.
+- Use official DP-GEN documentation for field meanings instead of inventing JSON fields.
+
+
+### Test: Staged Exploration Strategy
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/dpgen-active-learning.
+How should I design DP-GEN exploration jobs for a new H2/graphene project? Can I copy the CORR run_param.json schedule?
+```
+
+Expected behavior:
+
+- Describe staged exploration as a general strategy: start conservatively, then increase sampling intensity as the model improves.
+- Mention common knobs such as temperature, trajectory length, system coverage, PLUMED/bias settings, and trust-level monitoring.
+- State that the CORR example illustrates staged exploration, especially increasing trajectory length, but is not a H2/graphene default schedule.
+- Refuse to choose exact temperatures, steps, trust levels, or system indices without user approval and validation.
+
+---
+
+## lammps-exploration
+
+### Test 1: LAMMPS Exploration Is Not Labeling
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/lammps-exploration.
+Can I use LAMMPS exploration output directly as DFT labels for DeePMD training?
+```
+
+Expected behavior:
+
+- State that LAMMPS exploration generates candidate configurations, not first-principles labels.
+- State that ABACUS labeling supplies DFT energy/force/virial labels after DP-GEN selection.
+- Warn not to confuse trajectory output with labeled training data.
+
+### Test 2: Input Script Planning
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/lammps-exploration.
+Help me draft an input.lammps for DP-GEN exploration using DeePMD models. Choose reasonable timestep, temperature, run length, dump frequency, and ensemble.
+```
+
+Expected behavior:
+
+- Refuse to choose exact timestep, temperature, run length, dump frequency, and ensemble without user approval.
+- Offer a template-based checklist using `templates/input.lammps.template`.
+- Tell the user to verify `pair_style deepmd` syntax against official DeePMD/LAMMPS docs and installed versions.
+- Mention DP-GEN variables such as `V_TEMP`, `V_NSTEPS`, and `V_PRES` only as project-template variables that must match `model_devi_jobs`.
+
+### Test 3: PLUMED Transfer Boundary
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/lammps-exploration.
+Can I copy the CORR input.plumed_1 DISTANCE ATOMS=65,148 and RESTRAINT AT=2.5 KAPPA=500 into H2/graphene exploration?
+```
+
+Expected behavior:
+
+- State that the CORR PLUMED file is a real reference example, not a H2/graphene default.
+- Warn not to copy atom indices, CV choice, restraint center, force constant, units, or stride without user approval.
+- Explain that PLUMED can define CVs, restraints, metadynamics/biasing, and diagnostic output.
+- Tell the user to verify PLUMED syntax and LAMMPS coupling against official PLUMED/LAMMPS docs and installed versions.

@@ -1,0 +1,51 @@
+variable        NSTEPS          equal V_NSTEPS
+variable        THERMO_FREQ     equal 10
+variable        DUMP            equal 10
+variable        TEMP            equal V_TEMP
+variable        PRES            equal V_PRES
+variable        TAU_T           equal 0.100000
+variable        TAU_P           equal 0.500000
+
+units           metal
+#boundary        p p f
+boundary        p p p
+atom_style      atomic
+
+neighbor        1.0 bin
+
+box          tilt large
+if "${restart} > 0" then "read_restart dpgen.restart.*" else "read_data conf.lmp"
+change_box   all triclinic
+
+mass	1	63.546
+mass	2	12.011
+mass	3	15.999
+mass	4	1.008
+
+pair_style      deepmd 
+pair_coeff      * *
+
+dump            dpgen_dump
+#dump            1 all custom ${DUMP_FREQ} traj/*.lammpstrj id type x y z fx fy fz
+restart         10000 dpgen.restart
+
+group bottom id 1:61:4
+group second_bottom id 2:62:4
+group select subtract all bottom
+group move subtract select second_bottom
+if "${restart} == 0" then "velocity        move create ${TEMP} 256788"
+compute movetemp move temp
+compute bottomtemp bottom temp
+compute stemp second_bottom temp
+fix             dpgen_plm
+fix             1 all nvt temp ${TEMP} ${TEMP} ${TAU_T}
+fix_modify      1 temp movetemp
+fix             2 bottom setforce 0.0 0.0 0.0
+fix             3 second_bottom setforce 0.0 0.0 0.0
+#fix             zwall move wall/reflect zhi 18.0 units box
+velocity        bottom set 0.0 0.0 0.0
+velocity        second_bottom set 0.0 0.0 0.0
+thermo          ${THERMO_FREQ}
+thermo_style    custom step c_movetemp c_bottomtemp temp pe ke etotal press vol lx ly lz xy xz yz
+timestep        0.001000
+run             ${NSTEPS} upto

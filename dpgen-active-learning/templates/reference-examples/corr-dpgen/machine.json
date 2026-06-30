@@ -1,0 +1,116 @@
+{
+  "api_version": "1.0",
+  "train": [
+    {
+      "command": "dp",
+      "machine": {
+        "batch_type": "DpCloudServer",
+        "context_type": "DpCloudServerContext",
+        "local_root": "./",
+        "remote_profile": {
+          "email": "REDACTED_EMAIL",
+          "password": "REDACTED_PASSWORD",
+          "program_id": "REDACTED_PROGRAM_ID",
+          "input_data": {
+            "api_version": 2,
+            "log_file": "00*/train.log",
+            "grouped": true,
+            "job_name": "REDACTED_JOB_NAME",
+            "disk_size": 100,
+            "scass_type": "c8_m32_1 * NVIDIA V100",
+            "platform": "ali",
+            "job_type": "container",
+            "image_name": "registry.dp.tech/dptech/deepmd-kit:2.1.5-cuda11.6",
+            "on_demand": 0
+          }
+        }
+      },
+      "resources": {
+        "number_node": 1,
+        "local_root": "./",
+        "cpu_per_node": 8,
+        "gpu_per_node": 1,
+        "queue_name": "TODO_USER_APPROVAL_QUEUE",
+        "group_size": 1,
+        "strategy": {
+          "if_cuda_multi_devices": true
+        },
+        "para_deg": 3,
+        "source_list": []
+      }
+    }
+  ],
+  "model_devi": [
+    {
+      "command": "lmp -i input.lammps -v restart 0",
+      "machine": {
+        "batch_type": "DpCloudServer",
+        "context_type": "DpCloudServerContext",
+        "local_root": "./",
+        "remote_profile": {
+          "email": "REDACTED_EMAIL",
+          "password": "REDACTED_PASSWORD",
+          "program_id": "REDACTED_PROGRAM_ID",
+          "input_data": {
+            "api_version": 2,
+            "job_type": "container",
+            "log_file": "*/model_devi.log",
+            "grouped": true,
+            "checkpoint_files": "sync_files",
+            "checkpoint_time": 15,
+            "job_name": "REDACTED_JOB_NAME",
+            "disk_size": 100,
+            "scass_type": "c8_m32_1 * NVIDIA V100",
+            "platform": "ali",
+            "image_name": "registry.dp.tech/dptech/deepmd-kit:2.1.5-cuda11.6",
+            "on_demand": 0
+          }
+        }
+      },
+      "resources": {
+        "number_node": 1,
+        "local_root": "./",
+        "cpu_per_node": 8,
+        "gpu_per_node": 1,
+        "queue_name": "TODO_USER_APPROVAL_QUEUE",
+        "group_size": 10
+      }
+    }
+  ],
+  "fp": [
+    {
+      "command": "OMP_NUM_THREADS=1 mpirun -np 32 abacus > log",
+      "machine": {
+        "batch_type": "DpCloudServer",
+        "context_type": "DpCloudServerContext",
+        "local_root": "./",
+        "remote_profile": {
+          "email": "REDACTED_EMAIL",
+          "password": "REDACTED_PASSWORD",
+          "program_id": "REDACTED_PROGRAM_ID",
+          "input_data": {
+            "api_version": 2,
+            "job_type": "container",
+            "log_file": "task*/fp.log",
+            "grouped": true,
+            "job_name": "REDACTED_JOB_NAME",
+            "disk_size": 100,
+            "scass_type": "c32_m64_cpu",
+            "platform": "ali",
+            "image_name": "registry.dp.tech/dptech/prod-11540/abacus-ase:3.4.0",
+            "on_demand": 0
+          }
+        }
+      },
+      "resources": {
+        "number_node": 4,
+        "cpu_per_node": 8,
+        "gpu_per_node": 0,
+        "queue_name": "TODO_USER_APPROVAL_QUEUE",
+        "group_size": 1,
+        "local_root": "./",
+        "source_list": []
+      }
+    }
+  ]
+}

@@ -46,6 +46,19 @@ When ABACUS labels DP-GEN candidate configurations:
 - all completed labels should be checked before appending to the training dataset
 - failures should be logged rather than silently included
 
+
+## Single-Point Labeling Versus Geometry Optimization
+
+For DP-GEN/DeePMD labeling, treat candidate structures as fixed input configurations unless the user explicitly requests a relaxation workflow. The usual labeling goal is to evaluate energy, forces, and optionally virial/stress on the candidate configuration, not to optimize it into a different structure.
+
+When reviewing or generating ABACUS `STRU` files for single-point labeling:
+
+- Preserve atom order, atom count, element mapping, cell vectors, coordinates, and PBC exactly as required by the dataset conversion path.
+- Do not change coordinates, relax the slab, or move adsorbates unless the task is explicitly geometry optimization rather than labeling.
+- Do not describe movable flags as a default labeling strategy. If ABACUS syntax or a conversion tool requires movable flags, preserve or set them according to the documented tool requirement and user approval.
+- Discuss fixed/free atoms only for relaxation, cell-relaxation, or other geometry-optimization tasks.
+- For single-point labels, prioritize SCF convergence, complete force output, virial/stress availability when required, unit conversion, and metadata consistency.
+
 ## Label Readiness For DeePMD/DP-GEN
 
 Before labels are accepted:

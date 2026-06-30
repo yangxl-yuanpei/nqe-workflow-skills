@@ -1,0 +1,16 @@
+# PLUMED input template for LAMMPS/DP-GEN exploration
+# Teaching scaffold only. Confirm syntax against official PLUMED docs for the installed version.
+# Replace every TODO_USER_APPROVAL before running.
+
+UNITS LENGTH=TODO_USER_APPROVAL TIME=TODO_USER_APPROVAL ENERGY=TODO_USER_APPROVAL
+
+# Define one or more collective variables.
+# Example pattern: a distance CV. Confirm atom indices and PBC treatment.
+d: DISTANCE ATOMS=TODO_USER_APPROVAL,TODO_USER_APPROVAL LABEL=d
+
+# Optional restraint or bias. Remove unless explicitly approved.
+restraint: RESTRAINT ARG=d AT=TODO_USER_APPROVAL KAPPA=TODO_USER_APPROVAL
+
+# Output diagnostics.
+PRINT ARG=d STRIDE=TODO_USER_APPROVAL FILE=TODO_USER_APPROVAL
+FLUSH STRIDE=TODO_USER_APPROVAL

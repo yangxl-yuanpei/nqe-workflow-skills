@@ -1,0 +1,56 @@
+# LAMMPS input.lammps template for DP-GEN exploration
+# Teaching scaffold only. Confirm all commands against official LAMMPS and DeePMD-kit docs.
+# Replace every TODO_USER_APPROVAL before running.
+
+# ---- DP-GEN / command-line variables ----
+# DP-GEN may pass variables such as:
+#   -v TEMP <value> -v PRES <value> -v NSTEPS <value> -v restart <0/1>
+# Match these names to the user's run_param.json/model_devi_jobs.
+
+variable        TEMP equal TODO_USER_APPROVAL
+variable        PRES equal TODO_USER_APPROVAL
+variable        NSTEPS equal TODO_USER_APPROVAL
+variable        DUMP_FREQ equal TODO_USER_APPROVAL
+variable        THERMO_FREQ equal TODO_USER_APPROVAL
+variable        restart equal TODO_USER_APPROVAL
+
+# ---- System definition ----
+units           TODO_USER_APPROVAL
+atom_style      TODO_USER_APPROVAL
+boundary        TODO_USER_APPROVAL TODO_USER_APPROVAL TODO_USER_APPROVAL
+
+# Choose exactly one structure source and remove the other.
+read_data       TODO_USER_APPROVAL.data
+# read_restart  TODO_USER_APPROVAL.restart
+
+# ---- MLFF model ----
+# Verify pair_style/pair_coeff syntax for the installed DeePMD-kit LAMMPS interface.
+pair_style      deepmd TODO_USER_APPROVAL_MODEL_0 TODO_USER_APPROVAL_MODEL_1 TODO_USER_APPROVAL_MODEL_2 TODO_USER_APPROVAL_MODEL_3
+pair_coeff      * *
+
+# ---- Neighbor / timestep ----
+neighbor        TODO_USER_APPROVAL bin
+neigh_modify    every TODO_USER_APPROVAL delay TODO_USER_APPROVAL check TODO_USER_APPROVAL
+timestep        TODO_USER_APPROVAL
+
+# ---- Initial velocities / ensemble ----
+# Only create velocities when the exploration protocol requires it.
+# velocity      all create ${TEMP} TODO_USER_APPROVAL_SEED mom yes rot yes dist gaussian
+
+# Choose thermostat/barostat settings with user approval.
+fix             1 all TODO_USER_APPROVAL
+
+# ---- Output ----
+thermo          ${THERMO_FREQ}
+thermo_style    custom step temp pe ke etotal press vol
+
+dump            1 all custom ${DUMP_FREQ} dump.lammpstrj id type x y z fx fy fz
+# dump_modify   1 sort id
+
+restart         TODO_USER_APPROVAL restart.*.bin
+
+# ---- Run ----
+run             ${NSTEPS}
+
+unfix           1
+undump          1

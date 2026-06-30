@@ -1,0 +1,44 @@
+INPUT_PARAMETERS
+calculation         md
+ntype               3
+ecutwfc             100.000000
+scf_thr             5.000000e-06
+scf_nmax            200
+basis_type          lcao
+gamma_only          0
+mixing_type         pulay-kerker
+mixing_beta         0.400000
+mixing_ndim         20
+smearing_method		gauss
+smearing_sigma		0.02
+cal_force           1
+vdw_method          d3_0
+#out_pot			    2
+
+#Parameters (implicit solvation)
+imp_sol		1
+eb_k		80
+tau		    0.000010798
+sigma_k		0.6
+nc_k		0.00037
+
+#Parameters (dipole correction)
+efield_flag         1
+dip_cor_flag        1
+efield_amp          0
+efield_dir          0
+efield_pos_max      0.8
+
+#Parameters (Compensating charge)
+gate_flag           1
+nelec               2114.2
+zgate               0.6
+
+#Parameters (MD)
+md_nstep            500   # md steps
+md_type             1    # choose NVT ensemble
+md_dt               1    # time step
+md_tfirst           350  # the first target temperature
+md_restart          0    # whether restart md
+md_dumpfreq         1   # The period to dump MD information
+md_restartfreq	    1

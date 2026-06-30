@@ -1,0 +1,25 @@
+INPUT_PARAMETERS
+calculation cell-relax
+ntype 1
+ecutwfc 100.000000
+scf_thr 5.000000e-07
+force_thr_ev 0.01
+out_stru 1
+scf_nmax 200
+relax_nmax 100
+basis_type lcao
+gamma_only 0
+mixing_type pulay
+mixing_gg0 1.5
+mixing_beta 0.400000
+mixing_ndim 20
+smearing_method gauss
+smearing_sigma 0.020000
+cal_force 1
+vdw_method d3_0
+#imp_sol 0
+#efield_flag 1
+#dip_cor_flag 1
+#efield_amp 0
+#efield_dir 2
+#efield_pos_max 0.8

@@ -40,12 +40,14 @@ Use this skill for ABACUS-specific first-principles labeling tasks in the NQE H2
 - Do not claim labels are ready for DP-GEN/DeePMD unless energy, force, virial, units, atom ordering, and metadata checks pass.
 - Do not invent ABACUS commands, file names, keywords, or output fields; use official ABACUS documentation or existing project templates.
 - Do not change physical assumptions to make a calculation easier without user approval.
+- Do not relax or alter DP-GEN candidate structures when the task is single-point labeling; discuss fixed/free atoms only for explicit optimization workflows.
 
 ## Input Checks
 
 - Confirm `INPUT`, `STRU`, and `KPT` are present or explicitly TODO.
 - Confirm all physical settings are user-provided or marked TODO.
 - Confirm structure, cell, vacuum, PBC, atom order, and element labels match the target system.
+- For single-point labeling, preserve candidate coordinates and atom order; do not treat movable flags as a default labeling strategy.
 - Confirm pseudopotential and basis references are documented and accessible to the execution environment.
 - Confirm initial dataset labeling and DP-GEN labeling use consistent ABACUS settings.
 
@@ -57,9 +59,15 @@ Use this skill for ABACUS-specific first-principles labeling tasks in the NQE H2
 - Check atom ordering and cell information remain consistent with input structures.
 - Flag broken structures, unconverged calculations, missing labels, or abnormal forces for human review.
 
+## Templates
+
+- Use `templates/INPUT.template`, `templates/STRU.template`, and `templates/KPT.template` as teaching scaffolds when the user asks how ABACUS input files should be organized.
+- Treat every `TODO_USER_APPROVAL` token in the templates as a required human decision, not a default.
+- Verify all keywords and file syntax against the official ABACUS documentation for the user's installed version before running.
+- Read `templates/reference-examples/corr/README.md` and `references/abacus-corr-transfer-notes.md` when a real ABACUS project example is useful for file organization or style. Treat the CORR files as reference examples, not H2/graphene production settings.
+
 ## References
 
 - Read `references/abacus-official-notes.md` for official ABACUS documentation entry points and file/command meanings.
 - Read `references/abacus-labeling-checklist.md` for local workflow-specific checks.
 - Use official ABACUS documentation for input/output file syntax and keyword meanings: https://abacus.deepmodeling.com/en/latest/
-- Read repository files `templates/dft_labeling/README.md` and `templates/dft_labeling/abacus/README.md` when more local context is needed.

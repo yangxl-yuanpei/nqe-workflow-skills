@@ -11,7 +11,7 @@ Initial DFT-labeled dataset -> DP-GEN active learning -> DeePMD/MLFF -> CHMC/CPI
 | Stage | Purpose | Main Inputs | Main Outputs | Approval |
 |---|---|---|---|---|
 | initial dataset | Provide DFT labels for first DP-GEN training | user-prepared structures, ABACUS settings | energy/force/virial labels | required |
-| DP-GEN | Iteratively improve MLFF | initial dataset, training/exploration/labeling configs | converged dataset and frozen models | required |
+| DP-GEN | Iteratively improve MLFF | initial dataset, training/exploration/labeling configs, LAMMPS exploration templates | converged dataset and frozen models | required |
 | final DeePMD | Optional model specialization | converged dataset or DP-GEN models | custom frozen model | required |
 | CHMC | Classical constrained sampling | MLFF, RC, windows, HMC settings | classical mean force | required |
 | CPIHMC | Path-integral constrained sampling | MLFF, RC, bead number, windows, HMC settings | quantum/NQE mean force | required |
@@ -49,7 +49,7 @@ Not documented yet:
 ## Correct Handoff Logic
 
 - ABACUS produces DFT labels.
-- DP-GEN uses DeePMD training, exploration, and ABACUS labeling to improve the MLFF.
+- DP-GEN uses DeePMD training, LAMMPS exploration/model-deviation, and ABACUS labeling to improve the MLFF.
 - DeePMD frozen models approximate the Born-Oppenheimer PES learned from DFT labels.
 - CHMC/CPIHMC use the MLFF to sample mean force along reaction coordinates.
 - TI converts mean force into free-energy profiles and activation free energies.

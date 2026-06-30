@@ -1,0 +1,37 @@
+# ABACUS INPUT template for DFT labeling
+# Teaching scaffold only. Verify all keywords against the official ABACUS docs for your ABACUS version.
+# Replace every TODO_USER_APPROVAL before running.
+
+INPUT_PARAMETERS
+suffix              TODO_USER_APPROVAL
+calculation         scf
+esolver_type        ksdft
+basis_type          TODO_USER_APPROVAL
+ks_solver           TODO_USER_APPROVAL
+
+# Electronic structure settings requiring user approval
+pseudo_dir          TODO_USER_APPROVAL
+orbital_dir         TODO_USER_APPROVAL
+stru_file           STRU
+kpoint_file         KPT
+
+# XC / dispersion / spin / charge settings
+# xc_functional     TODO_USER_APPROVAL
+# dft_plus_u        TODO_USER_APPROVAL
+# vdwd3             TODO_USER_APPROVAL
+# nspin             TODO_USER_APPROVAL
+# nelec             TODO_USER_APPROVAL
+
+# Numerical settings
+ecutwfc             TODO_USER_APPROVAL
+scf_thr             TODO_USER_APPROVAL
+scf_nmax            TODO_USER_APPROVAL
+smearing_method     TODO_USER_APPROVAL
+smearing_sigma      TODO_USER_APPROVAL
+
+# Labeling output expectations
+# Confirm that energy, forces, and virial/stress are available in outputs used downstream.
+cal_force           1
+cal_stress          TODO_USER_APPROVAL
+
+# Parallel / performance settings should be supplied by the execution environment or machine config.

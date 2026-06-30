@@ -59,10 +59,15 @@ Use this skill for DeePMD-kit training and model validation within the NQE H2 fo
 - Check the frozen model path and format are documented before downstream use.
 - Report unresolved TODOs rather than declaring production readiness.
 
+## Templates
+
+- Use `templates/input.json.template` as a teaching scaffold for DeePMD-kit training input.
+- Treat every `TODO_USER_APPROVAL` token as a required user-approved value.
+- Verify field names, descriptor options, and command behavior against the official DeePMD-kit documentation for the installed version before running.
+
 ## References
 
 - Read `references/deepmd-official-notes.md` for official DeePMD-kit documentation entry points for data, train, freeze, test, and model deviation.
 - Read `references/deepmd-training-checklist.md` for local workflow-specific checks.
 - Use `scripts/parse_lcurve.py` to summarize DeePMD-kit `lcurve.out`-style training logs; treat its output as diagnostics, not model certification.
 - Use the official DeePMD-kit documentation for data, train, freeze, test, and model-deviation command meanings: https://docs.deepmodeling.com/projects/deepmd/en/latest/
-- Read repository file `templates/deepmd/README.md` for the local placeholder template plan.

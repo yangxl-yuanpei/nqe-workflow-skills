@@ -17,6 +17,7 @@ Use this skill for the DP-GEN stage that turns a user-prepared initial DFT-label
 - Apply `nqe-boundaries` before explaining DP-GEN loop structure, model deviation, trust levels, or convergence.
 - Use `initial-dft-dataset` when the question concerns the first training dataset.
 - Use `deepmd-training` when the question concerns DeePMD-kit `input.json`, training logs, freeze, or model testing.
+- Use `lammps-exploration` when the question concerns LAMMPS input scripts, exploration trajectories, LAMMPS variables, `model_devi_jobs` templates, or LAMMPS output sanity checks.
 - Use `abacus-dft-labeling` when the question concerns first-principles labeling tasks.
 - Use `nqe-h2-workflow` when the user asks how DP-GEN connects to CHMC/CPIHMC, TI, TST, or KMC.
 
@@ -38,12 +39,13 @@ Treat model-deviation selection as an internal filtering mechanism within or imm
 - Map required DP-GEN inputs: initial data, structure configs, DeePMD training template, exploration settings, ABACUS labeling settings, and machine resources.
 - Help inspect `param.json` and `machine.json` for missing fields and consistency, using official DP-GEN documentation as the source of parameter meanings.
 - Summarize iteration outputs such as `iter.000000`, model files, exploration trajectories, model-deviation reports, candidate structures, and newly labeled data.
-- Explain trust levels, candidate selection, and convergence concepts.
+- Explain trust levels, candidate selection, convergence concepts, and staged exploration strategy.
+- Route detailed LAMMPS script generation or review to `lammps-exploration`.
 - Create TODO lists for human approval before a DP-GEN run.
 
 ## What This Skill Must Not Do
 
-- Do not choose `tol_lo`, `tol_hi`, exploration engine, exploration temperature, ensemble, sampling length, or candidate selection strategy automatically.
+- Do not choose `tol_lo`, `tol_hi`, exploration engine, exploration temperature, ensemble, sampling length, LAMMPS timestep, dump frequency, or candidate selection strategy automatically.
 - Do not choose ABACUS DFT settings for labeling.
 - Do not choose DeePMD architecture, learning rate, batch size, loss weights, or training steps.
 - Do not claim DP-GEN is converged without documented convergence criteria and user confirmation.
@@ -69,9 +71,18 @@ Treat model-deviation selection as an internal filtering mechanism within or imm
 - Check ABACUS labeling tasks converged and produced complete energy, force, and virial labels.
 - Report unresolved TODOs instead of filling them silently.
 
+## Templates
+
+- Use `templates/param.json.template` and `templates/machine.json.template` as teaching scaffolds for DP-GEN planning.
+- Treat every `TODO_USER_APPROVAL` token as a required user-approved value.
+- Do not treat template JSON fields as guaranteed for every DP-GEN version; check official DP-GEN documentation for the installed version.
+- Delegate DeePMD training details to `deepmd-training/templates/input.json.template` and ABACUS label inputs to `abacus-dft-labeling/templates/`.
+- Read `templates/reference-examples/README.md` and `references/dpgen-real-input-transfer-notes.md` when the user provides or asks about real DP-GEN `param.json`/`machine.json` files from another project.
+
 ## References
+
+- Read `references/dpgen-exploration-strategy.md` when the user asks how to design exploration jobs, stage temperatures/trajectory lengths, or interpret `model_devi_jobs`.
 
 - Read `references/dpgen-official-notes.md` for official DP-GEN documentation entry points for `dpgen run`, `param.json`, and `machine.json`.
 - Read `references/dpgen-run-checklist.md` for local workflow-specific checks.
 - Use the official DP-GEN documentation for `dpgen run`, `param.json`, and `machine.json` parameter meanings: https://docs.deepmodeling.com/projects/dpgen/en/latest/run/index.html
-- Read repository files `docs/dpgen.md` and `templates/dpgen/README.md` when more teaching context is needed.

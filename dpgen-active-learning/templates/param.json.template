@@ -1,0 +1,38 @@
+{
+  "_comment": "Teaching template only. Confirm field names and supported values against the official DP-GEN docs for your installed version. Replace all TODO_USER_APPROVAL values before running.",
+  "type_map": ["TODO_USER_APPROVAL"],
+  "mass_map": ["TODO_USER_APPROVAL"],
+  "init_data_prefix": "TODO_USER_APPROVAL",
+  "init_data_sys": [
+    "TODO_USER_APPROVAL"
+  ],
+  "sys_configs_prefix": "TODO_USER_APPROVAL",
+  "sys_configs": [
+    ["TODO_USER_APPROVAL"]
+  ],
+  "numb_models": "TODO_USER_APPROVAL",
+  "default_training_param": "See deepmd-training/templates/input.json.template",
+  "model_devi_dt": "TODO_USER_APPROVAL",
+  "model_devi_f_trust_lo": "TODO_USER_APPROVAL",
+  "model_devi_f_trust_hi": "TODO_USER_APPROVAL",
+  "model_devi_jobs": [
+    {
+      "_comment": "Exploration settings are system- and engine-specific. Confirm against DP-GEN docs.",
+      "sys_idx": "TODO_USER_APPROVAL",
+      "temps": ["TODO_USER_APPROVAL"],
+      "press": ["TODO_USER_APPROVAL"],
+      "trj_freq": "TODO_USER_APPROVAL",
+      "nsteps": "TODO_USER_APPROVAL",
+      "ensemble": "TODO_USER_APPROVAL"
+    }
+  ],
+  "fp_style": "abacus",
+  "fp_task_max": "TODO_USER_APPROVAL",
+  "fp_task_min": "TODO_USER_APPROVAL",
+  "fp_pp_path": "TODO_USER_APPROVAL",
+  "fp_orb_files": ["TODO_USER_APPROVAL"],
+  "fp_pp_files": ["TODO_USER_APPROVAL"],
+  "user_fp_params": {
+    "_comment": "Keep ABACUS settings consistent with abacus-dft-labeling/templates/ and official DP-GEN ABACUS interface docs."
+  }
+}

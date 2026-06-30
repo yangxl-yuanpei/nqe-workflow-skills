@@ -1,0 +1,51 @@
+{
+  "_comment": "Teaching template only. Confirm all fields against official DeePMD-kit docs for your installed version. Replace all TODO_USER_APPROVAL values before running.",
+  "model": {
+    "type_map": ["TODO_USER_APPROVAL"],
+    "descriptor": {
+      "type": "TODO_USER_APPROVAL",
+      "rcut": "TODO_USER_APPROVAL",
+      "sel": "TODO_USER_APPROVAL",
+      "neuron": "TODO_USER_APPROVAL",
+      "resnet_dt": "TODO_USER_APPROVAL",
+      "axis_neuron": "TODO_USER_APPROVAL",
+      "seed": "TODO_USER_APPROVAL"
+    },
+    "fitting_net": {
+      "neuron": "TODO_USER_APPROVAL",
+      "resnet_dt": "TODO_USER_APPROVAL",
+      "seed": "TODO_USER_APPROVAL"
+    }
+  },
+  "learning_rate": {
+    "type": "TODO_USER_APPROVAL",
+    "start_lr": "TODO_USER_APPROVAL",
+    "stop_lr": "TODO_USER_APPROVAL",
+    "decay_steps": "TODO_USER_APPROVAL"
+  },
+  "loss": {
+    "type": "TODO_USER_APPROVAL",
+    "start_pref_e": "TODO_USER_APPROVAL",
+    "limit_pref_e": "TODO_USER_APPROVAL",
+    "start_pref_f": "TODO_USER_APPROVAL",
+    "limit_pref_f": "TODO_USER_APPROVAL",
+    "start_pref_v": "TODO_USER_APPROVAL",
+    "limit_pref_v": "TODO_USER_APPROVAL"
+  },
+  "training": {
+    "training_data": {
+      "systems": ["TODO_USER_APPROVAL"],
+      "batch_size": "TODO_USER_APPROVAL"
+    },
+    "validation_data": {
+      "systems": ["TODO_USER_APPROVAL"],
+      "batch_size": "TODO_USER_APPROVAL",
+      "numb_btch": "TODO_USER_APPROVAL"
+    },
+    "numb_steps": "TODO_USER_APPROVAL",
+    "seed": "TODO_USER_APPROVAL",
+    "disp_file": "lcurve.out",
+    "disp_freq": "TODO_USER_APPROVAL",
+    "save_freq": "TODO_USER_APPROVAL"
+  }
+}

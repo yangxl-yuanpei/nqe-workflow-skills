@@ -30,6 +30,7 @@ ABACUS is the documented DFT backend for this teaching repository. DeePMD-kit an
 | `initial-dft-dataset` | Strategies and checks for the user-prepared initial DFT-labeled dataset | ready |
 | `abacus-dft-labeling` | ABACUS input/output and DFT labeling checks | ready |
 | `dpgen-active-learning` | DP-GEN train -> exploration -> labeling loop, model deviation, and convergence checks | ready |
+| `lammps-exploration` | LAMMPS exploration scripts, trajectory sanity checks, and DP-GEN model-deviation handoff | ready |
 | `deepmd-training` | DeePMD-kit data, training, freeze/test, model-deviation, and model-readiness checks | ready |
 | `chmc-cpihmc-sampling` | CHMC/CPIHMC constrained sampling, reaction-coordinate, bead, and mean-force checks | ready |
 | `ti-tst-rate` | Mean force -> free energy -> activation barrier -> TST rate handoff | ready |
@@ -43,6 +44,7 @@ Some skills are reusable beyond this H2 workflow:
 - `abacus-dft-labeling`
 - `dpgen-active-learning`
 - `deepmd-training`
+- `lammps-exploration`
 
 These contain `Scope` and `Reusable Beyond This Workflow` sections that distinguish general DFT/MLFF workflow checks from NQE H2-specific requirements.
 

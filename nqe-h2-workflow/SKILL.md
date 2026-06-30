@@ -30,6 +30,7 @@ Use this stage order:
 - Use `initial-dft-dataset` for questions about starting DFT labels, CINEB/TS/AIMD strategies, data compatibility, and dataset sufficiency checks.
 - Use `abacus-dft-labeling` for ABACUS INPUT/STRU/KPT templates, DFT labeling checks, SCF convergence, and label extraction.
 - Use `dpgen-active-learning` for train-explore-label loops, model deviation, trust levels, candidate selection, and convergence diagnostics.
+- Use `lammps-exploration` for LAMMPS input scripts, exploration trajectories, variables, thermo/dump outputs, and DP-GEN exploration-engine checks.
 - Use `deepmd-training` for DeePMD-kit input.json, training/freeze/test, data format, and model error checks.
 - Use `chmc-cpihmc-sampling` for reaction coordinates, CHMC/CPIHMC modes, beads, sampling windows, and mean-force output.
 - Use `ti-tst-rate` for mean-force integration, free-energy barriers, TST rate constants, and NQE enhancement factors.
