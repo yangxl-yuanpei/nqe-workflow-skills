@@ -1,0 +1,29 @@
+# Example for the bundled user-tested TI/TST demo.
+parameters_confirmed: true
+
+sampling_output_root: ../../ti-tst-rate/templates/reference-examples/user-tested-ti-tst-chain/demo
+input_file: energy.dat
+window_glob: "*"
+dataset_label: demo_cpihmc_100K
+output_dir: ../../tmp/nqe-postprocess-demo-output
+
+format: auto
+skiprows: 1
+rc_raw_unit_label: au
+force_raw_unit_label: au
+rc_scale: 1.0
+force_scale: 1.0
+rc_index: 0
+
+integration_direction: descending
+zero: first
+free_energy_scale: 27.211386245988
+free_energy_unit_label: eV
+
+plots: true
+compute_tst: true
+elementary_step: CHO
+temperature_K: 100
+reactant_mode: first
+ts_mode: max
+prefactor_model: kBT_over_h

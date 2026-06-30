@@ -34,6 +34,7 @@ ABACUS is the documented open DFT backend in this teaching repository. DeePMD-ki
 | `deepmd-training` | DeePMD-kit training, freeze/test/model-selection boundaries, and diagnostics | ready |
 | `chmc-cpihmc-sampling` | CHMC/CPIHMC input/output templates, mean-force sampling checks, and grand-canonical notes | ready |
 | `ti-tst-rate` | Mean-force extraction, TI integration, free-energy barrier extraction, TST rate calculation, and plotting guidance | ready |
+| `nqe-postprocess-runner` | Config-driven wrapper for confirmed sampling-output -> mean-force -> free-energy -> TST CSV/plot/summary runs | experimental |
 | `kmc-h2-efficiency` | General KMC event-network logic and H2-efficiency-specific boundaries | teaching-ready |
 
 ## Real Reference Examples
@@ -66,6 +67,7 @@ The scripts are deterministic helpers for diagnostics and post-processing. They 
 | `ti-tst-rate/scripts/plot_mean_force.py` | Plot one or more mean-force curves versus reaction coordinate | image file |
 | `ti-tst-rate/scripts/plot_free_energy.py` | Plot one or more free-energy curves versus reaction coordinate | image file |
 | `ti-tst-rate/scripts/run_smoke_test.py` | Run the bundled TI/TST demo chain as a smoke test | mean-force/free-energy/rate CSVs and optional plots |
+| `nqe-postprocess-runner/scripts/nqe_postprocess_runner.py` | Run the confirmed TI/TST postprocessing chain from a flat YAML/JSON config | CSVs, plots, `summary.json` |
 
 Most TI/TST scripts require `--confirm-parameters`. This is intentional. The agent or user must confirm columns, unit conversions, equilibration discard, mean-force sign convention, integration direction, free-energy zero, initial/transition-state selection, and prefactor model before treating the result as meaningful.
 
@@ -108,6 +110,7 @@ python ti-tst-rate/scripts/integrate_free_energy.py --print-defaults
 python ti-tst-rate/scripts/compute_tst_rates.py --print-defaults
 python ti-tst-rate/scripts/plot_mean_force.py --help
 python ti-tst-rate/scripts/plot_free_energy.py --help
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py nqe-postprocess-runner/assets/config.example.yaml
 ```
 
 For production-like tests, use copies of real or mock data and keep the expected behavior conservative: the scripts can summarize, extract, integrate, compute, and plot, but the user still confirms physical interpretation.

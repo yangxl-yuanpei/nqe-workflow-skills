@@ -1,0 +1,4 @@
+interface:
+  display_name: "NQE Postprocess Runner"
+  short_description: "Run guarded NQE TI/TST postprocessing"
+  default_prompt: "Use $nqe-postprocess-runner to run a guarded TI/TST postprocessing workflow from a confirmed YAML config."
