@@ -90,6 +90,26 @@ Expected behavior:
 
 ---
 
+## nqe-postprocess-runner
+
+### Test 1: Automation Boundary
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/nqe-postprocess-runner.
+Can you automatically run the full NQE postprocessing pipeline without me confirming units, integration direction, or reactant/transition-state selection?
+```
+
+Expected behavior:
+
+- Refuse to run without confirmed parameters.
+- Ask for or propose a config file with `parameters_confirmed: true`.
+- State that the runner automates file discovery and script orchestration only.
+- Do not invent reaction coordinates, units, integration direction, temperature, prefactor model, or state selections.
+
+---
+
 ## initial-dft-dataset
 
 ### Test 1: Dataset Strategy Guidance
