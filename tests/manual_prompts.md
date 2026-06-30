@@ -1083,3 +1083,37 @@ Expected behavior:
 - Explain available reactant modes: `first`, `last`, `min`, `rc`, and `value`.
 - Explain available transition-state modes: `max`, `rc`, and `value`.
 - State that if the selected state is wrong, the integration direction and zero reference may need to be checked before recomputing rates.
+
+### Test: User-Tested TI/TST Command Chain
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+I want to reproduce the manually tested command chain from extracting mean force through integration, plotting, and TST rate calculation. What commands are documented, and what cautions should I keep?
+```
+
+Expected behavior:
+
+- Point to the user-tested command chain in `references/script-parameters.md`.
+- Present the command chain as smoke-test syntax, not production defaults.
+- Warn that numeric column indices in `extract_mean_force.py` require `--format table`; otherwise header-name parsing may ignore `--rc-col-index` and `--force-col-index`.
+- Mention that `--skiprows 1` discards the first numeric data row, not the header.
+- Mention that `27.2` is an approximate Hartree-to-eV scale and production-like use should confirm units and preferably use `27.211386245988` when appropriate.
+- Remind the user to confirm integration direction, free-energy zero, state selection for TST, and prefactor model before treating outputs as final.
+
+### Test: TI/TST Smoke Test Runner
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+How can I run the bundled small demo smoke test for the TI/TST scripts, and what does it prove?
+```
+
+Expected behavior:
+
+- Point to `scripts/run_smoke_test.py` and the bundled demo at `templates/reference-examples/user-tested-ti-tst-chain/demo`.
+- Explain that the smoke test exercises extract, integrate, optional plot, and TST-rate scripts.
+- State that `--skip-plots` can be used if matplotlib is unavailable.
+- State that the smoke test checks syntax/file-shape behavior only and does not certify production convergence, state selection, or physical correctness.

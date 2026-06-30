@@ -1,0 +1,2 @@
+elementary_step,dataset_label,temperature_K,deltaF_dagger_au,reactant_rc_au,transition_state_rc_au,reactant_free_energy,transition_state_free_energy,prefactor_model,prefactor_expression,prefactor_inputs,prefactor_units,prefactor_value,rate_units,rate_value,barrier_source,notes
+CHO,test,100,0.0229055073344,2.59999999998,0,0,0.0229055073344,kBT_over_h,k_B*T/h,T=100.0 K,s^-1,2.08366191233e+12,s^-1,8.06052257218e-20,free_energy.dat; reactant=first(rc=2.59999999998); ts=max(rc=0); unit=au,

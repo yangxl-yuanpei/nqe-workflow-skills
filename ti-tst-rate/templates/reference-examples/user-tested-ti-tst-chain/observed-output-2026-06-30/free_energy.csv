@@ -1,0 +1,13 @@
+dataset_label,rc_index,reaction_coordinate_au,free_energy_au,free_energy_converted,free_energy_converted_unit,free_energy_relative_to,uncertainty_au,integration_method,source_mean_force_table,parameters_confirmed,free_energy_scale,free_energy_unit,notes
+test,0,2.59999999998,0,0,eV,first_grid_point,TODO_NOT_PROPAGATED,trapezoid;direction=descending,result.dat,true,27.2,au,
+test,0,2.19999999999,0.00249097795949,0.0677546004982,eV,first_grid_point,TODO_NOT_PROPAGATED,trapezoid;direction=descending,result.dat,true,27.2,au,
+test,0,1.8,0.00587098207146,0.159690712344,eV,first_grid_point,TODO_NOT_PROPAGATED,trapezoid;direction=descending,result.dat,true,27.2,au,
+test,0,1.40000000001,0.0106060933177,0.288485738241,eV,first_grid_point,TODO_NOT_PROPAGATED,trapezoid;direction=descending,result.dat,true,27.2,au,
+test,0,1.20000000001,0.0135665306956,0.369009634921,eV,first_grid_point,TODO_NOT_PROPAGATED,trapezoid;direction=descending,result.dat,true,27.2,au,
+test,0,0.799999999992,0.0187471929567,0.509923648422,eV,first_grid_point,TODO_NOT_PROPAGATED,trapezoid;direction=descending,result.dat,true,27.2,au,
+test,0,0.399999999997,0.022145053297,0.602345449679,eV,first_grid_point,TODO_NOT_PROPAGATED,trapezoid;direction=descending,result.dat,true,27.2,au,
+test,0,0,0.0228837307627,0.622437476745,eV,first_grid_point,TODO_NOT_PROPAGATED,trapezoid;direction=descending,result.dat,true,27.2,au,
+test,0,-0.399999999996,0.020825837025,0.566462767081,eV,first_grid_point,TODO_NOT_PROPAGATED,trapezoid;direction=descending,result.dat,true,27.2,au,
+test,0,-0.799999999992,0.0178658176267,0.485950239447,eV,first_grid_point,TODO_NOT_PROPAGATED,trapezoid;direction=descending,result.dat,true,27.2,au,
+test,0,-1.19999999999,0.0153671220619,0.417985720084,eV,first_grid_point,TODO_NOT_PROPAGATED,trapezoid;direction=descending,result.dat,true,27.2,au,
+test,0,-1.59999999998,0.0131329268268,0.35721560969,eV,first_grid_point,TODO_NOT_PROPAGATED,trapezoid;direction=descending,result.dat,true,27.2,au,

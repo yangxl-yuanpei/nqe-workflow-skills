@@ -179,3 +179,72 @@ Important notes:
 - Plot from initial state to final state using the same convention confirmed during integration and TST.
 - Do not reverse or reinterpret the x-axis silently.
 - When plotting converted free energies, make sure `--y-column` and `--free-energy-unit-label` describe the same data.
+
+## User-Tested End-To-End Command Chain
+
+The following commands were reported by the user as a working manual smoke test for the current TI/TST postprocessing chain. Treat them as example syntax, not production defaults. The physical choices still require confirmation for each system.
+
+```bash
+python /personal/extract_mean_force.py \
+  --input energy.dat \
+  --output ../result.dat \
+  --dataset-label test \
+  --skiprows 1 \
+  --confirm-parameters \
+  --force-col-index 7 \
+  --rc-col-index 6
+
+python /personal/integrate_free_energy.py \
+  --input result.dat \
+  --output free_energy.dat \
+  --dataset-label test \
+  --confirm-parameters \
+  --free-energy-scale 27.2 \
+  --free-energy-unit-label eV \
+  --integration-direction descending
+
+python /personal/plot_mean_force.py \
+  --curve file=result.dat,dataset=test \
+  --output meanforce.png \
+  --confirm-parameters
+
+python /personal/plot_free_energy.py \
+  --curve file=free_energy.dat,dataset=test \
+  --output free_energy.png \
+  --confirm-parameters
+
+python /personal/compute_tst_rates.py \
+  --input free_energy.dat \
+  --output rate.csv \
+  --confirm-parameters \
+  --elementary-step CHO \
+  --dataset-label test \
+  --temperature 100
+```
+
+Notes for reusing this chain:
+
+- If relying on numeric columns in `extract_mean_force.py`, add `--format table`; otherwise `--rc-col-index` and `--force-col-index` are ignored in `auto`/`phy_quant` mode when the file has headers such as `RxnCoord` and `MeanForce`.
+- If the CHMC output has single-RC headers `RxnCoord` and `MeanForce`, the default `auto`/`phy_quant` mode can work without numeric column indices.
+- `--skiprows 1` discards the first numeric data row after header handling; use `--skiprows 0` if no equilibration row should be discarded.
+- `--free-energy-scale 27.2` is an approximate Hartree-to-eV conversion used in the smoke test. For production-like conversion, prefer the more precise documented factor `27.211386245988` after confirming the input free energy is Hartree-compatible.
+- The smoke-test `meanforce.csv` observed in the workspace used an older mean-force table schema without raw columns. Current `extract_mean_force.py` writes both raw and au-scaled columns; regenerate old tables before appending with the current script.
+- The TST command uses default barrier selection: `--reactant-mode first --ts-mode max`. Confirm these physical state choices before treating `rate.csv` as final.
+
+## Smoke Test Runner
+
+Use `scripts/run_smoke_test.py` to run the bundled demo chain from many `energy.dat` windows to mean-force table, free-energy profile, optional plots, and one TST rate.
+
+```bash
+python ti-tst-rate/scripts/run_smoke_test.py --output-dir smoke-test-output
+```
+
+Useful options:
+
+- `--demo-dir`: directory containing reaction-coordinate window folders with `energy.dat` files. Default is `templates/reference-examples/user-tested-ti-tst-chain/demo`.
+- `--use-table-columns`: use `--format table --rc-col-index 6 --force-col-index 7` during extraction.
+- `--skip-plots`: skip `matplotlib` plot generation if the plotting dependency is unavailable.
+- `--integration-direction`: default `descending`, matching the user-tested chain.
+- `--free-energy-scale`: default `27.211386245988`, Hartree to eV after unit confirmation.
+
+This script is a smoke test only. It does not certify sampling convergence, state selection, prefactor correctness, or production readiness.

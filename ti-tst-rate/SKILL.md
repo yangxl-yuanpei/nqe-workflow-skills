@@ -66,7 +66,8 @@ Use this skill for the thermodynamic-integration and transition-state-theory sta
 
 - Use `scripts/extract_mean_force.py` to extract one sampling output/window into one row of `mean_force_table.csv`. Use external loops to collect many reaction-coordinate windows. Require `--confirm-parameters` because columns, skip rows, unit scales, and output units can differ between CHMC/CPIHMC runs.
 - Use `scripts/integrate_free_energy.py` to integrate a completed `mean_force_table.csv` into `free_energy_profile.csv`. Require `--confirm-parameters` because integration direction, sign convention, zero reference, unit compatibility, and optional `--free-energy-scale`/`--free-energy-unit-label` conversion need user confirmation. Ask for integration direction before invoking the script if the user has not explicitly specified it. Default ordering is `--integration-direction ascending`, from small reaction coordinate to large reaction coordinate; use `descending` when the large-RC side is the initial/reference side. `free_energy_au` always remains atomic units; optional conversion is written to `free_energy_converted`.
-- Do not use these scripts for temperature-directory discovery, plotting, TST rates, or KMC. Those remain separate layers.
+- Use `scripts/run_smoke_test.py` only as a bundled demo smoke test for the TI/TST script chain. It is not a production workflow runner.
+- Do not use these scripts for temperature-directory discovery, production orchestration, or KMC. Those remain separate layers.
 
 ## Script Usage
 
@@ -209,10 +210,11 @@ Each `--curve` may specify `file`, `dataset`, `label`, `rc_index`, `color`, `lin
 - Use `templates/free_energy_profile.csv.template` for the `mean force -> free energy profile` handoff.
 - Use `templates/tst_rates.csv.template` for the `activation free energy -> TST rate` handoff.
 - Use `templates/reference-examples/corr-phy-quant-handoff/` as a semi-real column-mapping example from the real CHMC/CPIHMC `PHY_QUANT`; it is not a computed free-energy profile.
+- Use `templates/reference-examples/user-tested-ti-tst-chain/` as the bundled small demo and observed-output reference for the user-tested postprocessing chain.
 
 ## References
 
-- Read `references/script-parameters.md` when the user asks what script parameters mean, what defaults are assumed, or whether indices are 0-based or 1-based.
+- Read `references/script-parameters.md` when the user asks what script parameters mean, what defaults are assumed, whether indices are 0-based or 1-based, or for the user-tested end-to-end command chain.
 - Read `references/postprocessing-logic.md` when connecting `PHY_QUANT`, mean-force tables, TI, and TST rates.
 - Read `references/legacy-mc-result-split-plan.md` when migrating the legacy `MC_result.py` plotting/integration script into maintainable postprocessing scripts.
 - Read `references/ti-tst-checklist.md` for local workflow-specific checks.

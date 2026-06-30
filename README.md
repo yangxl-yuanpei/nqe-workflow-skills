@@ -48,6 +48,7 @@ These examples are included to show real file shapes, naming patterns, and trans
 | DeePMD | `deepmd-training/templates/reference-examples/corr-deepmd/` | Real `input.json` and `lcurve.out` examples for training diagnostics | Architecture, cutoffs, learning rate schedule, data paths, stopping criteria |
 | CHMC/CPIHMC | `chmc-cpihmc-sampling/templates/reference-examples/corr-gc-cpihmc/` | Real `INPUT`, `BEADS`, `ALL_INPUT`, and `PHY_QUANT` examples for GC-CPIHMC output shape | Reaction coordinates, bead count, HMC/MC settings, electron-number settings, units/sign conventions |
 | TI/TST | `ti-tst-rate/templates/reference-examples/corr-phy-quant-handoff/` | Semi-real handoff CSVs: `mean_force_table.csv`, `free_energy_profile.csv`, `tst_rates.csv` | Final barriers/rates for a new target system |
+| TI/TST | `ti-tst-rate/templates/reference-examples/user-tested-ti-tst-chain/` | Small user-tested demo windows, observed outputs, and smoke-test chain | Production convergence or final rates |
 | KMC | `kmc-h2-efficiency/templates/reference-examples/generic-rate-network/` | Generic event-network input shape | A complete H2/graphene production KMC model |
 
 There is also a `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` folder kept as a placeholder/example shape. Prefer the documented CORR example when discussing real DP-GEN transfer.
@@ -64,6 +65,7 @@ The scripts are deterministic helpers for diagnostics and post-processing. They 
 | `ti-tst-rate/scripts/compute_tst_rates.py` | Extract an activation free-energy barrier and compute one TST rate | `tst_rates.csv` |
 | `ti-tst-rate/scripts/plot_mean_force.py` | Plot one or more mean-force curves versus reaction coordinate | image file |
 | `ti-tst-rate/scripts/plot_free_energy.py` | Plot one or more free-energy curves versus reaction coordinate | image file |
+| `ti-tst-rate/scripts/run_smoke_test.py` | Run the bundled TI/TST demo chain as a smoke test | mean-force/free-energy/rate CSVs and optional plots |
 
 Most TI/TST scripts require `--confirm-parameters`. This is intentional. The agent or user must confirm columns, unit conversions, equilibration discard, mean-force sign convention, integration direction, free-energy zero, initial/transition-state selection, and prefactor model before treating the result as meaningful.
 
