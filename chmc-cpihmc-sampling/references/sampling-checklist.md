@@ -46,7 +46,7 @@ These examples should not be treated as automatic defaults for new systems.
 - HMC acceptance rate; about 30-50% is often a useful range for this workflow, and temperature can shift acceptance
 - autocorrelation of mean force
 - trajectory mixing quality
-- convergence of mean force with sampling length
+- convergence of potential energy and mean force with sampling length, including instantaneous traces, cumulative averages, and final production averages
 - smoothness across neighboring windows
 - bead-number convergence for CPIHMC
 - abnormal wall/restriction rejection events if walls are used
@@ -80,6 +80,12 @@ Before using grand-canonical/constant-potential-like sampling, confirm:
 - For `PHY_QUANT`, identify `RxnCoord_*` and `MeanForce_*` pairs, then confirm units, sign convention, window/grid identity, and uncertainty before TI.
 - Treat `dE_dN` and `ElecNum` as grand-canonical/electrochemical diagnostics when present.
 - Treat `BEADS` as path-integral initialization data; confirm coordinate units and consistency with `N_Bead`/`Bead_Index`.
+
+## PHY_QUANT Convergence Screening
+
+After each reaction-coordinate window finishes, inspect the relevant `PHY_QUANT` columns before TI handoff. Plot at least potential energy and the mean-force column used for the selected reaction coordinate. A long pre-equilibration period is allowed; document the selected discard length or the reason for using all samples.
+
+The helper `scripts/analyze_phy_quant_convergence.py` can produce a plot and CSV summary. Its automatic cutoff is only a conservative screening heuristic based on block stability and drift; it still requires user approval.
 
 ## Handoff To TI
 

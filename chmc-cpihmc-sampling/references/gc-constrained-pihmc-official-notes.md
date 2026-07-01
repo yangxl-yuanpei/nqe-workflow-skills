@@ -15,7 +15,7 @@ Treat this repository README as the current public documentation for the code. I
 - MD, HMC, and CHMC simulations under canonical or grand-canonical ensemble conditions.
 - Nuclear quantum effects through path-integral formalism.
 - Grand-canonical ensemble support for CHMC and CPIHMC.
-- Potential energy and forces are conceptually described for DP, VASP, and ABACUS, but the README states that only DP is supported for the moment.
+- Potential energy and forces are conceptually described by the upstream README for DP, VASP, and ABACUS, but the README states that only DP is supported for the moment. In this teaching repository, ABACUS is documented for DFT labeling, not as a confirmed GC-Constrained-PIHMC force backend.
 - Model deviation is available for potential energy and force calculations by DP and can be used in model-deviation mode.
 
 ## Units Documented In The README

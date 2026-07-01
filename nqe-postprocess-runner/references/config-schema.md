@@ -2,9 +2,27 @@
 
 Use a flat YAML or JSON config. Paths are resolved relative to the config file.
 
+A runnable config must contain only user-confirmed values. When creating a new config, ask about each parameter before writing it to YAML. If a value is not yet confirmed, use a question checklist or a non-runnable draft with `parameters_confirmed: false` and `TODO_USER_APPROVAL` placeholders.
+
 Required guardrail:
 
 - `parameters_confirmed`: must be `true`.
+- Set `parameters_confirmed: true` only after every included parameter has been explicitly approved by the user or copied from a user-provided config.
+- Use `parameters_confirmed: false` for drafts, examples, or partially filled configs.
+
+Before outputting a runnable YAML and before setting `parameters_confirmed: true`, the user must confirm every applicable parameter:
+
+- input window directory and window discovery pattern
+- input file name and parser mode
+- reaction-coordinate and mean-force columns or numeric indices
+- whether indices are zero-based
+- unit labels and scale factors for reaction coordinate and mean force
+- equilibration/skip-row handling
+- integration direction and free-energy zero reference
+- free-energy conversion factor and unit label, if used
+- whether plots should be generated
+- whether TST should be computed
+- elementary-step label, temperature, reactant state, transition-state selection, and prefactor model when TST is enabled
 
 Window discovery:
 
@@ -35,6 +53,7 @@ Thermodynamic integration:
 Plotting:
 
 - `plots`: `true` or `false`. Default: `true`.
+- `free_energy_plot_unit_label`: optional y-axis unit label for the free-energy plot. Default: `au`.
 
 TST:
 
@@ -54,3 +73,13 @@ Optional:
 - `python`: Python executable used for child scripts. Default: current interpreter.
 - `ti_tst_scripts_dir`: override path to `ti-tst-rate/scripts`.
 - `notes`: text added to generated CSV rows.
+- CLI `--dry-run`: print generated child commands without executing them. Use this first for smoke testing and config review.
+
+Agent execution rule:
+
+1. Read this schema and the config file.
+2. When creating YAML, ask for every parameter before writing a runnable config; otherwise write only a non-runnable draft with `parameters_confirmed: false`.
+3. Refuse real execution if required fields are missing or `parameters_confirmed` is not true.
+4. Run the runner with `--dry-run` first.
+5. Ask for user confirmation if the dry-run commands reveal unexpected paths, units, ordering, state selection, temperature, or prefactor.
+6. Run without `--dry-run` only after the dry-run is accepted.
