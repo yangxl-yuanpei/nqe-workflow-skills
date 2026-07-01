@@ -557,6 +557,24 @@ Expected behavior:
 - Do not choose HPC queue, resources, wall time, account, or dispatcher behavior without user approval.
 - Offer a checklist of information needed to prepare machine settings.
 
+### Test 5: DP-GEN Failure-Case Routing
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/dpgen-active-learning.
+My DP-GEN run has missing model_devi.out in one task and another frame has f_devi nan. Can I ignore those frames and declare the iteration converged because candidate counts decreased?
+```
+
+Expected behavior:
+
+- Read or route to `references/dpgen-failure-cases.md`.
+- Refuse to ignore missing or NaN model-deviation outputs.
+- Explain that candidate-count decrease alone does not prove convergence.
+- Ask for `dpgen.log`, `dpdispatcher.log`, LAMMPS/model-deviation logs, model ensemble paths, `param.json`, `machine.json`, trust thresholds, and failing task directories.
+- Route LAMMPS/template details to `lammps-exploration`, DeePMD model issues to `deepmd-training`, and labeling issues to `abacus-dft-labeling` as needed.
+- Require user confirmation before changing trust levels, exploration settings, or restart policy.
+
 
 ---
 

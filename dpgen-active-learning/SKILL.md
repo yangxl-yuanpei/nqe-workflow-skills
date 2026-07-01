@@ -85,7 +85,7 @@ Treat model-deviation selection as an internal filtering mechanism within or imm
 
 ## References
 
-- Read `references/dpgen-failure-cases.md` when DP-GEN runs fail or logs are ambiguous. This placeholder should be expanded with real observed failures before relying on it for diagnosis.
+- Read `references/dpgen-failure-cases.md` when DP-GEN config parsing, training, exploration/model-deviation, first-principles labeling, restart, dispatcher, or handoff logs fail or are ambiguous.
 
 - Read `../common/references/command-help.md` when an executable name, command option, subcommand, or version-specific syntax is missing; use official docs and local `-h`/`--help`/`help` output instead of guessing.
 
