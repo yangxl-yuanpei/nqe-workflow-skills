@@ -82,7 +82,7 @@ python scripts/compare_converted_system.py \
 
 ## References
 
-- Read `references/dpdata-failure-cases.md` when dpdata inspection, conversion, or comparison fails. This placeholder should be expanded with real observed failures before relying on it for diagnosis.
+- Read `references/dpdata-failure-cases.md` when dpdata inspection, conversion, comparison, reloading, type-map checks, or labeled/unlabeled handoffs fail.
 
 - Read `README.md` for script usage, required confirmations, key arguments, and common failure modes.
 - Read `references/dpdata-official-notes.md` for official documentation entry points and basic API concepts.

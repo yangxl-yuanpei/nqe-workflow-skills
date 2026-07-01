@@ -74,4 +74,4 @@ The optional convergence step is still a pre-TI screening layer, not automatic c
 
 ## References
 
-- Read `references/postprocess-runner-failure-cases.md` when config parsing, dry-run, child-command generation, or runner execution fails. This placeholder should be expanded with real observed failures before relying on it for diagnosis.
+- Read `references/postprocess-runner-failure-cases.md` when config parsing, dry-run, child-command generation, child-script execution, partial outputs, or runner-to-TI/TST/KMC handoff review fails.

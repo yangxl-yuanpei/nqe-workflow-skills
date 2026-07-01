@@ -218,7 +218,7 @@ Each `--curve` may specify `file`, `dataset`, `label`, `rc_index`, `color`, `lin
 
 ## References
 
-- Read `references/ti-tst-failure-cases.md` when TI/TST scripts fail, reject inputs, or produce surprising state selections. This placeholder should be expanded with real observed failures before relying on it for diagnosis.
+- Read `references/ti-tst-failure-cases.md` when TI/TST scripts fail, reject inputs, produce surprising state selections, or appear to cross the boundary into KMC without a confirmed event network.
 
 - Read `references/script-parameters.md` when the user asks what script parameters mean, what defaults are assumed, whether indices are 0-based or 1-based, or for the user-tested end-to-end command chain.
 - Read `references/postprocessing-logic.md` when connecting `PHY_QUANT`, mean-force tables, TI, and TST rates.

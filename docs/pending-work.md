@@ -9,7 +9,7 @@ This file tracks work that remains after the current repository consistency pass
 - 12 skills exist.
 - 14 Python helper scripts exist.
 - 19 `.template` files exist.
-- 9 failure-case references exist; 7 are still placeholders.
+- 9 failure-case references exist; 4 are still placeholders.
 - `nqe-postprocess-runner` has a basic config example and a convergence-screening config example.
 - `check_chmc_window.py` exists; it is no longer a future script placeholder.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped files, but it is not a real DP-GEN example.
@@ -20,14 +20,11 @@ This file tracks work that remains after the current repository consistency pass
 High priority. The following files still need real observed failures, causes, checks, and conservative responses:
 
 - `deepmd-training/references/deepmd-failure-cases.md`
-- `dpdata-format-conversion/references/dpdata-failure-cases.md`
 - `dpgen-active-learning/references/dpgen-failure-cases.md`
 - `kmc-h2-efficiency/references/kmc-failure-cases.md`
 - `lammps-exploration/references/lammps-failure-cases.md`
-- `nqe-postprocess-runner/references/postprocess-runner-failure-cases.md`
-- `ti-tst-rate/references/ti-tst-failure-cases.md`
 
-`abacus-dft-labeling/references/abacus-failure-cases.md` and `chmc-cpihmc-sampling/references/chmc-cpihmc-failure-cases.md` already have populated cases and can be used as style references.
+`abacus-dft-labeling/references/abacus-failure-cases.md`, `chmc-cpihmc-sampling/references/chmc-cpihmc-failure-cases.md`, `ti-tst-rate/references/ti-tst-failure-cases.md`, `dpdata-format-conversion/references/dpdata-failure-cases.md`, and `nqe-postprocess-runner/references/postprocess-runner-failure-cases.md` already have populated cases and can be used as style references.
 
 ## 2. CHMC/CPIHMC Window Checking
 
@@ -53,7 +50,7 @@ Current state:
 
 Remaining work:
 
-- Add real failure cases for config parsing, missing windows, bad columns, unexpected dry-run commands, and child-script failures.
+- Exercise the populated failure cases with fresh-agent behavior tests for config parsing, missing windows, bad columns, unexpected dry-run commands, and child-script failures.
 - Add fresh-agent behavior tests for runnable versus non-runnable configs.
 - Validate convergence-screening config on real multi-window `PHY_QUANT` data.
 - Consider adding a `--generate-config` or draft-config mode only if it can preserve `parameters_confirmed: false` for unapproved values.
@@ -80,7 +77,7 @@ Current state:
 Remaining work:
 
 - Add small real or toy conversion examples with explicit format strings.
-- Add failure cases for wrong format strings, missing labels, element-order mismatch, cell-shape mismatch, and frame-count mismatch.
+- Use the populated dpdata failure cases to design small example checks for wrong format strings, missing labels, element-order mismatch, cell-shape mismatch, and frame-count mismatch.
 - Add a short recipe reference for ABACUS -> DeePMD raw/npy and LAMMPS dump inspection when format names are confirmed.
 
 ## 6. Fresh-Agent Test Records
@@ -122,9 +119,9 @@ Do not state that all manual tests have passed unless there is a dated test reco
 
 ## Suggested Priority Order
 
-1. Populate TI/TST, dpdata, and postprocess-runner failure references.
+1. Populate KMC and DeePMD failure references.
 2. Run and record fresh-agent tests for changed skills.
 3. Validate convergence screening on real multi-window `PHY_QUANT` data.
 4. Add a minimal KMC event-network checker.
-5. Add real small dpdata conversion examples and failure cases.
+5. Add real small dpdata conversion examples and failure-case-driven checks.
 6. Polish release-facing README and tutorial material after the evidence above is in place.

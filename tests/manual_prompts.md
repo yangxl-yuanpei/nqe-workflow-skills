@@ -252,6 +252,23 @@ Expected behavior:
 - Ask for source software, exact input format, target format, type map, units, and whether energies/forces/virials are present.
 - State that converted data still need downstream DeePMD/DP-GEN checks.
 
+### `dpdata-format-conversion` Parser/Shape Failure
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/dpdata-format-conversion.
+dpdata loads my ABACUS or VASP output but the converted DeePMD data has fewer frames than expected, missing virials, or a type_map mismatch. Can I continue training anyway?
+```
+
+Expected behavior:
+
+- Read or route to `references/dpdata-failure-cases.md`.
+- Refuse to treat a partial or shape-mismatched conversion as training-ready.
+- Ask for source software/version, dpdata version, exact format strings, expected frame count, atom count, labels, cells/PBC, virials, and type map.
+- Recommend inspecting the source, converting with explicit formats, reloading the converted output, and comparing source versus converted systems.
+- State that parser/version issues may require a dpdata update, another official route, or user-approved regeneration, not guessed repairs.
+
 ### `chmc-cpihmc-sampling`
 
 Prompt:
@@ -420,6 +437,24 @@ Expected behavior:
 - Refuse to treat the convergence CSV or auto-equilibration suggestion as proof of equilibration.
 - State that the runner can orchestrate per-window diagnostic plots and summaries before TI only when the config explicitly confirms the convergence columns and screening options.
 - State that any suggested cutoff still requires user review and does not automatically rewrite TI extraction `skiprows`.
+
+### Test 4: Runner Failure-Case Routing
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+The runner failed after writing mean_force_table.csv, and one child command says a window energy.dat could not be parsed. Can I rerun and continue from the partial output?
+```
+
+Expected behavior:
+
+- Read or route to `references/postprocess-runner-failure-cases.md`.
+- Treat partial outputs as diagnostic artifacts, not production results.
+- Identify the failing child-command stage before proposing rerun.
+- Route the bad window to CHMC/CPIHMC failure checks and the table/integration issue to TI/TST failure checks as appropriate.
+- Ask whether to use a fresh output directory or user-approved cleanup before rerunning.
+- Do not continue from partial CSVs without checking schema, provenance, and missing windows.
 
 ---
 
@@ -1316,6 +1351,23 @@ Expected behavior:
 - Report or promise to report the selected reactant reaction coordinate and transition-state reaction coordinate.
 - Ask the user to confirm these state choices or say whether they need modification.
 - If the user wants modification, ask whether the free-energy integration direction and zero reference should be checked before recomputing the rate.
+
+### Test: TST Negative Barrier Failure Case
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
+compute_tst_rates.py says the activation free energy is negative. Can I just take the absolute value and continue to KMC?
+```
+
+Expected behavior:
+
+- Read or route to `references/ti-tst-failure-cases.md`.
+- Refuse to take the absolute value silently.
+- Explain that a negative barrier usually means reactant/transition-state selection, integration direction, zero reference, dataset label, RC index, free-energy column, or sign convention must be checked.
+- Ask the user to confirm reactant/reference state, transition-state choice, integration direction, zero reference, free-energy unit, temperature, prefactor model, and elementary-step identity before recomputing.
+- State that KMC should receive confirmed elementary rates and event-network context, not an automatically repaired TST output.
 
 ### Test: Plot Script Direction Consistency
 
