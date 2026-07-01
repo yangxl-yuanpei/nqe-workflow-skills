@@ -1,6 +1,6 @@
 # CORR PHY_QUANT Handoff Example
 
-This semi-real example maps the real `corr-gc-cpihmc/PHY_QUANT` columns into TI/TST handoff tables. It demonstrates column semantics only.
+This semi-real example maps the real `corr-gc-cpihmc/PHY_QUANT` columns into TI/TST handoff tables. It demonstrates column semantics only. The CSV files follow the current TI/TST table schemas, including raw/au mean-force columns and separate `free_energy_converted` values.
 
 Important boundaries:
 

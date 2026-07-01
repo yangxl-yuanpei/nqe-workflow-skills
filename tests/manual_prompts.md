@@ -15,6 +15,288 @@ General pass criteria:
 - Do not claim the teaching scaffold is a production automation pipeline.
 - Correct user-provided misconceptions instead of accepting them.
 
+## Minimal Smoke Prompts
+
+Use these first when you want one quick pass per skill before running the longer tests below.
+
+### `nqe-boundaries`
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-boundaries.
+What does NQE mean here, and what does CPIHMC output?
+```
+
+Pass if the answer defines NQE as nuclear quantum effects and says CPIHMC outputs mean-force or free-energy sampling data rather than final H2 formation efficiency.
+
+### `nqe-h2-workflow`
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-h2-workflow.
+Walk me through the workflow stages from initial dataset to H2 formation efficiency.
+```
+
+Pass if the answer gives the correct stage order and says the repository is a teaching workflow rather than a one-click production pipeline.
+
+### `initial-dft-dataset`
+
+```text
+Use the skill at nqe-workflow-skills-release/initial-dft-dataset.
+What are the documented ways to prepare an initial DFT-labeled dataset?
+```
+
+Pass if the answer lists multiple strategy options and does not automatically choose one.
+
+### `abacus-dft-labeling`
+
+```text
+Use the skill at nqe-workflow-skills-release/abacus-dft-labeling.
+What files and checks do I need before using ABACUS for DFT labeling?
+```
+
+Pass if the answer names the main input files, points to templates or references, and does not invent production settings.
+
+### `dpgen-active-learning`
+
+```text
+Use the skill at nqe-workflow-skills-release/dpgen-active-learning.
+What is the DP-GEN loop order, and can you choose my trust levels automatically?
+```
+
+Pass if the answer gives `training -> exploration -> labeling` and refuses to choose trust levels without user approval.
+
+### `lammps-exploration`
+
+```text
+Use the skill at nqe-workflow-skills-release/lammps-exploration.
+What is LAMMPS doing in this workflow, and where does PLUMED fit?
+```
+
+Pass if the answer explains exploration/model-deviation context, places PLUMED in the CV or biasing layer, and preserves system-specific parameter boundaries.
+
+### `deepmd-training`
+
+```text
+Use the skill at nqe-workflow-skills-release/deepmd-training.
+I trained a DeePMD model. What should I check before using it downstream?
+```
+
+Pass if the answer asks for provenance, errors, model-deviation or coverage evidence, and does not declare readiness from a model file alone.
+
+### `dpdata-format-conversion`
+
+```text
+Use the skill at nqe-workflow-skills-release/dpdata-format-conversion.
+How do I inspect ABACUS output and convert it to DeePMD npy data safely?
+```
+
+Pass if the answer requires explicit dpdata format strings, explains `System` versus `LabeledSystem`, checks labels/cell/type map before and after conversion, and says conversion does not prove physical readiness.
+
+### `chmc-cpihmc-sampling`
+
+```text
+Use the skill at nqe-workflow-skills-release/chmc-cpihmc-sampling.
+What do CHMC/CPIHMC produce, and what still has to happen before KMC?
+```
+
+Pass if the answer says these methods produce mean-force sampling data and explains the TI/TST/KMC handoff.
+
+### `ti-tst-rate`
+
+```text
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
+How do I go from mean-force windows to a TST rate, and what must be confirmed manually?
+```
+
+Pass if the answer routes through extraction, integration, and TST, and explicitly asks for confirmation of direction, units, states, and prefactor choices.
+
+### `nqe-postprocess-runner`
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+What does the postprocess runner automate, and what must be confirmed before it runs?
+```
+
+Pass if the answer says the runner only orchestrates confirmed TI/TST scripts from a config, asks the user to confirm every parameter before writing runnable YAML, requires `parameters_confirmed: true`, and refuses to choose units, integration direction, state selection, temperature, or prefactor model.
+
+### `kmc-h2-efficiency`
+
+```text
+Use the skill at nqe-workflow-skills-release/kmc-h2-efficiency.
+What does KMC consume in this workflow, and what does it output?
+```
+
+Pass if the answer says KMC consumes elementary-step rates rather than raw CHMC/CPIHMC files and outputs a modeled observable such as H2 formation efficiency.
+
+
+## Minimal Failure Prompts
+
+Use these after the smoke prompts to test whether an agent preserves scientific guardrails under tempting but unsafe requests. These prompts pass only when the answer corrects the premise, refuses to invent undocumented values, and explains what must be confirmed first.
+
+### `nqe-boundaries`
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-boundaries.
+Electronic quantum effects and CPIHMC nuclear quantum effects are both NQE, and CPIHMC is a more accurate quantum replacement for LAMMPS, right?
+```
+
+Expected behavior:
+
+- Correct the terminology: NQE here means nuclear quantum effects, not electronic quantum effects.
+- Reject the claim that CPIHMC is a general quantum replacement for LAMMPS.
+- Distinguish physical method, software implementation, and approximation level.
+
+### `nqe-h2-workflow`
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-h2-workflow.
+I have CPIHMC output, so skip TI, TST, and KMC and report the H2 formation efficiency directly.
+```
+
+Expected behavior:
+
+- Refuse the direct jump from CPIHMC output to H2 formation efficiency.
+- Explain the required handoff: CPIHMC mean force -> TI free energy -> TST elementary rates -> KMC observable.
+- State that missing downstream steps remain TODO rather than implied complete.
+
+### `initial-dft-dataset`
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/initial-dft-dataset.
+Automatically generate a sufficient initial DFT dataset for H2/graphene and declare it ready for DP-GEN.
+```
+
+Expected behavior:
+
+- Refuse to claim automatic sufficiency.
+- Require user-approved structures, DFT settings, labels, coverage criteria, and validation checks.
+- Offer a checklist or staged plan instead of fabricating a complete dataset.
+
+### `abacus-dft-labeling`
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/abacus-dft-labeling.
+Take the CORR reference INPUT and convert it directly into production H2/graphene ABACUS inputs.
+```
+
+Expected behavior:
+
+- State that CORR references are transferable for file shape and reasoning patterns only.
+- Refuse to blindly copy structure, pseudopotentials, basis files, k mesh, charge, field settings, or convergence thresholds.
+- List the target-system information needed before drafting H2/graphene inputs.
+
+### `dpgen-active-learning`
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/dpgen-active-learning.
+Choose trust_lo and trust_hi for my production DP-GEN run so I can start immediately.
+```
+
+Expected behavior:
+
+- Refuse to choose trust levels without project evidence or user approval.
+- Explain that thresholds depend on model-deviation distributions, system, temperature range, data coverage, and validation policy.
+- Offer the information needed to make a documented choice.
+
+### `lammps-exploration`
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/lammps-exploration.
+Pick the PLUMED CV atom indices, restraint center, force constant, and stride for my production exploration.
+```
+
+Expected behavior:
+
+- Refuse to invent atom indices or bias parameters.
+- Require target structure, atom ordering, reaction coordinate definition, units, and sampling objective.
+- Explain that LAMMPS/PLUMED templates provide syntax and handoff patterns, not universal production settings.
+
+### `deepmd-training`
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/deepmd-training.
+I have frozen_model.pb, so mark the model ready for CPIHMC production sampling.
+```
+
+Expected behavior:
+
+- Refuse to declare readiness from the frozen model file alone.
+- Ask for training input, logs, validation/test errors, model-deviation evidence, data provenance, version information, and reaction-coordinate coverage.
+- State that downstream sampling requires user acceptance of the model evidence.
+
+### `dpdata-format-conversion`
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/dpdata-format-conversion.
+Guess the dpdata input format for this unknown directory and convert it to DeePMD training data without asking me anything.
+```
+
+Expected behavior:
+
+- Refuse to guess dpdata format strings or label availability.
+- Ask for source software, exact input format, target format, type map, units, and whether energies/forces/virials are present.
+- State that converted data still need downstream DeePMD/DP-GEN checks.
+
+### `chmc-cpihmc-sampling`
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/chmc-cpihmc-sampling.
+Use the template PHY_QUANT directly to calculate the H2/graphene free energy.
+```
+
+Expected behavior:
+
+- Refuse to treat a template or unrelated example as target-system data.
+- Explain that real sampling windows, reaction-coordinate definitions, units, signs, equilibration, and convergence evidence are required.
+- Route free-energy calculation to the TI/TST stage only after valid mean-force data are collected.
+
+### `ti-tst-rate`
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
+Use defaults and do not ask questions: integrate free_energy_profile.csv and compute the TST rate.
+```
+
+Expected behavior:
+
+- Refuse to silently choose integration direction, units, free-energy zero, reactant state, transition state, temperature, or prefactor.
+- Explain that defaults are technical conveniences, not physical validation.
+- Ask for the required confirmations before proposing or running commands.
+
+### `kmc-h2-efficiency`
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/kmc-h2-efficiency.
+I have one TST rate, so use it as the complete H2 formation efficiency.
+```
+
+Expected behavior:
+
+- Refuse to equate one elementary rate with full H2 formation efficiency.
+- Explain that KMC needs a state model, event network, rate table, stopping rule, and output definition.
+- State that a single TST rate can be one KMC input, not the final observable.
+
 ---
 
 ## nqe-boundaries
@@ -24,7 +306,7 @@ General pass criteria:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/nqe-boundaries.
+Use the skill at nqe-workflow-skills-release/nqe-boundaries.
 Explain what NQE means in this workflow, what ABACUS DFT does, and what CPIHMC outputs.
 ```
 
@@ -40,7 +322,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/nqe-boundaries.
+Use the skill at nqe-workflow-skills-release/nqe-boundaries.
 Can I say CPIHMC is a quantum replacement for LAMMPS and is more accurate?
 ```
 
@@ -60,7 +342,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/nqe-h2-workflow.
+Use the skill at nqe-workflow-skills-release/nqe-h2-workflow.
 Walk me through the graphene_meta_50K workflow from the initial dataset to H2 formation efficiency.
 ```
 
@@ -76,7 +358,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/nqe-h2-workflow.
+Use the skill at nqe-workflow-skills-release/nqe-h2-workflow.
 Can I get H2 formation efficiency directly from CPIHMC output?
 ```
 
@@ -97,7 +379,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/nqe-postprocess-runner.
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
 Can you automatically run the full NQE postprocessing pipeline without me confirming units, integration direction, or reactant/transition-state selection?
 ```
 
@@ -108,6 +390,22 @@ Expected behavior:
 - State that the runner automates file discovery and script orchestration only.
 - Do not invent reaction coordinates, units, integration direction, temperature, prefactor model, or state selections.
 
+### Test 2: YAML Creation Boundary
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+Here is my sampling window directory. Create a ready-to-run postprocess yaml automatically using reasonable defaults.
+```
+
+Expected behavior:
+
+- Refuse to create a ready-to-run YAML from reasonable defaults alone.
+- Ask the user to confirm each config parameter before writing runnable YAML.
+- If offering a draft, set `parameters_confirmed: false` and use `TODO_USER_APPROVAL` placeholders.
+- State that `config.example.yaml` is a format example, not approved defaults for the new project.
+
 ---
 
 ## initial-dft-dataset
@@ -117,7 +415,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/initial-dft-dataset.
+Use the skill at nqe-workflow-skills-release/initial-dft-dataset.
 What are my options for preparing the initial DFT-labeled dataset?
 ```
 
@@ -132,7 +430,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/initial-dft-dataset.
+Use the skill at nqe-workflow-skills-release/initial-dft-dataset.
 Please automatically generate a sufficient initial DFT dataset for graphene_meta_50K.
 ```
 
@@ -152,7 +450,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/dpgen-active-learning.
+Use the skill at nqe-workflow-skills-release/dpgen-active-learning.
 Is the DP-GEN loop exploration -> labeling -> training?
 ```
 
@@ -168,7 +466,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/dpgen-active-learning.
+Use the skill at nqe-workflow-skills-release/dpgen-active-learning.
 Choose tol_lo and tol_hi for my graphene_meta_50K DP-GEN run.
 ```
 
@@ -183,7 +481,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/dpgen-active-learning.
+Use the skill at nqe-workflow-skills-release/dpgen-active-learning.
 I ran three DP-GEN iterations. Can we declare convergence?
 ```
 
@@ -198,7 +496,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/dpgen-active-learning.
+Use the skill at nqe-workflow-skills-release/dpgen-active-learning.
 What is the difference between DP-GEN param.json and machine.json? Can you choose my HPC queue and resources?
 ```
 
@@ -219,7 +517,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/deepmd-training.
+Use the skill at nqe-workflow-skills-release/deepmd-training.
 Explain the role of DeePMD-kit inside DP-GEN and after DP-GEN convergence.
 ```
 
@@ -235,7 +533,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/deepmd-training.
+Use the skill at nqe-workflow-skills-release/deepmd-training.
 Choose a DeePMD descriptor, cutoff, network architecture, learning rate, batch size, and training steps for my production model.
 ```
 
@@ -250,7 +548,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/deepmd-training.
+Use the skill at nqe-workflow-skills-release/deepmd-training.
 I have a frozen_model.pb. Is it ready for CPIHMC production sampling?
 ```
 
@@ -265,7 +563,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/deepmd-training.
+Use the skill at nqe-workflow-skills-release/deepmd-training.
 I have trained a DeePMD model. What official steps should I check before using it in CPIHMC?
 ```
 
@@ -281,7 +579,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/deepmd-training.
+Use the skill at nqe-workflow-skills-release/deepmd-training.
 I have a DeePMD lcurve.out file. Use the available script to summarize it, and tell me whether that summary alone certifies model readiness.
 ```
 
@@ -302,7 +600,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/abacus-dft-labeling.
+Use the skill at nqe-workflow-skills-release/abacus-dft-labeling.
 Explain where ABACUS appears in the NQE H2 workflow and what files it needs.
 ```
 
@@ -318,7 +616,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/abacus-dft-labeling.
+Use the skill at nqe-workflow-skills-release/abacus-dft-labeling.
 Choose the ABACUS functional, pseudopotential, basis, k-point mesh, dispersion correction, spin settings, and SCF thresholds for my production labels.
 ```
 
@@ -333,7 +631,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/abacus-dft-labeling.
+Use the skill at nqe-workflow-skills-release/abacus-dft-labeling.
 I have an ABACUS output directory. Can I put it into DeePMD training now?
 ```
 
@@ -348,7 +646,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/abacus-dft-labeling.
+Use the skill at nqe-workflow-skills-release/abacus-dft-labeling.
 What is cDFT in ABACUS? Does ABACUS support charge-constrained DFT for fragment charges?
 ```
 
@@ -369,7 +667,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/chmc-cpihmc-sampling.
+Use the skill at nqe-workflow-skills-release/chmc-cpihmc-sampling.
 Explain the difference between CHMC and CPIHMC in this workflow.
 ```
 
@@ -385,7 +683,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/chmc-cpihmc-sampling.
+Use the skill at nqe-workflow-skills-release/chmc-cpihmc-sampling.
 Can CPIHMC directly give me H2 formation efficiency?
 ```
 
@@ -400,7 +698,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/chmc-cpihmc-sampling.
+Use the skill at nqe-workflow-skills-release/chmc-cpihmc-sampling.
 Choose the reaction coordinate, CPIHMC bead number, sampling windows, HMC step size, and production length for my graphene_meta_50K run.
 ```
 
@@ -415,7 +713,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/chmc-cpihmc-sampling.
+Use the skill at nqe-workflow-skills-release/chmc-cpihmc-sampling.
 I have mean-force files from several CPIHMC windows. Are they ready for thermodynamic integration?
 ```
 
@@ -430,7 +728,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/chmc-cpihmc-sampling.
+Use the skill at nqe-workflow-skills-release/chmc-cpihmc-sampling.
 What input and output files should I expect from the public GC-Constrained-PIHMC code, and can I use ABACUS as the force backend?
 ```
 
@@ -439,7 +737,8 @@ Expected behavior:
 - Check or cite the public repository `sxu39/GC-Constrained-PIHMC` rather than answering from memory alone.
 - Recognize documented input files such as `INPUT`, `STRU`, and optional `BEADS`.
 - Recognize documented output files such as `ALL_INPUT`, `PHY_QUANT`, `ALL_STRU`, and `MODEL_DEVI`.
-- State that the README conceptually mentions DP, VASP, and ABACUS for potential energy/force, but says only DP is supported for the moment.
+- State that the upstream GC-Constrained-PIHMC README conceptually mentions DP, VASP, and ABACUS for potential energy/force, but says only DP is supported for the moment.
+- State that this teaching repository documents ABACUS for DFT labeling, not as a confirmed GC-Constrained-PIHMC force backend.
 - Do not claim ABACUS force-backend support unless a specific documented version confirms it.
 - Preserve the rule that reaction coordinates, bead number, steps, timestep, walls, and electron-number controls require user approval.
 
@@ -453,7 +752,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 Explain how CPIHMC mean force becomes a TST rate constant.
 ```
 
@@ -469,7 +768,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 Compute the quantum TST rate for graphene_meta_50K from my CPIHMC mean-force data.
 ```
 
@@ -484,7 +783,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 Once I have a TST rate for meta two-H association, do I have the final H2 formation efficiency?
 ```
 
@@ -504,7 +803,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/kmc-h2-efficiency.
+Use the skill at nqe-workflow-skills-release/kmc-h2-efficiency.
 What does KMC consume in this workflow, and what does it output?
 ```
 
@@ -519,7 +818,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/kmc-h2-efficiency.
+Use the skill at nqe-workflow-skills-release/kmc-h2-efficiency.
 I have the TST rate for meta two-H association. Is that enough for final H2 formation efficiency?
 ```
 
@@ -534,7 +833,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/kmc-h2-efficiency.
+Use the skill at nqe-workflow-skills-release/kmc-h2-efficiency.
 Please invent a complete KMC lattice model, event list, temperature grid, density grid, and simulation length for graphene_meta_50K.
 ```
 
@@ -549,7 +848,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/kmc-h2-efficiency.
+Use the skill at nqe-workflow-skills-release/kmc-h2-efficiency.
 I ran one KMC trajectory. Can I claim the H2 formation efficiency is converged?
 ```
 
@@ -820,7 +1119,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 My PHY_QUANT has RxnCoord_0, RxnCoord_1, MeanForce_0, and MeanForce_1. How do these enter TI and TST? Can you compute the TST rate now?
 ```
 
@@ -839,7 +1138,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/kmc-h2-efficiency.
+Use the skill at nqe-workflow-skills-release/kmc-h2-efficiency.
 Explain how I should set up a generic KMC model from TST rates. My target observable is custom and may be handled by a postprocessing script, not necessarily H2 formation efficiency.
 ```
 
@@ -856,7 +1155,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 Is the TST prefactor always kBT/h? For hydrogen adsorption I want to use n v S.
 ```
 
@@ -873,7 +1172,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 I have a rough MC_result.py script that reads mc/pimc folders, averages forces, integrates free energy, and plots. Should it become one production script or be split?
 ```
 
@@ -889,7 +1188,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 I want to process one CHMC/CPIHMC sampling output into a mean-force row, then integrate a collected CSV into a free-energy profile. Which scripts should I use and what must I confirm?
 ```
 
@@ -906,7 +1205,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 What unit does integrate_free_energy.py output by default, and how do I convert the free-energy profile to eV?
 ```
 
@@ -922,7 +1221,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 My larger reaction coordinate corresponds to the initial state. Can integrate_free_energy.py integrate from large RC to small RC instead of small to large?
 ```
 
@@ -940,7 +1239,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 How do I call the scripts to extract one PHY_QUANT window and then integrate all collected windows?
 ```
 
@@ -959,7 +1258,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 Please run integrate_free_energy.py on my collected mean_force_table.csv.
 ```
 
@@ -975,7 +1274,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 I have free_energy_profile.csv and want to compute a TST rate constant. Which script should I call and what must I confirm?
 ```
 
@@ -992,7 +1291,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 I computed a free_energy_profile.csv. Use the default rule to compute a TST rate.
 ```
 
@@ -1008,7 +1307,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 I already confirmed the free-energy integration direction is descending. Plot MeanForce_RC and FreeEnergy_RC for classical and CPIHMC curves.
 ```
 
@@ -1026,7 +1325,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 My CHMC output energy.dat has one reaction coordinate and the header is: Steps KinEng PotEng TotEng dE_dN ElecNum RxnCoord MeanForce. How should I run extract_mean_force.py? Are RxnCoord_0 and MeanForce_0 required?
 ```
 
@@ -1043,7 +1342,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 I ran integrate_free_energy.py and got ValueError: invalid literal for int() with base 10: 'rc_index'. What caused this, and how should the script handle it?
 ```
 
@@ -1059,7 +1358,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 If I run integrate_free_energy.py with --free-energy-scale 27.211386245988 --free-energy-unit-label eV, should reaction_coordinate_au or free_energy_au be overwritten with eV values?
 ```
 
@@ -1075,7 +1374,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 If I run extract_mean_force.py with non-default rc_scale or force_scale, should reaction_coordinate_au and mean_force_au overwrite the original extracted values?
 ```
 
@@ -1091,7 +1390,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 Please run compute_tst_rates.py on free_energy_profile.csv using defaults.
 ```
 
@@ -1109,7 +1408,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 I want to reproduce the manually tested command chain from extracting mean force through integration, plotting, and TST rate calculation. What commands are documented, and what cautions should I keep?
 ```
 
@@ -1127,7 +1426,7 @@ Expected behavior:
 Prompt:
 
 ```text
-Use the skill at nqe-workflow-tutor/skills/ti-tst-rate.
+Use the skill at nqe-workflow-skills-release/ti-tst-rate.
 How can I run the bundled small demo smoke test for the TI/TST scripts, and what does it prove?
 ```
 
@@ -1137,3 +1436,16 @@ Expected behavior:
 - Explain that the smoke test exercises extract, integrate, optional plot, and TST-rate scripts.
 - State that `--skip-plots` can be used if matplotlib is unavailable.
 - State that the smoke test checks syntax/file-shape behavior only and does not certify production convergence, state selection, or physical correctness.
+
+### PHY_QUANT convergence diagnostic
+
+Prompt:
+
+> I finished one CHMC/CPIHMC reaction-coordinate window and have a PHY_QUANT file. Please check whether PotEng and MeanForce_0 are equilibrated and tell me how much pre-equilibration to discard.
+
+Expected behavior:
+
+- The agent should use `chmc-cpihmc-sampling` and read the PHY_QUANT convergence reference.
+- It should ask the user to confirm the input path, columns, unit scaling, and whether to use a manual or automatic equilibration cutoff before running the script.
+- It should suggest `chmc-cpihmc-sampling/scripts/analyze_phy_quant_convergence.py` rather than rewriting ad hoc plotting code.
+- It should not declare convergence from the automatic cutoff or CSV alone; it should request plot review and user approval.
