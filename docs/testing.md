@@ -69,6 +69,7 @@ python dpdata-format-conversion/scripts/inspect_dpdata_system.py --help
 python dpdata-format-conversion/scripts/convert_with_dpdata.py --help
 python dpdata-format-conversion/scripts/compare_converted_system.py --help
 python deepmd-training/scripts/parse_lcurve.py --help
+python chmc-cpihmc-sampling/scripts/check_chmc_window.py --help
 python chmc-cpihmc-sampling/scripts/analyze_phy_quant_convergence.py --print-defaults
 python ti-tst-rate/scripts/extract_mean_force.py --print-defaults
 python ti-tst-rate/scripts/integrate_free_energy.py --print-defaults
@@ -76,6 +77,7 @@ python ti-tst-rate/scripts/compute_tst_rates.py --print-defaults
 python ti-tst-rate/scripts/plot_mean_force.py --help
 python ti-tst-rate/scripts/plot_free_energy.py --help
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py nqe-postprocess-runner/assets/config.example.yaml --dry-run
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py nqe-postprocess-runner/assets/config.convergence-screening.example.yaml --dry-run
 ```
 
 These checks only confirm that minimal static checkers and script interfaces load and expose expected options. They do not validate convergence, parameter quality, or physical correctness. The CHMC/CPIHMC convergence helper reports screening diagnostics only; plot review and user-approved equilibration choices are still required.
@@ -83,6 +85,7 @@ These checks only confirm that minimal static checkers and script interfaces loa
 For ABACUS, the static checker also checks INPUT-declared STRU/KPT paths and pseudopotential/orbital file references from STRU when the relevant directories are documented. Missing files under explicit directories are failures; missing files under implicit current-directory fallback are warnings for review.
 
 The postprocess runner smoke test uses `--dry-run` so it checks config parsing, window discovery, and generated child commands without executing the TI/TST scripts or requiring plotting dependencies.
+The convergence-screening example extends this check by verifying that per-window `analyze_phy_quant_convergence.py` commands are generated before mean-force extraction, without treating suggested cutoffs as automatic TI discard lengths.
 
 ## TI/TST Demo Chain
 

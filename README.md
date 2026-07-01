@@ -44,6 +44,20 @@ ABACUS is the documented open DFT backend in this teaching repository. DeePMD-ki
 | `nqe-postprocess-runner` | Config-driven wrapper for confirmed sampling-output -> mean-force -> free-energy -> TST CSV/plot/summary runs | experimental |
 | `kmc-h2-efficiency` | General KMC event-network logic and H2-efficiency-specific boundaries | teaching-ready |
 
+## Current Progress
+
+Current repository state:
+
+- 12 skills cover the full teaching workflow from initial DFT data through KMC reasoning.
+- 14 Python helper scripts are available for static checks, data conversion, diagnostics, and guarded post-processing.
+- 19 `.template` files provide input or handoff scaffolds with explicit `TODO_USER_APPROVAL` placeholders.
+- `nqe-postprocess-runner` now has both a basic demo config and an optional convergence-screening config.
+- `check_chmc_window.py` and `analyze_phy_quant_convergence.py` support the current CHMC/CPIHMC pre-TI checking path.
+- 9 failure-case reference files exist; 7 are still placeholders and should not be treated as reliable diagnosis guides yet.
+- Manual prompt coverage exists, but complete fresh-agent pass records are not yet documented.
+
+The most up-to-date status and pending-work summaries live in [docs/current-status-report.md](docs/current-status-report.md) and [docs/pending-work.md](docs/pending-work.md).
+
 ## Real Reference Examples
 
 These examples are included to show real file shapes, naming patterns, and transfer boundaries. They are not production defaults for a new H2/graphene calculation.
@@ -72,6 +86,7 @@ The scripts are deterministic helpers for diagnostics and post-processing. They 
 | `dpdata-format-conversion/scripts/convert_with_dpdata.py` | Convert atomistic data between explicit dpdata input/output formats | converted data |
 | `dpdata-format-conversion/scripts/compare_converted_system.py` | Compare source and converted dpdata systems for basic shape consistency | JSON comparison |
 | `deepmd-training/scripts/parse_lcurve.py` | Parse DeePMD `lcurve.out`-style logs for first-pass diagnostics | Summary of columns, final values, and basic warnings |
+| `chmc-cpihmc-sampling/scripts/check_chmc_window.py` | Window health check: acceptance rate, output row integrity, RC consistency, convergence, INPUT/ALL_INPUT agreement | PASS/WARN/FAIL/SKIP report |
 | `chmc-cpihmc-sampling/scripts/analyze_phy_quant_convergence.py` | Plot and summarize `PHY_QUANT` potential-energy/mean-force convergence for one sampling window | convergence image and optional CSV summary |
 | `ti-tst-rate/scripts/extract_mean_force.py` | Extract one CHMC/CPIHMC sampling output/window into one mean-force CSV row | `mean_force_table.csv` |
 | `ti-tst-rate/scripts/integrate_free_energy.py` | Integrate collected mean-force windows into a relative free-energy profile | `free_energy_profile.csv` |
@@ -79,7 +94,7 @@ The scripts are deterministic helpers for diagnostics and post-processing. They 
 | `ti-tst-rate/scripts/plot_mean_force.py` | Plot one or more mean-force curves versus reaction coordinate | image file |
 | `ti-tst-rate/scripts/plot_free_energy.py` | Plot one or more free-energy curves versus reaction coordinate | image file |
 | `ti-tst-rate/scripts/run_smoke_test.py` | Run the bundled TI/TST demo chain as a smoke test | mean-force/free-energy/rate CSVs and optional plots |
-| `nqe-postprocess-runner/scripts/nqe_postprocess_runner.py` | Run the confirmed TI/TST postprocessing chain from a flat YAML/JSON config | CSVs, plots, `summary.json` |
+| `nqe-postprocess-runner/scripts/nqe_postprocess_runner.py` | Run the confirmed TI/TST postprocessing chain from a flat YAML/JSON config, optionally generating pre-TI convergence-screening commands | CSVs, plots, `summary.json` |
 
 Most TI/TST scripts require `--confirm-parameters`. This is intentional. The agent or user must confirm columns, unit conversions, equilibration discard, mean-force sign convention, integration direction, free-energy zero, initial/transition-state selection, and prefactor model before treating the result as meaningful.
 
@@ -98,6 +113,11 @@ The repository includes templates for major workflow stages:
 Templates use explicit placeholders and should be filled only with user-approved or project-documented choices.
 
 dpdata helpers live under `dpdata-format-conversion/scripts/` rather than templates because format conversion should be performed with explicit input/output format strings, confirmed type maps, and post-conversion checks.
+
+The postprocess runner also includes two config examples:
+
+- `nqe-postprocess-runner/assets/config.example.yaml`: basic TI/TST demo wrapper
+- `nqe-postprocess-runner/assets/config.convergence-screening.example.yaml`: same demo shape with optional per-window `PHY_QUANT` convergence screening before TI
 
 ## How To Test
 
@@ -126,6 +146,7 @@ python dpdata-format-conversion/scripts/inspect_dpdata_system.py --help
 python dpdata-format-conversion/scripts/convert_with_dpdata.py --help
 python dpdata-format-conversion/scripts/compare_converted_system.py --help
 python deepmd-training/scripts/parse_lcurve.py --help
+python chmc-cpihmc-sampling/scripts/check_chmc_window.py --help
 python chmc-cpihmc-sampling/scripts/analyze_phy_quant_convergence.py --print-defaults
 python ti-tst-rate/scripts/extract_mean_force.py --print-defaults
 python ti-tst-rate/scripts/integrate_free_energy.py --print-defaults
@@ -133,6 +154,7 @@ python ti-tst-rate/scripts/compute_tst_rates.py --print-defaults
 python ti-tst-rate/scripts/plot_mean_force.py --help
 python ti-tst-rate/scripts/plot_free_energy.py --help
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py nqe-postprocess-runner/assets/config.example.yaml --dry-run
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py nqe-postprocess-runner/assets/config.convergence-screening.example.yaml --dry-run
 ```
 
 For production-like tests, use copies of real or mock data and keep the expected behavior conservative: the scripts can summarize, extract, integrate, compute, and plot, but the user still confirms physical interpretation.

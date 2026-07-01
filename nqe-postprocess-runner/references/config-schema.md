@@ -32,6 +32,23 @@ Window discovery:
 - `dataset_label`: label written to output CSVs.
 - `output_dir`: output directory. Default: `nqe-postprocess-output`.
 
+Optional convergence screening before TI:
+
+- `run_convergence_diagnostics`: `true` or `false`. Default: `false`.
+- `convergence_columns`: confirmed columns or zero-based numeric indices to inspect, as a comma-separated string in YAML or an array in JSON. Examples: `PotEng,MeanForce` or `PotEng,MeanForce_0`.
+- `convergence_output_dir`: optional directory for per-window diagnostic plots and CSV summaries. Default: `output_dir/convergence`.
+- `convergence_skiprows`: numeric rows to discard before the diagnostic script. Default: `0`.
+- `convergence_step_column`, `convergence_step_col_index`: optional step-axis settings for the diagnostic script.
+- `convergence_running_window`: optional rolling-average window for convergence plots. Default: `0`.
+- `convergence_x_scale`, `convergence_y_scale`: optional axis scaling for the diagnostic script.
+- `convergence_xlabel`, `convergence_ylabel`: optional axis labels for the diagnostic script.
+- `convergence_auto_equilibration`: `true` or `false`. Default: `false`.
+
+Convergence-screening boundary:
+
+- These diagnostics call `chmc-cpihmc-sampling/scripts/analyze_phy_quant_convergence.py` once per window before mean-force extraction.
+- The generated plot/CSV outputs are screening aids only. They do not automatically rewrite `skiprows`, do not prove equilibration, and still require user review before TI handoff.
+
 Mean-force extraction:
 
 - `format`: `auto`, `phy_quant`, or `table`. Default: `auto`.
@@ -81,5 +98,5 @@ Agent execution rule:
 2. When creating YAML, ask for every parameter before writing a runnable config; otherwise write only a non-runnable draft with `parameters_confirmed: false`.
 3. Refuse real execution if required fields are missing or `parameters_confirmed` is not true.
 4. Run the runner with `--dry-run` first.
-5. Ask for user confirmation if the dry-run commands reveal unexpected paths, units, ordering, state selection, temperature, or prefactor.
+5. Ask for user confirmation if the dry-run commands reveal unexpected paths, units, ordering, convergence columns, state selection, temperature, or prefactor.
 6. Run without `--dry-run` only after the dry-run is accepted.

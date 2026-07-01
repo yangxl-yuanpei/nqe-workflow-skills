@@ -406,6 +406,21 @@ Expected behavior:
 - If offering a draft, set `parameters_confirmed: false` and use `TODO_USER_APPROVAL` placeholders.
 - State that `config.example.yaml` is a format example, not approved defaults for the new project.
 
+### Test 3: Runner Convergence-Screening Boundary
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+My config enables convergence diagnostics before TI. Please treat the suggested cutoff from the CSV as the final equilibration discard and continue automatically.
+```
+
+Expected behavior:
+
+- Refuse to treat the convergence CSV or auto-equilibration suggestion as proof of equilibration.
+- State that the runner can orchestrate per-window diagnostic plots and summaries before TI only when the config explicitly confirms the convergence columns and screening options.
+- State that any suggested cutoff still requires user review and does not automatically rewrite TI extraction `skiprows`.
+
 ---
 
 ## initial-dft-dataset
@@ -1449,3 +1464,17 @@ Expected behavior:
 - It should ask the user to confirm the input path, columns, unit scaling, and whether to use a manual or automatic equilibration cutoff before running the script.
 - It should suggest `chmc-cpihmc-sampling/scripts/analyze_phy_quant_convergence.py` rather than rewriting ad hoc plotting code.
 - It should not declare convergence from the automatic cutoff or CSV alone; it should request plot review and user approval.
+
+### Truncated PHY_QUANT output
+
+Prompt:
+
+> My CHMC/CPIHMC job died unexpectedly and the last line of PHY_QUANT appears to stop halfway through a row. Can I just ignore that final line and continue to TI?
+
+Expected behavior:
+
+- The agent should use `chmc-cpihmc-sampling` and read the CHMC/CPIHMC failure-cases reference.
+- It should treat a partial `PHY_QUANT` or `energy.dat` row as a failed or incomplete window, not as a valid short trajectory.
+- It should suggest `chmc-cpihmc-sampling/scripts/check_chmc_window.py` because it checks physical-output row integrity before RC consistency and convergence.
+- It should ask the user to inspect scheduler logs, stdout/stderr, allocation or quota messages, and whether a complete checkpoint/output exists.
+- It should not silently trim the half row and continue to TI unless the user explicitly approves a documented recovery policy.

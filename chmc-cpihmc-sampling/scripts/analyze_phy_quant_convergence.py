@@ -51,7 +51,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--skiprows", type=int, default=0, help="Number of numeric data rows to skip after the header.")
     parser.add_argument("--delimiter", default=None, help="Optional delimiter. Default: arbitrary whitespace.")
     parser.add_argument("--equilibration-index", type=int, help="Zero-based data-row index where production sampling starts after skiprows.")
-    parser.add_argument("--equilibration-step", type=float, help="Step value where production sampling starts.")
+    parser.add_argument(
+        "--equilibration-step",
+        type=float,
+        help="Step value where production sampling starts, interpreted in the plotted/scaled x-axis units.",
+    )
     parser.add_argument("--auto-equilibration", action="store_true", help="Suggest an equilibration cutoff with conservative block-stability heuristics.")
     parser.add_argument("--auto-max-fraction", type=float, default=0.8, help="Largest fraction auto-equilibration may discard. Default: 0.8.")
     parser.add_argument("--auto-step-fraction", type=float, default=0.05, help="Fractional spacing between candidate burn-in cutoffs. Default: 0.05.")
@@ -79,7 +83,7 @@ def build_parser() -> argparse.ArgumentParser:
 def print_defaults() -> None:
     print("Default behavior:")
     print("  input table: whitespace-delimited PHY_QUANT/energy.dat style")
-    print("  default analyzed column: first available of PotEng, MeanForce, MeanForce_0")
+    print("  default analyzed columns: PotEng plus the first available mean-force column among MeanForce or MeanForce_0")
     print("  column indices: zero-based")
     print("  step column: Steps")
     print("  skiprows: 0 numeric data rows after header")
@@ -161,7 +165,6 @@ def select_value_columns(header: Sequence[str], names: Sequence[str], indices: S
         for candidate in DEFAULT_COLUMN_CANDIDATES:
             if candidate in header:
                 selected.append(header.index(candidate))
-                break
     if not selected:
         raise ValueError(f"No value column selected. Pass --column NAME or --col-index N. Available columns={list(header)}")
     unique: List[int] = []
@@ -376,7 +379,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if args.equilibration_index is not None:
         user_eq_index = args.equilibration_index
     elif args.equilibration_step is not None:
-        user_eq_index = index_from_step(raw_steps, args.equilibration_step * args.x_scale)
+        user_eq_index = index_from_step(raw_steps, args.equilibration_step)
     diagnostics: List[SeriesDiagnostic] = []
     plot_series: List[Tuple[str, List[float], SeriesDiagnostic]] = []
     for index in value_indices:

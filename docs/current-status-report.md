@@ -1,63 +1,95 @@
-# NQE Workflow Skills 仓库现状报告
+# NQE Workflow Skills Current Status Report
 
-## 整体成熟度：教学就绪 (Teaching-Ready)
+Last updated: 2026-07-01
 
-仓库已建成一个结构化的教学示例骨架，包含 12 个 skill，覆盖 NQE H2 workflow 全链路。
+## Overall Status
 
-## ✅ 已经做好的
+This repository is currently a teaching, checking, and semi-automated post-processing skills library for an atomistic NQE workflow. It is not a one-click production pipeline.
 
-| 维度 | 现状 |
+The workflow coverage is broad and internally coherent:
+
+```text
+initial DFT-labeled dataset
+  -> DP-GEN active learning
+    -> LAMMPS/PLUMED exploration
+      -> ABACUS DFT labeling
+        -> DeePMD/MLFF training
+          -> CHMC/CPIHMC mean-force sampling
+            -> thermodynamic integration
+              -> activation free energy
+                -> TST elementary rates
+                  -> KMC event-network reasoning
+```
+
+## Repository Snapshot
+
+| Area | Current state |
 |---|---|
-| **技能覆盖** | 12 个 skill，从 NQE 基础 → DFT → DP-GEN → DeePMD → CHMC/CPIHMC → TI/TST → KMC 全链路 |
-| **测试体系** | `tests/manual_prompts.md` 含 smoke + failure + 完整测试，所有 28 个测试已通过验证 |
-| **脚本** | 13 个可执行脚本（TI/TST 链、DeePMD 诊断、dpdata 转换、文件检查、后处理编排） |
-| **模板** | 19 个模板，统一使用 `TODO_USER_APPROVAL` 占位符 |
-| **引用文档** | 各 skill 带 official-notes 和 checklist |
-| **边界防护** | 所有 skill 强制要求用户确认参数，拒绝自行编造数值 |
+| Skills | 12 skills total |
+| Skill maturity | Most skills are ready for teaching/checking; `nqe-postprocess-runner` remains experimental; `kmc-h2-efficiency` remains teaching-ready |
+| Scripts | 14 Python helper scripts |
+| Templates | 19 `.template` files |
+| Failure references | 9 `*failure-cases.md` files; 2 populated, 7 still placeholders |
+| Manual prompts | Broad prompt coverage exists in `tests/manual_prompts.md`; fresh-agent pass status is not fully recorded |
+| Open DFT backend | ABACUS is the documented open backend; do not reintroduce VASP as the default |
+| Production status | Not production-ready without target-system parameters, convergence evidence, and user-approved physical choices |
 
-## ⚠️ 仍需完善的小问题
+## What Is Working
 
-- **2 个断裂引用**：`initial-dft-dataset/SKILL.md:68` 和 `kmc-h2-efficiency/SKILL.md:78` 指向不存在的文件
-- **8/9 failure-cases 为空**：仅存占位符 TODO 文件
-- **无真正的 production 工作流文件**：所有数值都是占位符
+- The 12 skills cover the full teaching workflow from initial DFT data through KMC reasoning.
+- The README, quickstart, testing guide, and major skills now agree on the repository boundary: useful for teaching, guarded checking, and deterministic post-processing helpers, not automatic production.
+- The TI/TST script chain exists and is split into extraction, integration, plotting, and TST-rate computation.
+- `nqe-postprocess-runner` can dry-run a confirmed config and generate child commands for the TI/TST chain.
+- `nqe-postprocess-runner` now has an optional convergence-screening mode that generates per-window `analyze_phy_quant_convergence.py` commands before mean-force extraction.
+- `analyze_phy_quant_convergence.py` supports single-RC demo files and real multi-column `PHY_QUANT` shapes such as `PotEng` plus `MeanForce_0`.
+- `check_chmc_window.py` exists as a CHMC/CPIHMC window health-check helper for acceptance, physical-output row integrity, RC consistency, convergence screening, and `INPUT`/`ALL_INPUT` comparison.
+- `dpdata-format-conversion` provides inspect, convert, and compare helpers for dpdata-readable systems.
+- Real or semi-real reference examples exist for ABACUS, DP-GEN, LAMMPS/PLUMED, DeePMD, CHMC/CPIHMC, TI/TST handoff, and KMC event-network shape.
 
-## 🏭 可替代的人工操作
+## Current Gaps
 
-### 1. 数据后处理（完全替代）
+- `7/9` failure-case reference files are still placeholders. `abacus-dft-labeling/references/abacus-failure-cases.md` and `chmc-cpihmc-sampling/references/chmc-cpihmc-failure-cases.md` currently contain populated cases.
+- Fresh-agent manual test results are not fully recorded. Do not claim that all manual prompts have passed unless a dated test record is added.
+- `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped `param.json`, `machine.json`, and README files. It is not a real DP-GEN production example.
+- `nqe-postprocess-runner` is still experimental because it needs more failure cases, fresh-agent behavior tests, and more real multi-window validation.
+- `kmc-h2-efficiency` is still teaching-ready because it lacks an executable schema checker for event networks and rate tables.
+- The repository still lacks target-system-specific production inputs, validated physical parameters, convergence evidence, and provenance records.
 
-| 操作 | 原人工方式 | 现脚本 |
-|---|---|---|
-| 从 CHMC/CPIHMC 输出提取平均力 | 打开文件、找列、复制数据 | `extract_mean_force.py` |
-| TI 积分得到自由能势能面 | Excel/手算积分 | `integrate_free_energy.py` |
-| 从自由能面计算 TST 速率常数 | 代入公式 k = pref·exp(-ΔF/kT) | `compute_tst_rates.py` |
-| 编排完整后处理链 | 按顺序手动运行 3 个脚本 | `nqe_postprocess_runner.py` |
-| 解析 DeePMD 训练日志 | 打开 lcurve.out 逐列看 | `parse_lcurve.py` |
-| 文件格式完整性检查 | 肉眼核对文件结构 | `check_workflow_files.py` |
-| ABACUS ↔ DeePMD 数据转换 | 手动 dpdata 命令 | `convert_with_dpdata.py` |
-| 绘图（平均力、自由能曲线） | 手动 matplotlib | `plot_mean_force.py` / `plot_free_energy.py` |
+## Script Inventory
 
-### 2. 知识问答/指导（部分替代）
+The current 14 Python helper scripts are:
 
-加载这些 skill 的 AI agent 可替代**初级导师/文档查阅**角色：
-- 回答 "下一步该做什么" 的工作流问题
-- 给出每个 stage 的 checklist
-- 纠正概念错误（如 "CPIHMC 输出可以直接算效率吗 → 否"）
-- 拒绝编造参数并要求用户确认
-- 协助编写/检查配置文件结构（ABACUS INPUT、DP-GEN param.json、LAMMPS input 等）
+- `common/scripts/check_workflow_files.py`
+- `deepmd-training/scripts/parse_lcurve.py`
+- `dpdata-format-conversion/scripts/inspect_dpdata_system.py`
+- `dpdata-format-conversion/scripts/convert_with_dpdata.py`
+- `dpdata-format-conversion/scripts/compare_converted_system.py`
+- `chmc-cpihmc-sampling/scripts/check_chmc_window.py`
+- `chmc-cpihmc-sampling/scripts/analyze_phy_quant_convergence.py`
+- `ti-tst-rate/scripts/extract_mean_force.py`
+- `ti-tst-rate/scripts/integrate_free_energy.py`
+- `ti-tst-rate/scripts/compute_tst_rates.py`
+- `ti-tst-rate/scripts/plot_mean_force.py`
+- `ti-tst-rate/scripts/plot_free_energy.py`
+- `ti-tst-rate/scripts/run_smoke_test.py`
+- `nqe-postprocess-runner/scripts/nqe_postprocess_runner.py`
 
-### 3. 🚫 不能替代的（仍需人工）
+Script output remains diagnostic or post-processing output. It is not proof of physical correctness or production convergence.
 
-- **所有计算任务**：ABACUS DFT、DP-GEN 循环、LAMMPS 探索、DeePMD 训练、CHMC/CPIHMC 采样
-- **物理判断**：反应坐标定义、信任阈值选取、收敛性判断、RC 符号约定、prefactor 模型选择
-- **数值设定**：k 点、截断能、赝势、系综参数、温度、步长等
+## Highest-Priority Next Work
 
-## 💡 对实际生产的帮助
+1. Populate the next high-value failure references, starting with TI/TST, dpdata, and postprocess-runner.
+2. Add dated fresh-agent test records for the changed skills and prompts, especially `nqe-postprocess-runner`, `dpdata-format-conversion`, and `kmc-h2-efficiency`.
+3. Continue validating `analyze_phy_quant_convergence.py` and runner convergence screening on real multi-window `PHY_QUANT` data.
+4. Add a minimal KMC event-network checker such as `check_kmc_network.py` or `check_kmc_events.py`.
+5. Add small real dpdata conversion examples and failure cases.
+6. Keep README, quickstart, testing guide, status report, and pending-work documents synchronized after every script or skill change.
 
-作为教学参考，仓库的核心价值是：
+## Scientific Guardrails
 
-1. **工作流设计蓝图** — 12 个 stage 的上下游依赖关系、每个 stage 的输入/输出/需确认参数，可直接映射到真实项目
-2. **脚本可用** — `extract_mean_force.py` → `integrate_free_energy.py` → `compute_tst_rates.py` 加上 `nqe_postprocess_runner.py` 编排，经过参数确认后可直接用于真实数据
-3. **checklist 模板** — 每个 skill 的 checklist 和 failure-cases 可复用为真实项目的质量门禁
-4. **代理测试套件** — `tests/manual_prompts.md` 可作为评估 AI agent 在科研工作流中行为规范的质量标准
-
-**目前还不是生产即用型管线**，但已经是一个结构完备、可扩展的教学参考框架。
+- Real reference examples show file shape, organization, and migration boundaries. They are not defaults for a new target system.
+- DFT settings, DP-GEN trust levels, DeePMD hyperparameters, reaction coordinates, sampling lengths, CPIHMC beads, TST prefactors, and KMC event networks require user confirmation.
+- From CHMC/CPIHMC to TI, inspect `PHY_QUANT` potential-energy and mean-force convergence evidence first.
+- From free energy to TST, confirm integration direction, initial state, transition state, units, and prefactor.
+- From rates to KMC, confirm event network, state definitions, rate table, and output metrics.
+- ABACUS remains the documented open DFT backend in this teaching repository.

@@ -61,7 +61,8 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 
 ## Output Checks
 
-- For each reaction-coordinate window, use `scripts/analyze_phy_quant_convergence.py` when the user asks to inspect `PHY_QUANT` potential-energy or mean-force convergence; ask the user to confirm columns, unit scaling, and equilibration policy before running it.
+- Use `scripts/check_chmc_window.py` for a five-part window health check: acceptance rate, `PHY_QUANT`/`energy.dat` row integrity, final RC vs INPUT constraint consistency, potential energy and mean force convergence, and ALL_INPUT vs INPUT parameter agreement. Require `--confirm-parameters` before running.
+- For deeper convergence analysis, use `scripts/analyze_phy_quant_convergence.py` when the user asks to inspect `PHY_QUANT` potential-energy or mean-force convergence with plots; ask the user to confirm columns, unit scaling, and equilibration policy before running it.
 - Check that mean force is reported for each reaction-coordinate window.
 - Check uncertainty estimates, autocorrelation, and mixing diagnostics if available.
 - Check HMC acceptance rate and abnormal rejection behavior if available.
@@ -80,7 +81,7 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 
 ## References
 
-- Read `references/chmc-cpihmc-failure-cases.md` when CHMC/CPIHMC runs fail or outputs are missing. This placeholder should be expanded with real observed failures before relying on it for diagnosis.
+- Read `references/chmc-cpihmc-failure-cases.md` when CHMC/CPIHMC runs fail, outputs are missing, or `PHY_QUANT`/`energy.dat` appears truncated.
 - Read `references/phy-quant-convergence-diagnostics.md` before plotting or automatically screening `PHY_QUANT` convergence.
 
 - Read `../common/references/command-help.md` when an executable name, command option, subcommand, or version-specific syntax is missing; use official docs and local `-h`/`--help`/`help` output instead of guessing.

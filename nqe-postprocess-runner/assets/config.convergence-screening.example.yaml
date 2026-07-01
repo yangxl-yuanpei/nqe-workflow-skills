@@ -1,0 +1,38 @@
+# Example showing optional pre-TI convergence screening for the bundled single-RC demo.
+# This remains a format example only; do not reuse these values for a new target system
+# unless the user explicitly confirms each field.
+parameters_confirmed: true
+
+sampling_output_root: ../../ti-tst-rate/templates/reference-examples/user-tested-ti-tst-chain/demo
+input_file: energy.dat
+window_glob: "*"
+dataset_label: demo_cpihmc_100K
+output_dir: ../../tmp/nqe-postprocess-demo-with-convergence
+
+run_convergence_diagnostics: true
+convergence_columns: PotEng,MeanForce
+convergence_output_dir: ../../tmp/nqe-postprocess-demo-with-convergence/convergence
+convergence_skiprows: 1
+convergence_running_window: 1000
+convergence_auto_equilibration: true
+
+format: auto
+skiprows: 1
+rc_raw_unit_label: au
+force_raw_unit_label: au
+rc_scale: 1.0
+force_scale: 1.0
+rc_index: 0
+
+integration_direction: descending
+zero: first
+free_energy_scale: 27.211386245988
+free_energy_unit_label: eV
+
+plots: true
+compute_tst: true
+elementary_step: CHO
+temperature_K: 100
+reactant_mode: first
+ts_mode: max
+prefactor_model: kBT_over_h

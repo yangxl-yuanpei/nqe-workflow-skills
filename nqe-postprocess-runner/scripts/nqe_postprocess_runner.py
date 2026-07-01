@@ -57,6 +57,17 @@ def load_config(path: Path) -> dict[str, Any]:
     return load_simple_yaml(path)
 
 
+def parse_listish(value: Any) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        return [item.strip() for item in value.split(",") if item.strip()]
+    if isinstance(value, (list, tuple)):
+        return [str(item).strip() for item in value if str(item).strip()]
+    text = str(value).strip()
+    return [text] if text else []
+
+
 def as_bool(config: dict[str, Any], key: str, default: bool) -> bool:
     value = config.get(key, default)
     if isinstance(value, bool):
@@ -120,6 +131,11 @@ def add_opt(cmd: list[str], flag: str, config: dict[str, Any], key: str) -> None
         cmd.extend([flag, str(value)])
 
 
+def add_flag(cmd: list[str], flag: str, enabled: bool) -> None:
+    if enabled:
+        cmd.append(flag)
+
+
 def run(cmd: list[str], dry_run: bool, commands: list[list[str]]) -> None:
     commands.append(cmd)
     print("$ " + " ".join(shlex.quote(part) for part in cmd))
@@ -158,6 +174,47 @@ def build_extract_cmd(python: str, scripts: Path, config: dict[str, Any], window
     add_opt(cmd, "--rc-col-index", config, "rc_col_index")
     add_opt(cmd, "--force-col-index", config, "force_col_index")
     add_opt(cmd, "--notes", config, "notes")
+    return cmd
+
+
+def build_convergence_cmd(
+    python: str,
+    repo_root: Path,
+    config: dict[str, Any],
+    window: Path,
+    output_dir: Path,
+    input_file: str,
+) -> list[str]:
+    columns = parse_listish(config.get("convergence_columns"))
+    if not columns:
+        raise ValueError(
+            "run_convergence_diagnostics=true requires convergence_columns "
+            "(comma-separated names or zero-based numeric indices)"
+        )
+    cmd = [
+        python,
+        str(repo_root / "chmc-cpihmc-sampling" / "scripts" / "analyze_phy_quant_convergence.py"),
+        "--input", str(window / input_file),
+        "--output", str(output_dir / f"{window.name}.png"),
+        "--summary", str(output_dir / f"{window.name}.csv"),
+        "--skiprows", str(config.get("convergence_skiprows", 0)),
+        "--confirm-parameters",
+    ]
+    for item in columns:
+        try:
+            index = int(item)
+        except ValueError:
+            cmd.extend(["--column", item])
+        else:
+            cmd.extend(["--col-index", str(index)])
+    add_opt(cmd, "--step-column", config, "convergence_step_column")
+    add_opt(cmd, "--step-col-index", config, "convergence_step_col_index")
+    add_opt(cmd, "--running-window", config, "convergence_running_window")
+    add_opt(cmd, "--x-scale", config, "convergence_x_scale")
+    add_opt(cmd, "--y-scale", config, "convergence_y_scale")
+    add_opt(cmd, "--xlabel", config, "convergence_xlabel")
+    add_opt(cmd, "--ylabel", config, "convergence_ylabel")
+    add_flag(cmd, "--auto-equilibration", as_bool(config, "convergence_auto_equilibration", False))
     return cmd
 
 
@@ -249,14 +306,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         raise ValueError("Refusing to run until config contains parameters_confirmed: true")
 
     config_dir = config_path.parent
+    repo_root = Path(__file__).resolve().parents[2]
     root = path_from(config_dir, require(config, "sampling_output_root"))
     out = path_from(config_dir, config.get("output_dir", "nqe-postprocess-output"))
     scripts = script_paths(config, config_dir)
     python = str(config.get("python", sys.executable))
     input_file = str(config.get("input_file", "energy.dat"))
     windows = discover_windows(root, input_file, str(config.get("window_glob", "*")))
+    run_convergence = as_bool(config, "run_convergence_diagnostics", False)
+    convergence_dir = path_from(config_dir, config.get("convergence_output_dir", out / "convergence"))
 
     out.mkdir(parents=True, exist_ok=True)
+    if run_convergence and not args.dry_run:
+        convergence_dir.mkdir(parents=True, exist_ok=True)
     mean_force = out / "mean_force_table.csv"
     free_energy = out / "free_energy_profile.csv"
     rates = out / "tst_rates.csv"
@@ -264,6 +326,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     unlink_outputs([mean_force, free_energy, rates, summary], args.dry_run)
 
     commands: list[list[str]] = []
+    if run_convergence:
+        for window in windows:
+            run(build_convergence_cmd(python, repo_root, config, window, convergence_dir, input_file), args.dry_run, commands)
     for window in windows:
         run(build_extract_cmd(python, scripts, config, window, mean_force, input_file), args.dry_run, commands)
     run(build_integrate_cmd(python, scripts, config, mean_force, free_energy), args.dry_run, commands)
@@ -279,6 +344,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "window_count": len(windows),
         "windows": [{"sample_label": window.name, "input": str(window / input_file)} for window in windows],
         "outputs": {
+            "convergence_dir": str(convergence_dir) if run_convergence else None,
             "mean_force_table": str(mean_force),
             "free_energy_profile": str(free_energy),
             "tst_rates": str(rates) if as_bool(config, "compute_tst", True) else None,
@@ -288,6 +354,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "commands": commands,
         "notes": [
             "All numerical choices come from the confirmed config.",
+            "Convergence diagnostics remain screening outputs; review plots and do not treat suggested cutoffs as proof of equilibration.",
             "Inspect reactant and transition-state selections before treating rates as final.",
         ],
     }
