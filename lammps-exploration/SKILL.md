@@ -18,6 +18,7 @@ Use this skill for LAMMPS-based exploration in DP-GEN and related MLFF sampling 
 - Use `dpgen-active-learning` when the LAMMPS run is part of DP-GEN `model_devi_jobs`.
 - Use `deepmd-training` when the question concerns frozen DeePMD model paths, model ensemble consistency, or `pair_style deepmd` model files.
 - Use `abacus-dft-labeling` when selected exploration configurations are handed off for first-principles labeling.
+- Use `dpdata-format-conversion` when LAMMPS dumps/data/restarts need to be inspected or converted through dpdata for downstream checking or dataset preparation.
 
 ## Roles In This Workflow
 
@@ -44,6 +45,8 @@ Use this skill for LAMMPS-based exploration in DP-GEN and related MLFF sampling 
 - Do not treat a LAMMPS trajectory as a DFT label. LAMMPS exploration proposes configurations; ABACUS labeling supplies first-principles labels.
 - Do not treat the CORR DP-GEN exploration schedule as an H2/graphene default.
 
+- Use `../common/scripts/check_workflow_files.py --software lammps --path PATH_TO_RUN` for a minimal static check of LAMMPS input/log files. Use `--software plumed` for standalone PLUMED input checks. Treat warnings as prompts for human review, not as trajectory-stability proof.
+
 ## Input Checks
 
 - Confirm the LAMMPS input script and data/restart source are documented.
@@ -59,6 +62,7 @@ Use this skill for LAMMPS-based exploration in DP-GEN and related MLFF sampling 
 - Check LAMMPS completed without fatal errors.
 - Check thermo output for NaNs, extreme temperatures, pressure blow-ups, or energy drift inconsistent with the intended ensemble.
 - Check dump trajectories are present, readable, and have consistent atom count, type map, cell, and ordering assumptions.
+- Use `dpdata-format-conversion` for dpdata-readable trajectory/data shape inspection; do not treat that as proof of physical stability.
 - Check restart and model-deviation outputs are present if required by DP-GEN.
 - Check PLUMED output files such as CV traces or restraint diagnostics are present and synchronized with LAMMPS output when PLUMED is used.
 - Flag broken trajectories or chemically unreasonable structures for human review before ABACUS labeling.
@@ -72,6 +76,8 @@ Use this skill for LAMMPS-based exploration in DP-GEN and related MLFF sampling 
 - Read `templates/reference-examples/README.md` when the user provides real LAMMPS scripts from another project.
 
 ## References
+
+- Read `references/lammps-failure-cases.md` when LAMMPS or PLUMED exploration fails. This placeholder should be expanded with real observed failures before relying on it for diagnosis.
 
 - Read `../common/references/command-help.md` when an executable name, command option, subcommand, or version-specific syntax is missing; use official docs and local `-h`/`--help`/`help` output instead of guessing.
 

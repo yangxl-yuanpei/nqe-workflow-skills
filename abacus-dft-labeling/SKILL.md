@@ -18,6 +18,7 @@ Use this skill for ABACUS-specific first-principles labeling tasks in the NQE H2
 - Use `initial-dft-dataset` when ABACUS is used to generate or check starting labels before DP-GEN.
 - Use `dpgen-active-learning` when ABACUS labeling occurs inside DP-GEN iterations.
 - Use `deepmd-training` when ABACUS labels are being checked for DeePMD training readiness.
+- Use `dpdata-format-conversion` when ABACUS outputs need to be inspected or converted into DeePMD raw/npy data or another atomistic data format.
 
 ## Roles In This Workflow
 
@@ -32,6 +33,7 @@ Use this skill for ABACUS-specific first-principles labeling tasks in the NQE H2
 - Help inspect ABACUS outputs for obvious missing labels, SCF failures, force/virial availability, or unit/format issues.
 - Produce TODO lists for missing functional, pseudopotential, basis, k-point, dispersion, spin, charge, slab, and convergence settings.
 - Explain how ABACUS labels hand off to DP-GEN and DeePMD-kit data preparation.
+- Route actual ABACUS-output-to-DeePMD conversion commands to `dpdata-format-conversion`.
 
 ## What This Skill Must Not Do
 
@@ -41,6 +43,8 @@ Use this skill for ABACUS-specific first-principles labeling tasks in the NQE H2
 - Do not invent ABACUS commands, file names, keywords, or output fields; use official ABACUS documentation or existing project templates.
 - Do not change physical assumptions to make a calculation easier without user approval.
 - Do not relax or alter DP-GEN candidate structures when the task is single-point labeling; discuss fixed/free atoms only for explicit optimization workflows.
+
+- Use `../common/scripts/check_workflow_files.py --software abacus --path PATH_TO_CALC` for a minimal static check of ABACUS `INPUT`/`STRU`/`KPT` files, INPUT-declared STRU/KPT paths, pseudopotential/orbital file existence, and obvious output/log issues. Treat warnings as prompts for human review, not as convergence proof.
 
 ## Input Checks
 
@@ -57,6 +61,7 @@ Use this skill for ABACUS-specific first-principles labeling tasks in the NQE H2
 - Check energy, force, and virial/stress labels are present when required.
 - Check units and sign conventions before conversion to DP-GEN/DeePMD data.
 - Check atom ordering and cell information remain consistent with input structures.
+- Before conversion, confirm the dpdata input format string, target output format, type map, labels, and units with `dpdata-format-conversion`.
 - Flag broken structures, unconverged calculations, missing labels, or abnormal forces for human review.
 
 ## Templates
@@ -67,6 +72,8 @@ Use this skill for ABACUS-specific first-principles labeling tasks in the NQE H2
 - Read `templates/reference-examples/corr/README.md` and `references/abacus-corr-transfer-notes.md` when a real ABACUS project example is useful for file organization or style. Treat the CORR files as reference examples, not H2/graphene production settings.
 
 ## References
+
+- Read `references/abacus-failure-cases.md` when ABACUS input checks or logs mention missing pseudopotential files, missing numerical orbital files, missing STRU/KPT paths, or path-resolution failures.
 
 - Read `../common/references/command-help.md` when an executable name, command option, subcommand, or version-specific syntax is missing; use official docs and local `-h`/`--help`/`help` output instead of guessing.
 

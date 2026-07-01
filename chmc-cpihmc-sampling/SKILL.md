@@ -27,12 +27,14 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 - Explain that the classical versus quantum distinction depends on whether path-integral beads are used.
 - Help inspect planned sampling inputs for MLFF path, reaction coordinate, temperature, windows, bead number, HMC/MC parameters, equilibration, sampling length, and output format.
 - Help inspect mean-force output readiness for thermodynamic integration.
+- Help plot and summarize `PHY_QUANT` convergence diagnostics for potential energy and mean-force columns after each sampling window.
 - Produce TODO lists for missing sampling parameters and convergence evidence.
 
 ## What This Skill Must Not Do
 
 - Do not choose reaction coordinates, bead number, window positions, HMC step size, HMC step count, equilibration length, production length, or convergence criteria without user approval.
 - Do not claim CHMC/CPIHMC results are converged without documented acceptance rates, autocorrelation/mixing checks, and mean-force convergence evidence.
+- Do not treat the automatic cutoff from `scripts/analyze_phy_quant_convergence.py` as proof of equilibration; it is a screening suggestion that requires user review.
 - Do not claim CPIHMC directly outputs H2 formation efficiency.
 - Do not claim CPIHMC is a replacement for LAMMPS or more accurate than LAMMPS.
 - Do not invent in-house code input fields, commands, paths, or file formats.
@@ -46,6 +48,8 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 - Keep this capability separate from the current workflow unless the user explicitly adds electrochemical or constant-potential assumptions. This is a package capability, not a default assumption for an arbitrary target system.
 - Require user approval for `Elec_Num_Ratio`, `Mu`, `Elec_Num_Range`, `Elec_Num_Width`, initial electron number in `STRU`, and any interpretation as constant-potential sampling.
 
+- Use `../common/scripts/check_workflow_files.py --software chmc --path PATH_TO_RUN` for a minimal static check of CHMC/CPIHMC `INPUT`, `STRU`, optional `BEADS`, and `PHY_QUANT`/`energy.dat` file shapes. Treat warnings as prompts for human review, not as sampling-convergence proof.
+
 ## Input Checks
 
 - Confirm the DeePMD frozen model has been accepted for downstream sampling.
@@ -57,6 +61,7 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 
 ## Output Checks
 
+- For each reaction-coordinate window, use `scripts/analyze_phy_quant_convergence.py` when the user asks to inspect `PHY_QUANT` potential-energy or mean-force convergence; ask the user to confirm columns, unit scaling, and equilibration policy before running it.
 - Check that mean force is reported for each reaction-coordinate window.
 - Check uncertainty estimates, autocorrelation, and mixing diagnostics if available.
 - Check HMC acceptance rate and abnormal rejection behavior if available.
@@ -74,6 +79,9 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 - Read `references/chmc-cpihmc-real-output-notes.md` when interpreting `ALL_INPUT`, `BEADS`, `PHY_QUANT`, or real CHMC/CPIHMC output files.
 
 ## References
+
+- Read `references/chmc-cpihmc-failure-cases.md` when CHMC/CPIHMC runs fail or outputs are missing. This placeholder should be expanded with real observed failures before relying on it for diagnosis.
+- Read `references/phy-quant-convergence-diagnostics.md` before plotting or automatically screening `PHY_QUANT` convergence.
 
 - Read `../common/references/command-help.md` when an executable name, command option, subcommand, or version-specific syntax is missing; use official docs and local `-h`/`--help`/`help` output instead of guessing.
 

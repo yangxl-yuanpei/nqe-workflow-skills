@@ -19,6 +19,7 @@ Use this skill for the DP-GEN stage that turns a user-prepared initial DFT-label
 - Use `deepmd-training` when the question concerns DeePMD-kit `input.json`, training logs, freeze, or model testing.
 - Use `lammps-exploration` when the question concerns LAMMPS input scripts, exploration trajectories, LAMMPS variables, `model_devi_jobs` templates, or LAMMPS output sanity checks.
 - Use `abacus-dft-labeling` when the question concerns first-principles labeling tasks.
+- Use `dpdata-format-conversion` when preparing, inspecting, or converting labeled data between ABACUS, DeePMD raw/npy, LAMMPS, or other dpdata-readable formats.
 - Use `nqe-h2-workflow` when the user asks how DP-GEN connects to CHMC/CPIHMC, TI, TST, or KMC.
 
 ## Core Loop
@@ -52,11 +53,14 @@ Treat model-deviation selection as an internal filtering mechanism within or imm
 - Do not invent DP-GEN commands, paths, scheduler settings, queue names, or JSON fields.
 - Do not present the loop as exploration -> labeling -> training or as training -> exploration -> model-deviation selection -> labeling.
 
+- Use `../common/scripts/check_workflow_files.py --software dpgen --path PATH_TO_RUN` for a minimal static check of `param.json`/`run_param.json`, `machine.json`, placeholders, and obvious schema issues. Treat warnings as prompts for human review, not as convergence proof.
+
 ## Checks Before Running DP-GEN
 
 - Confirm the initial DFT-labeled dataset exists and passed the `initial-dft-dataset` checklist.
 - Confirm DFT metadata consistency between the initial dataset and future ABACUS labeling.
 - Confirm `type_map` and atom ordering are consistent with DeePMD data and exploration structures.
+- Confirm converted datasets have been checked with `dpdata-format-conversion` when DP-GEN inputs came from another software format.
 - Confirm `param.json` and `machine.json` are present or explicitly marked TODO.
 - Confirm DeePMD training template ownership belongs to `deepmd-training`, not this skill.
 - Confirm ABACUS labeling template ownership belongs to `abacus-dft-labeling`, not this skill.
@@ -80,6 +84,8 @@ Treat model-deviation selection as an internal filtering mechanism within or imm
 - Read `templates/reference-examples/README.md` and `references/dpgen-real-input-transfer-notes.md` when the user provides or asks about real DP-GEN `param.json`/`machine.json` files from another project.
 
 ## References
+
+- Read `references/dpgen-failure-cases.md` when DP-GEN runs fail or logs are ambiguous. This placeholder should be expanded with real observed failures before relying on it for diagnosis.
 
 - Read `../common/references/command-help.md` when an executable name, command option, subcommand, or version-specific syntax is missing; use official docs and local `-h`/`--help`/`help` output instead of guessing.
 

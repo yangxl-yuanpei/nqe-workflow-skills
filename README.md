@@ -4,6 +4,12 @@ This repository contains agent-readable skills for teaching, inspecting, and par
 
 The current repository is a teaching and guidance skills library. It is not yet a one-click production automation pipeline.
 
+Quick entry points:
+
+- [Quick Start](docs/quickstart.md)
+- [Manual Skill Tests](tests/manual_prompts.md)
+- [Testing Guide](docs/testing.md)
+
 ## Workflow Scope
 
 ```text
@@ -32,6 +38,7 @@ ABACUS is the documented open DFT backend in this teaching repository. DeePMD-ki
 | `dpgen-active-learning` | DP-GEN training, exploration, labeling loop, trust-region boundaries, and staged exploration guidance | ready |
 | `lammps-exploration` | LAMMPS/PLUMED exploration templates, model-deviation handoff, and transfer boundaries | ready |
 | `deepmd-training` | DeePMD-kit training, freeze/test/model-selection boundaries, and diagnostics | ready |
+| `dpdata-format-conversion` | dpdata-based atomistic data inspection, explicit format conversion, and converted-data shape comparison | ready |
 | `chmc-cpihmc-sampling` | CHMC/CPIHMC input/output templates, mean-force sampling checks, and grand-canonical notes | ready |
 | `ti-tst-rate` | Mean-force extraction, TI integration, free-energy barrier extraction, TST rate calculation, and plotting guidance | ready |
 | `nqe-postprocess-runner` | Config-driven wrapper for confirmed sampling-output -> mean-force -> free-energy -> TST CSV/plot/summary runs | experimental |
@@ -56,11 +63,16 @@ There is also a `dpgen-active-learning/templates/reference-examples/placeholder-
 
 ## Available Scripts
 
-The scripts are deterministic helpers for diagnostics and post-processing. They do not replace expert review.
+The scripts are deterministic helpers for diagnostics and post-processing. They do not replace expert review. The shared file checker is intentionally minimal: it checks file presence, parseability, placeholders, expected columns/keywords, selected ABACUS resource-file paths, and obvious error markers, not convergence or physical parameter quality.
 
 | Script | Purpose | Output |
 |---|---|---|
+| `common/scripts/check_workflow_files.py` | Minimal static checks for ABACUS, DP-GEN, DeePMD, LAMMPS, PLUMED, CHMC/CPIHMC, TI/TST, and KMC file shapes | PASS/WARN/FAIL report |
+| `dpdata-format-conversion/scripts/inspect_dpdata_system.py` | Inspect frame/atom counts, type map, cell, and label availability in dpdata-readable data | JSON summary |
+| `dpdata-format-conversion/scripts/convert_with_dpdata.py` | Convert atomistic data between explicit dpdata input/output formats | converted data |
+| `dpdata-format-conversion/scripts/compare_converted_system.py` | Compare source and converted dpdata systems for basic shape consistency | JSON comparison |
 | `deepmd-training/scripts/parse_lcurve.py` | Parse DeePMD `lcurve.out`-style logs for first-pass diagnostics | Summary of columns, final values, and basic warnings |
+| `chmc-cpihmc-sampling/scripts/analyze_phy_quant_convergence.py` | Plot and summarize `PHY_QUANT` potential-energy/mean-force convergence for one sampling window | convergence image and optional CSV summary |
 | `ti-tst-rate/scripts/extract_mean_force.py` | Extract one CHMC/CPIHMC sampling output/window into one mean-force CSV row | `mean_force_table.csv` |
 | `ti-tst-rate/scripts/integrate_free_energy.py` | Integrate collected mean-force windows into a relative free-energy profile | `free_energy_profile.csv` |
 | `ti-tst-rate/scripts/compute_tst_rates.py` | Extract an activation free-energy barrier and compute one TST rate | `tst_rates.csv` |
@@ -85,6 +97,8 @@ The repository includes templates for major workflow stages:
 
 Templates use explicit placeholders and should be filled only with user-approved or project-documented choices.
 
+dpdata helpers live under `dpdata-format-conversion/scripts/` rather than templates because format conversion should be performed with explicit input/output format strings, confirmed type maps, and post-conversion checks.
+
 ## How To Test
 
 Manual behavior tests live in:
@@ -92,6 +106,8 @@ Manual behavior tests live in:
 ```text
 tests/manual_prompts.md
 ```
+
+The full testing workflow is documented in [docs/testing.md](docs/testing.md).
 
 Recommended manual test process:
 
@@ -104,13 +120,19 @@ Recommended manual test process:
 Useful script smoke tests:
 
 ```bash
+python common/scripts/check_workflow_files.py --software abacus --path abacus-dft-labeling/templates/reference-examples/corr --allow-warnings
+python common/scripts/check_workflow_files.py --software dpgen --path dpgen-active-learning/templates/reference-examples/corr-dpgen --allow-warnings
+python dpdata-format-conversion/scripts/inspect_dpdata_system.py --help
+python dpdata-format-conversion/scripts/convert_with_dpdata.py --help
+python dpdata-format-conversion/scripts/compare_converted_system.py --help
 python deepmd-training/scripts/parse_lcurve.py --help
+python chmc-cpihmc-sampling/scripts/analyze_phy_quant_convergence.py --print-defaults
 python ti-tst-rate/scripts/extract_mean_force.py --print-defaults
 python ti-tst-rate/scripts/integrate_free_energy.py --print-defaults
 python ti-tst-rate/scripts/compute_tst_rates.py --print-defaults
 python ti-tst-rate/scripts/plot_mean_force.py --help
 python ti-tst-rate/scripts/plot_free_energy.py --help
-python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py nqe-postprocess-runner/assets/config.example.yaml
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py nqe-postprocess-runner/assets/config.example.yaml --dry-run
 ```
 
 For production-like tests, use copies of real or mock data and keep the expected behavior conservative: the scripts can summarize, extract, integrate, compute, and plot, but the user still confirms physical interpretation.
@@ -124,12 +146,13 @@ The skills can help an agent:
 - inspect whether required inputs, outputs, metadata, or diagnostics are missing
 - use official-documentation notes instead of inventing software behavior
 - distinguish reusable patterns from project-specific numerical settings
+- inspect and convert atomistic file formats with dpdata when the user confirms format names and labels
 - generate TODO lists, readiness checklists, and conservative draft templates
 - run available diagnostic/post-processing scripts when the user confirms assumptions
 
 The skills must not let an agent:
 
-- invent DFT settings, DP-GEN trust levels, DeePMD hyperparameters, reaction coordinates, CPIHMC bead counts, HMC/MC settings, TST prefactors, or KMC event networks
+- invent DFT settings, DP-GEN trust levels, DeePMD hyperparameters, reaction coordinates, CPIHMC bead counts, HMC/MC settings, TST prefactors, KMC event networks, or dpdata format strings
 - copy CORR reference parameters directly into H2/graphene or another target system
 - claim that a template, frozen model, `PHY_QUANT`, or one CSV file proves production readiness
 - claim that CPIHMC directly outputs H2 formation efficiency
@@ -142,6 +165,7 @@ This repository currently teaches the workflow and provides guarded scaffolds. A
 
 - target-system-specific ABACUS input files and convergence-tested settings
 - validated initial structures and DFT-labeled datasets
+- documented dpdata conversion commands, type maps, units, label availability, and converted-data shape checks
 - project-approved DP-GEN exploration schedules, trust thresholds, and machine settings
 - validated DeePMD model-selection criteria and frozen models
 - confirmed CHMC/CPIHMC reaction coordinates, windows, units, signs, sampling length, and convergence evidence

@@ -43,6 +43,8 @@ Use this skill for kinetic Monte Carlo as a general event-based simulation stage
 - Do not claim KMC outputs are statistically converged without documented trajectory statistics and steady-state checks.
 - Do not decide physical assumptions such as thermalization, gas-dust decoupling, coverage independence, or adiabatic adsorption without user approval.
 
+- Use `../common/scripts/check_workflow_files.py --software kmc --path PATH_TO_KMC_INPUTS` for a minimal static check of KMC event and parameter JSON files. Treat warnings as prompts for human review, not as event-network validation.
+
 ## Input Checks
 
 - Confirm each elementary rate has an elementary-step label, temperature, units, and classical/quantum label.
@@ -69,7 +71,9 @@ Use this skill for kinetic Monte Carlo as a general event-based simulation stage
 
 ## References
 
+- Read `references/kmc-failure-cases.md` when KMC setup, event networks, or output interpretation fails. This placeholder should be expanded with real observed failures before relying on it for diagnosis.
+
 - Read `references/kmc-general-logic.md` when explaining KMC principles, generic event selection, custom observables, and non-H2 use cases.
 - Read `references/kmc-checklist.md` for local workflow-specific checks.
 - Read repository file `templates/kmc/README.md` for the current placeholder template plan and KMC handoff boundaries.
-- Read repository files `docs/overview.md` and `workflow.yaml` for the full workflow context.
+- Read repository files `README.md`, `docs/quickstart.md`, and `docs/testing.md` for the full workflow context.

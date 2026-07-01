@@ -32,8 +32,10 @@ Use this stage order:
 - Use `dpgen-active-learning` for train-explore-label loops, model deviation, trust levels, candidate selection, and convergence diagnostics.
 - Use `lammps-exploration` for LAMMPS input scripts, exploration trajectories, variables, thermo/dump outputs, and DP-GEN exploration-engine checks.
 - Use `deepmd-training` for DeePMD-kit input.json, training/freeze/test, data format, and model error checks.
+- Use `dpdata-format-conversion` for explicit atomistic data format inspection/conversion between ABACUS, DeePMD, DP-GEN, LAMMPS, xyz/ASE-like data, and related handoffs.
 - Use `chmc-cpihmc-sampling` for reaction coordinates, CHMC/CPIHMC modes, beads, sampling windows, and mean-force output.
 - Use `ti-tst-rate` for mean-force integration, free-energy barriers, TST rate constants, and NQE enhancement factors.
+- Use `nqe-postprocess-runner` when confirmed TI/TST assumptions should be executed through a config-driven wrapper around the existing postprocessing scripts.
 - Use `kmc-h2-efficiency` for event lists, elementary-step rates, lattice assumptions, and formation efficiency.
 - Use `nqe-boundaries` whenever reviewing terminology, automation claims, or scientific boundaries.
 
@@ -49,10 +51,12 @@ Use this stage order:
 
 - Do not generate production input files by itself.
 - Do not choose ABACUS settings, DP-GEN trust levels, DeePMD architecture, reaction coordinates, CPIHMC bead number, HMC parameters, TI method, or KMC event lists.
+- Do not guess dpdata format strings, type maps, unit conversions, or whether labels survived conversion.
+- Do not run the postprocess runner unless its config records confirmed units, column mapping, integration direction, state selection, temperature, and prefactor assumptions.
 - Do not claim the workflow can run end-to-end unless all required input files, scripts, and execution environments exist.
 - Do not claim final H2 formation efficiency from CHMC/CPIHMC output directly; require TI, TST, and KMC stages.
 
 ## References
 
 - Read `references/workflow-map.md` for the condensed stage table and the graphene_meta_50K teaching example status.
-- Read repository files `docs/overview.md`, `workflow.yaml`, and `examples/graphene_meta_50K/README.md` when more detail is needed.
+- Read repository files `README.md`, `docs/quickstart.md`, and `docs/testing.md` when more detail is needed.

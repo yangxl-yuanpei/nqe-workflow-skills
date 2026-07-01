@@ -17,6 +17,7 @@ Use this skill for DeePMD-kit training and model validation within the NQE H2 fo
 - Apply `nqe-boundaries` before judging model reliability or training settings.
 - Use `dpgen-active-learning` when DeePMD training is part of the DP-GEN train-explore-label loop.
 - Use `initial-dft-dataset` when the question concerns training data origin or label consistency.
+- Use `dpdata-format-conversion` when training data must be inspected as DeePMD raw/npy or converted from ABACUS, LAMMPS, xyz, ASE, or another dpdata-readable source.
 - Use `nqe-h2-workflow` when the user asks how the model is used by CHMC/CPIHMC, TI, TST, or KMC.
 
 ## Roles In This Workflow
@@ -29,10 +30,10 @@ Use this skill for DeePMD-kit training and model validation within the NQE H2 fo
 
 - Explain DeePMD-kit training inputs, data-format expectations, training/freeze/test concepts, and model-deviation use.
 - Inspect a DeePMD dataset description for expected files, type maps, units, label completeness, and train/test split assumptions.
+- Route file-format conversion and source/converted shape comparison to `dpdata-format-conversion`.
 - Inspect `input.json` for missing or undocumented sections using official DeePMD-kit documentation for field meanings.
 - Inspect training logs such as `lcurve.out` for obvious divergence, NaNs, or missing metrics. Use `scripts/parse_lcurve.py` for deterministic first-pass log summaries when a log file is available.
 - Explain how ensemble models from different random seeds support DP-GEN model-deviation estimates.
-- Use dp test results to compare multiple final models only when the test dataset, metrics, and user-approved selection criteria are documented.
 - Use `dp test` results to compare multiple final models only when the test dataset, metrics, and user-approved selection criteria are documented.
 - Produce TODO lists for user-approved training settings and validation criteria.
 
@@ -44,11 +45,14 @@ Use this skill for DeePMD-kit training and model validation within the NQE H2 fo
 - Do not skip user approval before choosing a final production model for CHMC/CPIHMC.
 - Do not invent DeePMD commands, paths, JSON fields, or output filenames; use official documentation or existing project files.
 
+- Use `../common/scripts/check_workflow_files.py --software deepmd --path PATH_TO_TRAINING` for a minimal static check of `input.json`, `lcurve.out`, logs, placeholders, and obvious NaN/Inf markers. Treat warnings as prompts for human review, not as model-readiness proof.
+
 ## Checks Before Training
 
 - Confirm the DFT-labeled dataset passed initial dataset and ABACUS labeling checks.
 - Confirm energy, force, and virial labels are present if required by the training setup.
 - Confirm `type_map`, atom ordering, units, coordinates, cells, and PBC are consistent.
+- If the dataset was converted, confirm `dpdata-format-conversion` inspected frame count, atom count, type map, cells, labels, and source/converted shape consistency.
 - Confirm training and validation data selection is documented.
 - Confirm all training hyperparameters are user-provided or explicitly TODO.
 
@@ -69,6 +73,8 @@ Use this skill for DeePMD-kit training and model validation within the NQE H2 fo
 - Verify field names, descriptor options, and command behavior against the official DeePMD-kit documentation for the installed version before running.
 
 ## References
+
+- Read `references/deepmd-failure-cases.md` when DeePMD-kit training, freeze, test, or model-deviation steps fail. This placeholder should be expanded with real observed failures before relying on it for diagnosis.
 
 - Read `../common/references/command-help.md` when an executable name, command option, subcommand, or version-specific syntax is missing; use official docs and local `-h`/`--help`/`help` output instead of guessing.
 

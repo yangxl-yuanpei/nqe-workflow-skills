@@ -11,6 +11,7 @@ Use this skill for the thermodynamic-integration and transition-state-theory sta
 
 - Apply `nqe-boundaries` before explaining what CPIHMC outputs or what KMC consumes.
 - Use `chmc-cpihmc-sampling` when the question concerns whether mean-force data are ready for integration.
+- Use `nqe-postprocess-runner` when the user wants config-driven orchestration of already confirmed extraction, integration, plotting, and TST-rate commands.
 - Use `kmc-h2-efficiency` when the question concerns how elementary rates enter the KMC model.
 - Use `nqe-h2-workflow` when the user asks where TI/TST fits in the full pipeline.
 
@@ -44,7 +45,7 @@ Use this skill for the thermodynamic-integration and transition-state-theory sta
 - Treat multiple mean-force columns as multidimensional free-energy-surface data. Do not collapse them to one dimension unless the user provides a path, projection, or marginalization rule.
 - Use atomic units for reaction coordinates and mean forces unless the user documents a conversion.
 - Support user-approved prefactor models by elementary step. Use `k_B T / h` only for the original/simple TST prefactor when requested or documented; allow custom prefactors such as hydrogen adsorption `n v S` when the user provides density, mean speed, site area, and units.
-- Treat postprocessing scripts as a future execution layer. Until a validated script is provided, this skill should explain table schemas and readiness checks, not claim production execution.
+- Treat postprocessing scripts as guarded helper tools. They can extract, integrate, compute TST rates, and plot when assumptions are confirmed, but they are not production orchestration or physical validation.
 
 ## TI Readiness Checks
 
@@ -62,16 +63,19 @@ Use this skill for the thermodynamic-integration and transition-state-theory sta
 - Confirm recrossing or transmission-coefficient assumptions are documented or TODO.
 - Confirm the rate corresponds to a single elementary step and is not the full KMC observable.
 
+- Use `../common/scripts/check_workflow_files.py --software ti-tst --path PATH_TO_POSTPROCESSING` for a minimal static check of mean-force, free-energy, and TST-rate table schemas. Treat warnings as prompts for human review, not as physical validation.
+
 ## Scripts
 
 - Use `scripts/extract_mean_force.py` to extract one sampling output/window into one row of `mean_force_table.csv`. Use external loops to collect many reaction-coordinate windows. Require `--confirm-parameters` because columns, skip rows, unit scales, and output units can differ between CHMC/CPIHMC runs.
 - Use `scripts/integrate_free_energy.py` to integrate a completed `mean_force_table.csv` into `free_energy_profile.csv`. Require `--confirm-parameters` because integration direction, sign convention, zero reference, unit compatibility, and optional `--free-energy-scale`/`--free-energy-unit-label` conversion need user confirmation. Ask for integration direction before invoking the script if the user has not explicitly specified it. Default ordering is `--integration-direction ascending`, from small reaction coordinate to large reaction coordinate; use `descending` when the large-RC side is the initial/reference side. `free_energy_au` always remains atomic units; optional conversion is written to `free_energy_converted`.
 - Use `scripts/run_smoke_test.py` only as a bundled demo smoke test for the TI/TST script chain. It is not a production workflow runner.
+- Use `../nqe-postprocess-runner/scripts/nqe_postprocess_runner.py` only as a thin wrapper after the same TI/TST assumptions have been confirmed in a config file.
 - Do not use these scripts for temperature-directory discovery, production orchestration, or KMC. Those remain separate layers.
 
 ## Script Usage
 
-Use these scripts only for the TI preprocessing and integration layer. They do not compute TST rates, KMC outputs, or plots. Use `scripts/compute_tst_rates.py` only after a free-energy barrier or a validated `free_energy_profile.csv` is available.
+Use the scripts according to their stage boundaries: `extract_mean_force.py` and `integrate_free_energy.py` handle the TI preprocessing/integration layer; `compute_tst_rates.py` computes one elementary TST rate only after a free-energy barrier or validated `free_energy_profile.csv` is available; plotting scripts only visualize prepared tables. None of these scripts runs KMC or certifies production readiness.
 
 ### Extract One Mean-Force Row
 
@@ -214,8 +218,10 @@ Each `--curve` may specify `file`, `dataset`, `label`, `rc_index`, `color`, `lin
 
 ## References
 
+- Read `references/ti-tst-failure-cases.md` when TI/TST scripts fail, reject inputs, or produce surprising state selections. This placeholder should be expanded with real observed failures before relying on it for diagnosis.
+
 - Read `references/script-parameters.md` when the user asks what script parameters mean, what defaults are assumed, whether indices are 0-based or 1-based, or for the user-tested end-to-end command chain.
 - Read `references/postprocessing-logic.md` when connecting `PHY_QUANT`, mean-force tables, TI, and TST rates.
 - Read `references/legacy-mc-result-split-plan.md` when migrating the legacy `MC_result.py` plotting/integration script into maintainable postprocessing scripts.
 - Read `references/ti-tst-checklist.md` for local workflow-specific checks.
-- Read repository files `docs/overview.md`, `workflow.yaml`, and `examples/graphene_meta_50K/README.md` for the documented teaching workflow.
+- Read repository files `README.md`, `docs/quickstart.md`, and `docs/testing.md` for the documented teaching workflow.
