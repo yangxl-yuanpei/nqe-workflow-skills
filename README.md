@@ -53,7 +53,7 @@ Current repository state:
 - 19 `.template` files provide input or handoff scaffolds with explicit `TODO_USER_APPROVAL` placeholders.
 - `nqe-postprocess-runner` now has both a basic demo config and an optional convergence-screening config.
 - `check_chmc_window.py` and `analyze_phy_quant_convergence.py` support the current CHMC/CPIHMC pre-TI checking path.
-- 9 failure-case reference files exist; 4 are still placeholders and should not be treated as reliable diagnosis guides yet.
+- 9 failure-case reference files exist; 3 are still placeholders and should not be treated as reliable diagnosis guides yet.
 - Manual prompt coverage exists, but complete fresh-agent pass records are not yet documented.
 
 The most up-to-date status and pending-work summaries live in [docs/current-status-report.md](docs/current-status-report.md) and [docs/pending-work.md](docs/pending-work.md).

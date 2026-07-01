@@ -29,7 +29,7 @@ initial DFT-labeled dataset
 | Skill maturity | Most skills are ready for teaching/checking; `nqe-postprocess-runner` remains experimental; `kmc-h2-efficiency` remains teaching-ready |
 | Scripts | 14 Python helper scripts |
 | Templates | 19 `.template` files |
-| Failure references | 9 `*failure-cases.md` files; 5 populated, 4 still placeholders |
+| Failure references | 9 `*failure-cases.md` files; 6 populated, 3 still placeholders |
 | Manual prompts | Broad prompt coverage exists in `tests/manual_prompts.md`; fresh-agent pass status is not fully recorded |
 | Open DFT backend | ABACUS is the documented open backend; do not reintroduce VASP as the default |
 | Production status | Not production-ready without target-system parameters, convergence evidence, and user-approved physical choices |
@@ -48,7 +48,7 @@ initial DFT-labeled dataset
 
 ## Current Gaps
 
-- `4/9` failure-case reference files are still placeholders. `abacus-dft-labeling/references/abacus-failure-cases.md`, `chmc-cpihmc-sampling/references/chmc-cpihmc-failure-cases.md`, `ti-tst-rate/references/ti-tst-failure-cases.md`, `dpdata-format-conversion/references/dpdata-failure-cases.md`, and `nqe-postprocess-runner/references/postprocess-runner-failure-cases.md` currently contain populated cases.
+- `3/9` failure-case reference files are still placeholders. `abacus-dft-labeling/references/abacus-failure-cases.md`, `chmc-cpihmc-sampling/references/chmc-cpihmc-failure-cases.md`, `ti-tst-rate/references/ti-tst-failure-cases.md`, `dpdata-format-conversion/references/dpdata-failure-cases.md`, `nqe-postprocess-runner/references/postprocess-runner-failure-cases.md`, and `deepmd-training/references/deepmd-failure-cases.md` currently contain populated cases.
 - Fresh-agent manual test results are not fully recorded. Do not claim that all manual prompts have passed unless a dated test record is added.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped `param.json`, `machine.json`, and README files. It is not a real DP-GEN production example.
 - `nqe-postprocess-runner` is still experimental because it needs fresh-agent behavior tests and more real multi-window validation.
@@ -78,7 +78,7 @@ Script output remains diagnostic or post-processing output. It is not proof of p
 
 ## Highest-Priority Next Work
 
-1. Populate the next high-value failure references, starting with KMC and DeePMD.
+1. Populate the next high-value failure references, starting with DP-GEN and LAMMPS/PLUMED.
 2. Add dated fresh-agent test records for the changed skills and prompts, especially `nqe-postprocess-runner`, `dpdata-format-conversion`, and `kmc-h2-efficiency`.
 3. Continue validating `analyze_phy_quant_convergence.py` and runner convergence screening on real multi-window `PHY_QUANT` data.
 4. Add a minimal KMC event-network checker such as `check_kmc_network.py` or `check_kmc_events.py`.

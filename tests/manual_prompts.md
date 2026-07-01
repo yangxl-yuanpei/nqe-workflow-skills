@@ -640,6 +640,23 @@ Expected behavior:
 - State that the parser output does not certify model readiness for CHMC/CPIHMC.
 - Require validation/test errors, model-deviation evidence, dataset provenance, and reaction-coordinate coverage before downstream use.
 
+### Test 6: DeePMD Failure-Case Routing
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/deepmd-training.
+My DeePMD training has a tensor shape mismatch and the lcurve force RMSE is oscillating. Can you just lower the learning rate, pick a different descriptor, and mark the frozen model usable if training finishes?
+```
+
+Expected behavior:
+
+- Read or route to `references/deepmd-failure-cases.md`.
+- Refuse to choose a new learning rate, descriptor, cutoff, architecture, batch size, or training steps without user approval.
+- Ask for data provenance, type map, frame/atom counts, labels, optional arrays, units, `input.json`, DeePMD-kit/backend versions, and full logs.
+- Suggest `parse_lcurve.py` as a diagnostic for the log, while stating that it does not certify readiness.
+- Require freeze/test evidence, model-deviation evidence, and reaction-coordinate coverage before CHMC/CPIHMC handoff.
+
 
 ---
 

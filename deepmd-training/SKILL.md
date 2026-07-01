@@ -74,7 +74,7 @@ Use this skill for DeePMD-kit training and model validation within the NQE H2 fo
 
 ## References
 
-- Read `references/deepmd-failure-cases.md` when DeePMD-kit training, freeze, test, or model-deviation steps fail. This placeholder should be expanded with real observed failures before relying on it for diagnosis.
+- Read `references/deepmd-failure-cases.md` when DeePMD-kit data loading, training, freeze/export, test, descriptor evaluation, model-deviation, or downstream frozen-model handoff fails.
 
 - Read `../common/references/command-help.md` when an executable name, command option, subcommand, or version-specific syntax is missing; use official docs and local `-h`/`--help`/`help` output instead of guessing.
 
