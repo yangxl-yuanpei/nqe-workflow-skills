@@ -75,5 +75,5 @@ Use this skill for kinetic Monte Carlo as a general event-based simulation stage
 
 - Read `references/kmc-general-logic.md` when explaining KMC principles, generic event selection, custom observables, and non-H2 use cases.
 - Read `references/kmc-checklist.md` for local workflow-specific checks.
-- Read repository file `templates/kmc/README.md` for the current placeholder template plan and KMC handoff boundaries.
+- Read `templates/reference-examples/generic-rate-network/README.md` for the current example event-network shape and KMC handoff boundaries.
 - Read repository files `README.md`, `docs/quickstart.md`, and `docs/testing.md` for the full workflow context.

@@ -64,5 +64,4 @@ Explain these strategies without choosing one automatically:
 
 ## References
 
-- Read `references/initial-dataset-checklist.md` for strategy details and inspection checklist.
-- Read repository file `docs/initial_dataset.md` for the full teaching explanation when needed.
+- Read `references/initial-dataset-checklist.md` for strategy details, inspection checklist, and any future expanded teaching notes for this stage.
