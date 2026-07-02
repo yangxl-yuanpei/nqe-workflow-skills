@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Check CHMC/CPIHMC sampling window for common issues.
 
-This script performs five diagnostic checks on a CHMC/CPIHMC sampling window:
+This script performs six diagnostic checks on a CHMC/CPIHMC sampling window:
 1. Acceptance probability (from log or user-supplied value)
 2. PHY_QUANT / energy.dat output integrity
-3. Final reaction coordinate consistency with INPUT constraints
-4. Potential energy and mean force convergence
-5. ALL_INPUT vs INPUT parameter consistency
+3. Initial reaction-coordinate adjustment diagnostics
+4. Final reaction coordinate consistency with INPUT constraints
+5. Potential energy and mean force convergence
+6. ALL_INPUT vs INPUT parameter consistency
 
 The script is intentionally conservative. It reports diagnostic information but does not
 certify production readiness. Users should review all warnings before using the data.
@@ -36,9 +37,16 @@ class InputParameters:
     normalized: dict[str, str]
 
 
+@dataclass
+class AcceptanceEstimate:
+    rate: float
+    source: str
+    details: str
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Check CHMC/CPIHMC sampling window for acceptance rate, RC consistency, convergence, and INPUT/ALL_INPUT agreement."
+        description="Check CHMC/CPIHMC sampling window for acceptance rate, RC adjustment, convergence, and INPUT/ALL_INPUT agreement."
     )
     parser.add_argument("--window-dir", help="Directory containing INPUT, ALL_INPUT, and PHY_QUANT/energy.dat.")
     parser.add_argument("--input-file", default="INPUT", help="Input parameter file. Default: INPUT.")
@@ -47,6 +55,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--log-file", default=None, help="Log file containing acceptance rate. Default: auto-detect log or stdout.")
     parser.add_argument("--acceptance-rate", type=float, default=None, help="Override acceptance rate if not found in log (0.0 to 1.0).")
     parser.add_argument("--acceptance-threshold", type=float, default=0.5, help="Minimum acceptable acceptance rate. Default: 0.5.")
+    parser.add_argument(
+        "--acceptance-energy-tolerance",
+        type=float,
+        default=0.0,
+        help="Tolerance for inferring accepted moves from KinEng/PotEng changes when no log acceptance is available. Default: 0.0.",
+    )
     parser.add_argument("--rc-tolerance", type=float, default=0.05, help="Tolerance for RC deviation from constraint (in RC units). Default: 0.05.")
     parser.add_argument("--skip-convergence-check", action="store_true", help="Skip potential energy and mean force convergence check.")
     parser.add_argument("--summary", default=None, help="Optional path to write summary report.")
@@ -58,8 +72,10 @@ def build_parser() -> argparse.ArgumentParser:
 def print_defaults() -> None:
     print("Default assumptions:")
     print("  acceptance-threshold: 0.5 (50%)")
+    print("  acceptance-energy-tolerance: 0.0 (exact energy-change inference when log acceptance is unavailable)")
     print("  rc-tolerance: 0.05 (in reaction coordinate units)")
     print("  output integrity check: enabled (detects truncated or nonnumeric PHY_QUANT/energy.dat rows)")
+    print("  initial RC adjustment check: enabled (diagnostic only; initial mismatch is not an automatic failure)")
     print("  convergence check: enabled (uses PHY_QUANT or energy.dat)")
     print("  INPUT/ALL_INPUT comparison: all parameters")
 
@@ -115,6 +131,100 @@ def extract_acceptance_from_log(log_path: Path) -> Optional[float]:
                     value = value / 100.0
                 return value
     return None
+
+
+def parse_table_header_and_rows(path: Path) -> Tuple[List[str], List[List[float]]]:
+    """Parse a whitespace table with either a text header or numeric-only rows."""
+    header: Optional[List[str]] = None
+    rows: List[List[float]] = []
+    with path.open("r", encoding="utf-8") as handle:
+        for line_no, raw in enumerate(handle, start=1):
+            stripped = raw.strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+            parts = stripped.split()
+            if header is None:
+                if all(is_float(part) for part in parts):
+                    header = [f"col_{idx}" for idx in range(len(parts))]
+                    rows.append([float(part) for part in parts])
+                else:
+                    header = parts
+                continue
+            if len(parts) != len(header):
+                raise ValueError(f"row {line_no} has {len(parts)} columns, expected {len(header)}")
+            try:
+                rows.append([float(part) for part in parts])
+            except ValueError as exc:
+                raise ValueError(f"row {line_no} contains nonnumeric data") from exc
+    if header is None:
+        raise ValueError("no table header or numeric data rows found")
+    return header, rows
+
+
+def find_column_index(header: List[str], names: List[str], fallback: Optional[int] = None) -> Optional[int]:
+    """Find a column by exact case-insensitive name, then by fallback index."""
+    normalized = {name.lower(): idx for idx, name in enumerate(header)}
+    for name in names:
+        if name.lower() in normalized:
+            return normalized[name.lower()]
+    if fallback is not None and fallback < len(header):
+        return fallback
+    return None
+
+
+def infer_acceptance_from_energy_table(path: Optional[Path], tolerance: float = 0.0) -> Optional[AcceptanceEstimate]:
+    """Infer acceptance from KinEng/PotEng changes when log acceptance is unavailable.
+
+    The rule follows the user-provided legacy script:
+    - changed KinEng between neighboring rows indicates an HMC attempt
+    - unchanged KinEng indicates an MC attempt
+    - changed PotEng indicates the attempted move was accepted
+    """
+    if path is None or not path.exists():
+        return None
+    try:
+        header, rows = parse_table_header_and_rows(path)
+    except ValueError:
+        return None
+    numeric_only_table = all(name.startswith("col_") for name in header)
+    kin_idx = find_column_index(header, ["KinEng", "KineticEnergy", "kinetic_energy"], fallback=1 if numeric_only_table else None)
+    pot_idx = find_column_index(header, ["PotEng", "PotentialEnergy", "potential_energy"], fallback=2 if numeric_only_table else None)
+    if kin_idx is None or pot_idx is None:
+        return None
+    if len(rows) < 2:
+        return None
+
+    hmc_attempts = 0
+    mc_attempts = 0
+    hmc_accepts = 0
+    mc_accepts = 0
+    for current, previous in zip(rows[1:], rows[:-1]):
+        kin_changed = abs(current[kin_idx] - previous[kin_idx]) > tolerance
+        pot_changed = abs(current[pot_idx] - previous[pot_idx]) > tolerance
+        if kin_changed:
+            hmc_attempts += 1
+            if pot_changed:
+                hmc_accepts += 1
+        else:
+            mc_attempts += 1
+            if pot_changed:
+                mc_accepts += 1
+
+    attempts = hmc_attempts + mc_attempts
+    if attempts == 0:
+        return None
+    rate = (hmc_accepts + mc_accepts) / attempts
+    hmc_rate = hmc_accepts / hmc_attempts if hmc_attempts else None
+    mc_rate = mc_accepts / mc_attempts if mc_attempts else None
+    details = (
+        "Inferred from neighboring-row KinEng/PotEng changes; "
+        f"HMC {hmc_accepts}/{hmc_attempts}"
+        f"{f' ({hmc_rate:.3f})' if hmc_rate is not None else ''}; "
+        f"MC {mc_accepts}/{mc_attempts}"
+        f"{f' ({mc_rate:.3f})' if mc_rate is not None else ''}; "
+        f"tolerance={tolerance:g}. This is a fallback diagnostic, not an internal log counter."
+    )
+    return AcceptanceEstimate(rate=rate, source="energy-delta-inferred", details=details)
 
 
 def auto_detect_phy_quant(window_dir: Path) -> Optional[Path]:
@@ -242,13 +352,14 @@ def check_phy_quant_integrity(phy_quant_path: Optional[Path]) -> CheckResult:
     )
 
 
-def parse_phy_quant_rc(path: Path) -> Tuple[List[str], List[float], List[float]]:
-    """Parse PHY_QUANT file to extract RC columns and final values."""
+def parse_phy_quant_rc(path: Path) -> Tuple[List[str], List[float], List[float], List[float]]:
+    """Parse PHY_QUANT file to extract RC columns plus first and final values."""
     if not path.exists():
         raise FileNotFoundError(f"PHY_QUANT file not found: {path}")
     header = None
     rc_columns = []
     rc_indices = []
+    first_values = []
     final_values = []
     with path.open("r", encoding="utf-8") as handle:
         for line in handle:
@@ -264,8 +375,11 @@ def parse_phy_quant_rc(path: Path) -> Tuple[List[str], List[float], List[float]]
             else:
                 parts = stripped.split()
                 if rc_indices:
-                    final_values = [float(parts[i]) for i in rc_indices if i < len(parts)]
-    return rc_columns, rc_indices, final_values
+                    current_values = [float(parts[i]) for i in rc_indices if i < len(parts)]
+                    if not first_values:
+                        first_values = current_values
+                    final_values = current_values
+    return rc_columns, rc_indices, first_values, final_values
 
 
 def parse_input_file_multi(path: Path) -> Tuple[dict[str, str], dict[str, List[str]]]:
@@ -314,25 +428,27 @@ def extract_rc_from_input_multi(multi_params: dict[str, List[str]]) -> List[Tupl
     return rc_constraints
 
 
-def check_acceptance_rate(acceptance: Optional[float], threshold: float) -> CheckResult:
+def check_acceptance_rate(acceptance: Optional[float], threshold: float, source: Optional[str] = None, details: Optional[str] = None) -> CheckResult:
     """Check if acceptance rate meets threshold."""
     if acceptance is None:
         return CheckResult(
             name="Acceptance Rate",
             status="SKIP",
-            message="Acceptance rate not found in log; provide --acceptance-rate or check log file.",
+            message="Acceptance rate not found in log or energy-table fallback; provide --acceptance-rate or check log/output files.",
         )
+    source_text = f" from {source}" if source else ""
     if acceptance < threshold:
         return CheckResult(
             name="Acceptance Rate",
             status="FAIL",
-            message=f"Acceptance rate {acceptance:.3f} below threshold {threshold:.3f}.",
-            details="Low acceptance may indicate timestep too large or poor equilibration.",
+            message=f"Acceptance rate{source_text} {acceptance:.3f} below threshold {threshold:.3f}.",
+            details=details or "Low acceptance may indicate timestep too large or poor equilibration.",
         )
     return CheckResult(
         name="Acceptance Rate",
         status="PASS",
-        message=f"Acceptance rate {acceptance:.3f} meets the user-reviewed threshold {threshold:.3f}.",
+        message=f"Acceptance rate{source_text} {acceptance:.3f} meets the user-reviewed threshold {threshold:.3f}.",
+        details=details,
     )
 
 
@@ -376,6 +492,84 @@ def check_rc_consistency(final_rcs: List[float], rc_constraints: List[Tuple[str,
         name="RC Consistency",
         status="PASS",
         message=f"All {len(deviations)} RC constraint(s) satisfied.",
+        details=details,
+    )
+
+
+def check_initial_rc_adjustment(first_rcs: List[float], final_rcs: List[float], rc_constraints: List[Tuple[str, float]], tolerance: float) -> CheckResult:
+    """Report whether the initial RC differs from the target and later adjusts."""
+    if not rc_constraints:
+        return CheckResult(
+            name="Initial RC Adjustment",
+            status="SKIP",
+            message="No reaction coordinate constraints found in INPUT.",
+        )
+    if not first_rcs or not final_rcs:
+        return CheckResult(
+            name="Initial RC Adjustment",
+            status="SKIP",
+            message="Could not read both first and final reaction-coordinate values.",
+        )
+
+    diagnostics = []
+    adjusted = []
+    initially_on_target = []
+    still_off_target = []
+    for i, (label, target) in enumerate(rc_constraints):
+        if i >= len(first_rcs) or i >= len(final_rcs):
+            continue
+        first = first_rcs[i]
+        final = final_rcs[i]
+        first_dev = abs(first - target)
+        final_dev = abs(final - target)
+        diagnostics.append((label, target, first, final, first_dev, final_dev))
+        if first_dev <= tolerance:
+            initially_on_target.append(label)
+        elif final_dev <= tolerance:
+            adjusted.append(label)
+        else:
+            still_off_target.append(label)
+
+    if not diagnostics:
+        return CheckResult(
+            name="Initial RC Adjustment",
+            status="SKIP",
+            message="Could not match RC constraints to first/final output columns.",
+        )
+
+    details = "\n".join(
+        [
+            (
+                f"  {label}: target={target:.4f}, first={first:.4f}, final={final:.4f}, "
+                f"first_deviation={first_dev:.4f}, final_deviation={final_dev:.4f}"
+            )
+            for label, target, first, final, first_dev, final_dev in diagnostics
+        ]
+    )
+    if adjusted:
+        return CheckResult(
+            name="Initial RC Adjustment",
+            status="WARN",
+            message=(
+                f"{len(adjusted)} RC value(s) started outside tolerance and ended near target. "
+                "This can be expected when CHMC/CPIHMC adjusts the initial structure, but review startup behavior."
+            ),
+            details=details,
+        )
+    if still_off_target:
+        return CheckResult(
+            name="Initial RC Adjustment",
+            status="WARN",
+            message=(
+                f"{len(still_off_target)} RC value(s) started outside tolerance and did not end near target. "
+                "Final RC consistency check should determine whether the window target failed."
+            ),
+            details=details,
+        )
+    return CheckResult(
+        name="Initial RC Adjustment",
+        status="PASS",
+        message=f"All {len(initially_on_target)} matched RC value(s) started within tolerance of the target.",
         details=details,
     )
 
@@ -546,18 +740,28 @@ def main(argv: Optional[List[str]] = None) -> int:
     except FileNotFoundError:
         all_input_params = InputParameters(raw={}, normalized={})
     acceptance = args.acceptance_rate
+    acceptance_source = "user-provided" if acceptance is not None else None
+    acceptance_details = None
     if acceptance is None and log_path:
         acceptance = extract_acceptance_from_log(log_path)
-    results.append(check_acceptance_rate(acceptance, args.acceptance_threshold))
+        if acceptance is not None:
+            acceptance_source = f"log:{log_path.name}"
     phy_quant_integrity = check_phy_quant_integrity(phy_quant_path)
+    if acceptance is None and phy_quant_integrity.status != "FAIL":
+        acceptance_estimate = infer_acceptance_from_energy_table(phy_quant_path, args.acceptance_energy_tolerance)
+        if acceptance_estimate is not None:
+            acceptance = acceptance_estimate.rate
+            acceptance_source = acceptance_estimate.source
+            acceptance_details = acceptance_estimate.details
+    results.append(check_acceptance_rate(acceptance, args.acceptance_threshold, acceptance_source, acceptance_details))
     results.append(phy_quant_integrity)
     if phy_quant_integrity.status == "FAIL":
-        rc_columns, rc_indices, final_rcs = ([], [], [])
+        rc_columns, rc_indices, first_rcs, final_rcs = ([], [], [], [])
     else:
         try:
-            rc_columns, rc_indices, final_rcs = parse_phy_quant_rc(phy_quant_path) if phy_quant_path else ([], [], [])
+            rc_columns, rc_indices, first_rcs, final_rcs = parse_phy_quant_rc(phy_quant_path) if phy_quant_path else ([], [], [], [])
         except Exception as exc:
-            rc_columns, rc_indices, final_rcs = ([], [], [])
+            rc_columns, rc_indices, first_rcs, final_rcs = ([], [], [], [])
             results.append(
                 CheckResult(
                     name="PHY_QUANT Parse",
@@ -576,6 +780,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             )
         )
     else:
+        results.append(check_initial_rc_adjustment(first_rcs, final_rcs, rc_constraints, args.rc_tolerance))
         results.append(check_rc_consistency(final_rcs, rc_constraints, args.rc_tolerance))
     if not args.skip_convergence_check and phy_quant_path and phy_quant_integrity.status != "FAIL":
         results.append(check_convergence(phy_quant_path))

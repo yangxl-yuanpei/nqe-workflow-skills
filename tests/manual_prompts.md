@@ -1073,6 +1073,24 @@ Expected behavior:
 - Explain that PLUMED can define CVs, restraints, metadynamics/biasing, and diagnostic output.
 - Tell the user to verify PLUMED syntax and LAMMPS coupling against official PLUMED/LAMMPS docs and installed versions.
 
+### Test 4: LAMMPS/PLUMED Failure-Case Routing
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/lammps-exploration.
+My DP-GEN exploration task failed with an unrecognized pair_style deepmd or illegal PLUMED fix, and another task has duplicate timesteps in model_devi.out. Can I ignore those tasks and continue labeling the rest?
+```
+
+Expected behavior:
+
+- Read or route to `references/lammps-failure-cases.md`.
+- Refuse to ignore failed exploration tasks or malformed `model_devi.out` when declaring readiness.
+- Ask for LAMMPS version/build, DeePMD-kit version, PLUMED version, LAMMPS log, PLUMED input/output, `model_devi.out`, model paths, and DP-GEN `model_devi_jobs`.
+- Route pair-style/model issues to `deepmd-training` and DP-GEN candidate-selection issues to `dpgen-active-learning` as needed.
+- State that LAMMPS trajectories are candidate configurations only, not DFT labels for DeePMD training.
+- Require user approval before changing pair-style syntax, PLUMED coupling, timestep, dump frequency, CVs, restraints, or exploration schedule.
+
 
 ### Test: DeePMD Freeze Test And Model Selection
 
@@ -1565,3 +1583,34 @@ Expected behavior:
 - It should suggest `chmc-cpihmc-sampling/scripts/check_chmc_window.py` because it checks physical-output row integrity before RC consistency and convergence.
 - It should ask the user to inspect scheduler logs, stdout/stderr, allocation or quota messages, and whether a complete checkpoint/output exists.
 - It should not silently trim the half row and continue to TI unless the user explicitly approves a documented recovery policy.
+
+### Acceptance Rate Fallback Without Log
+
+Prompt:
+
+> Use the skill at nqe-workflow-skills-release/chmc-cpihmc-sampling.
+> My CHMC/CPIHMC window has no saved log file, but the PHY_QUANT or energy.dat table contains KinEng and PotEng columns. Can the window checker still estimate the acceptance rate, and how should I interpret it?
+
+Expected behavior:
+
+- The agent should use `chmc-cpihmc-sampling` and read or route to the CHMC/CPIHMC failure-cases reference.
+- It should state that `check_chmc_window.py` first uses `--acceptance-rate` or a parsed log value, and only falls back to energy-table inference when those are unavailable.
+- It should explain the fallback rule: changed `KinEng` between neighboring rows indicates an HMC attempt, unchanged `KinEng` indicates an MC attempt, and changed `PotEng` indicates acceptance.
+- It should mention `--acceptance-energy-tolerance` and explain that the default preserves exact energy-change inference.
+- It should report that this source is labeled `energy-delta-inferred` and is a fallback diagnostic, not an internal program acceptance counter.
+- It should still require user-reviewed acceptance thresholds and should not tune HMC/MC parameters automatically.
+
+### Initial RC Adjustment Diagnostic
+
+Prompt:
+
+> Use the skill at nqe-workflow-skills-release/chmc-cpihmc-sampling.
+> My PHY_QUANT starts with RxnCoord around 0.8, but INPUT defines the window target as 0.4 and later rows/final RC are near 0.4. Should check_chmc_window.py fail this window?
+
+Expected behavior:
+
+- The agent should use `chmc-cpihmc-sampling` and read or route to the CHMC/CPIHMC failure-cases reference.
+- It should explain that the initial structure may not start exactly on the constrained target and CHMC/CPIHMC can adjust it early in the run.
+- It should state that `check_chmc_window.py` should report first RC, final RC, target RC, and deviations through `Initial RC Adjustment`.
+- It should state that initial RC mismatch is a diagnostic or warning, not an automatic failure, when final/post-adjustment RC is consistent with the target.
+- It should still require potential-energy and mean-force convergence review before TI, and should ask whether startup rows should be discarded.

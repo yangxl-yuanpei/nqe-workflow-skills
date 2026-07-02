@@ -29,7 +29,7 @@ initial DFT-labeled dataset
 | Skill maturity | Most skills are ready for teaching/checking; `nqe-postprocess-runner` remains experimental; `kmc-h2-efficiency` remains teaching-ready |
 | Scripts | 14 Python helper scripts |
 | Templates | 19 `.template` files |
-| Failure references | 9 `*failure-cases.md` files; 7 populated, 2 still placeholders |
+| Failure references | 9 `*failure-cases.md` files; 8 populated, 1 still placeholder |
 | Manual prompts | Broad prompt coverage exists in `tests/manual_prompts.md`; fresh-agent pass status is not fully recorded |
 | Open DFT backend | ABACUS is the documented open backend; do not reintroduce VASP as the default |
 | Production status | Not production-ready without target-system parameters, convergence evidence, and user-approved physical choices |
@@ -42,13 +42,13 @@ initial DFT-labeled dataset
 - `nqe-postprocess-runner` can dry-run a confirmed config and generate child commands for the TI/TST chain.
 - `nqe-postprocess-runner` now has an optional convergence-screening mode that generates per-window `analyze_phy_quant_convergence.py` commands before mean-force extraction.
 - `analyze_phy_quant_convergence.py` supports single-RC demo files and real multi-column `PHY_QUANT` shapes such as `PotEng` plus `MeanForce_0`.
-- `check_chmc_window.py` exists as a CHMC/CPIHMC window health-check helper for acceptance, physical-output row integrity, RC consistency, convergence screening, and `INPUT`/`ALL_INPUT` comparison.
+- `check_chmc_window.py` exists as a CHMC/CPIHMC window health-check helper for acceptance, physical-output row integrity, initial RC adjustment, final RC consistency, convergence screening, and `INPUT`/`ALL_INPUT` comparison.
 - `dpdata-format-conversion` provides inspect, convert, and compare helpers for dpdata-readable systems.
 - Real or semi-real reference examples exist for ABACUS, DP-GEN, LAMMPS/PLUMED, DeePMD, CHMC/CPIHMC, TI/TST handoff, and KMC event-network shape.
 
 ## Current Gaps
 
-- `2/9` failure-case reference files are still placeholders. `abacus-dft-labeling/references/abacus-failure-cases.md`, `chmc-cpihmc-sampling/references/chmc-cpihmc-failure-cases.md`, `ti-tst-rate/references/ti-tst-failure-cases.md`, `dpdata-format-conversion/references/dpdata-failure-cases.md`, `nqe-postprocess-runner/references/postprocess-runner-failure-cases.md`, `deepmd-training/references/deepmd-failure-cases.md`, and `dpgen-active-learning/references/dpgen-failure-cases.md` currently contain populated cases.
+- `1/9` failure-case reference file is still a placeholder: `kmc-h2-efficiency/references/kmc-failure-cases.md`. `abacus-dft-labeling/references/abacus-failure-cases.md`, `chmc-cpihmc-sampling/references/chmc-cpihmc-failure-cases.md`, `ti-tst-rate/references/ti-tst-failure-cases.md`, `dpdata-format-conversion/references/dpdata-failure-cases.md`, `nqe-postprocess-runner/references/postprocess-runner-failure-cases.md`, `deepmd-training/references/deepmd-failure-cases.md`, `dpgen-active-learning/references/dpgen-failure-cases.md`, and `lammps-exploration/references/lammps-failure-cases.md` currently contain populated cases.
 - Fresh-agent manual test results are not fully recorded. Do not claim that all manual prompts have passed unless a dated test record is added.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped `param.json`, `machine.json`, and README files. It is not a real DP-GEN production example.
 - `nqe-postprocess-runner` is still experimental because it needs fresh-agent behavior tests and more real multi-window validation.
@@ -78,12 +78,11 @@ Script output remains diagnostic or post-processing output. It is not proof of p
 
 ## Highest-Priority Next Work
 
-1. Populate the next high-value failure reference for LAMMPS/PLUMED.
-2. Add dated fresh-agent test records for the changed skills and prompts, especially `nqe-postprocess-runner`, `dpdata-format-conversion`, and `kmc-h2-efficiency`.
-3. Continue validating `analyze_phy_quant_convergence.py` and runner convergence screening on real multi-window `PHY_QUANT` data.
-4. Add a minimal KMC event-network checker such as `check_kmc_network.py` or `check_kmc_events.py`.
-5. Add small real dpdata conversion examples and failure cases.
-6. Keep README, quickstart, testing guide, status report, and pending-work documents synchronized after every script or skill change.
+1. Run and record dated fresh-agent tests for changed skills and prompts, especially `nqe-postprocess-runner`, `dpdata-format-conversion`, `deepmd-training`, `dpgen-active-learning`, and `lammps-exploration`.
+2. Continue validating `analyze_phy_quant_convergence.py` and runner convergence screening on real multi-window `PHY_QUANT` data.
+3. Add small real dpdata conversion examples and failure-case-driven checks.
+4. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
+5. Keep README, quickstart, testing guide, status report, and pending-work documents synchronized after every script or skill change.
 
 ## Scientific Guardrails
 

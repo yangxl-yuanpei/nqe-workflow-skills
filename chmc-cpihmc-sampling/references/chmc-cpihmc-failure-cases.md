@@ -127,28 +127,33 @@ Typical symptoms:
 
 - `check_chmc_window.py` reports `SKIP` because no acceptance rate was found.
 - The parsed or user-provided acceptance rate is much lower than expected.
+- No log was saved, but `PHY_QUANT` or `energy.dat` still contains `KinEng` and `PotEng` columns.
 - The output shows repeated rejection or almost no accepted HMC/MC moves.
 - The user asks the agent to tune HMC/MC parameters automatically.
 
 Likely causes:
 
 - The log file was not provided or uses an unrecognized acceptance-rate format.
+- The fallback energy-table inference cannot be used because the physical-output file is missing, truncated, too short, or lacks confirmed `KinEng`/`PotEng` columns.
 - HMC step size, move ratio, wall settings, or temperature may be unsuitable.
 - The run is not sampling the intended degrees of freedom efficiently.
 - The target acceptance range for this workflow has not been approved for the specific system.
 
 Agent response:
 
-1. Ask for the log file or an explicitly user-provided acceptance rate.
+1. Ask for the log file or an explicitly user-provided acceptance rate when available.
 2. Treat the acceptance rate as a diagnostic, not a pass/fail proof by itself.
-3. Report whether it is missing, unusually low, or outside the user-approved project range.
-4. Ask the user to approve any change to HMC step size, HMC/MC ratio, sampling length, or temperature.
-5. Do not choose new HMC/MC settings automatically.
+3. If no log acceptance is available, `check_chmc_window.py` may infer a fallback acceptance rate from neighboring-row `KinEng` and `PotEng` changes: changed `KinEng` indicates an HMC attempt, unchanged `KinEng` indicates an MC attempt, and changed `PotEng` indicates acceptance.
+4. Report whether the value came from `--acceptance-rate`, log parsing, or `energy-delta-inferred`.
+5. Report whether it is missing, unusually low, or outside the user-approved project range.
+6. Ask the user to approve any change to HMC step size, HMC/MC ratio, sampling length, or temperature.
+7. Do not choose new HMC/MC settings automatically.
 
 Notes:
 
 - The local checklist notes that about 30-50% acceptance is often useful for this workflow, but this is not a universal production threshold.
 - `check_chmc_window.py` has command-line thresholds for screening; those thresholds require user review before production-like use.
+- The `energy-delta-inferred` fallback is not an internal code counter. It depends on the current output convention that columns named `KinEng` and `PotEng` represent kinetic and potential energy, respectively.
 
 ## Final Reaction Coordinate Does Not Match The Window Definition
 
@@ -173,6 +178,28 @@ Agent response:
 3. Ask the user which source should define the intended window target.
 4. Mark the window as suspect before TI if the intended target and sampled coordinate cannot be reconciled.
 5. Do not infer the reaction-coordinate grid from directory names alone.
+
+## Initial Reaction Coordinate Differs From The Window Target
+
+Typical symptoms:
+
+- The first `RxnCoord*` value in `PHY_QUANT` or `energy.dat` differs from the `INPUT` target.
+- `check_chmc_window.py` reports `Initial RC Adjustment` as `WARN`, while final `RC Consistency` may still pass.
+- The user worries that an initial mismatch, such as `0.8` at the first row and `0.4` as the target, means the whole window failed.
+
+Likely causes:
+
+- The submitted initial structure was not exactly on the constrained reaction-coordinate target.
+- CHMC/CPIHMC adjusted the structure toward the target early in the run.
+- The input structure, window target, and physical-output table were paired correctly, but startup behavior is visible in the early rows.
+
+Agent response:
+
+1. Report the first RC, final RC, target RC, and deviations.
+2. Treat an initial mismatch as a diagnostic or warning, not an automatic failure.
+3. Use final/post-adjustment RC consistency as the main target-window check.
+4. Ask the user to inspect early trajectory behavior and decide whether any startup rows should be discarded before TI.
+5. Do not declare convergence from the fact that the final RC reaches the target; potential energy and mean-force convergence still need review.
 
 ## INPUT And ALL_INPUT Disagree
 

@@ -77,7 +77,7 @@ Use this skill for LAMMPS-based exploration in DP-GEN and related MLFF sampling 
 
 ## References
 
-- Read `references/lammps-failure-cases.md` when LAMMPS or PLUMED exploration fails. This placeholder should be expanded with real observed failures before relying on it for diagnosis.
+- Read `references/lammps-failure-cases.md` when LAMMPS or PLUMED exploration, DeePMD pair-style coupling, DP-GEN model-deviation output, trajectory output, restart, or candidate handoff fails.
 
 - Read `../common/references/command-help.md` when an executable name, command option, subcommand, or version-specific syntax is missing; use official docs and local `-h`/`--help`/`help` output instead of guessing.
 

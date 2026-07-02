@@ -14,9 +14,13 @@ Run tests in this order:
 
 The manual prompts live in [tests/manual_prompts.md](../tests/manual_prompts.md).
 
+For dated fresh-agent test procedure and record format, see [fresh-agent-testing.md](fresh-agent-testing.md).
+
 ## Manual Behavior Tests
 
 Use a fresh agent or fresh conversation for each prompt whenever possible. The point is to test whether the repository files are sufficient, not whether the agent remembers earlier context from this development thread.
+
+A clean subagent can also be used for practical fresh-agent testing if it receives only the repository path, the relevant `SKILL.md` path, required reference paths, and the exact test prompt. Record this as `Freshness level: subagent-fresh`; do not provide the subagent with expected behavior or prior development context.
 
 ### 1. Minimal Smoke Prompts
 
@@ -113,12 +117,15 @@ For small documentation edits, run the minimal smoke and failure prompts for aff
 
 ## Suggested Test Record
 
-Record manual tests in a simple table when preparing a release:
+Record manual tests when preparing a release. The detailed procedure and copyable template live in [fresh-agent-testing.md](fresh-agent-testing.md) and [tests/fresh_agent_record_template.md](../tests/fresh_agent_record_template.md).
+
+A minimal record should include:
 
 ```text
 Date:
 Commit or branch:
 Agent/model:
+Freshness level:
 Prompt section:
 Pass/fail:
 Notes:

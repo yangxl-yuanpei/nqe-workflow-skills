@@ -61,11 +61,11 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 
 ## Output Checks
 
-- Use `scripts/check_chmc_window.py` for a five-part window health check: acceptance rate, `PHY_QUANT`/`energy.dat` row integrity, final RC vs INPUT constraint consistency, potential energy and mean force convergence, and ALL_INPUT vs INPUT parameter agreement. Require `--confirm-parameters` before running.
+- Use `scripts/check_chmc_window.py` for a window health check: acceptance rate, `PHY_QUANT`/`energy.dat` row integrity, initial RC adjustment, final RC vs INPUT constraint consistency, potential energy and mean force convergence, and ALL_INPUT vs INPUT parameter agreement. Acceptance is read from a user-provided value or log first; if unavailable, the script can infer a fallback diagnostic from neighboring-row `KinEng`/`PotEng` changes in the physical-output table. Require `--confirm-parameters` before running.
 - For deeper convergence analysis, use `scripts/analyze_phy_quant_convergence.py` when the user asks to inspect `PHY_QUANT` potential-energy or mean-force convergence with plots; ask the user to confirm columns, unit scaling, and equilibration policy before running it.
 - Check that mean force is reported for each reaction-coordinate window.
 - Check uncertainty estimates, autocorrelation, and mixing diagnostics if available.
-- Check HMC acceptance rate and abnormal rejection behavior if available.
+- Check HMC acceptance rate and abnormal rejection behavior if available. If acceptance is inferred from `KinEng`/`PotEng` changes rather than a log counter, report that source explicitly and treat it as a fallback diagnostic.
 - Check CPIHMC bead convergence evidence when NQE results are reported.
 - Check output format is compatible with thermodynamic integration.
 - Report missing diagnostics as TODO rather than declaring convergence.

@@ -9,6 +9,7 @@ Quick entry points:
 - [Quick Start](docs/quickstart.md)
 - [Manual Skill Tests](tests/manual_prompts.md)
 - [Testing Guide](docs/testing.md)
+- [Fresh-Agent Testing](docs/fresh-agent-testing.md)
 
 ## Workflow Scope
 
@@ -53,7 +54,7 @@ Current repository state:
 - 19 `.template` files provide input or handoff scaffolds with explicit `TODO_USER_APPROVAL` placeholders.
 - `nqe-postprocess-runner` now has both a basic demo config and an optional convergence-screening config.
 - `check_chmc_window.py` and `analyze_phy_quant_convergence.py` support the current CHMC/CPIHMC pre-TI checking path.
-- 9 failure-case reference files exist; 2 are still placeholders and should not be treated as reliable diagnosis guides yet.
+- 9 failure-case reference files exist; 1 is still a placeholder and should not be treated as a reliable diagnosis guide yet.
 - Manual prompt coverage exists, but complete fresh-agent pass records are not yet documented.
 
 The most up-to-date status and pending-work summaries live in [docs/current-status-report.md](docs/current-status-report.md) and [docs/pending-work.md](docs/pending-work.md).
@@ -86,7 +87,7 @@ The scripts are deterministic helpers for diagnostics and post-processing. They 
 | `dpdata-format-conversion/scripts/convert_with_dpdata.py` | Convert atomistic data between explicit dpdata input/output formats | converted data |
 | `dpdata-format-conversion/scripts/compare_converted_system.py` | Compare source and converted dpdata systems for basic shape consistency | JSON comparison |
 | `deepmd-training/scripts/parse_lcurve.py` | Parse DeePMD `lcurve.out`-style logs for first-pass diagnostics | Summary of columns, final values, and basic warnings |
-| `chmc-cpihmc-sampling/scripts/check_chmc_window.py` | Window health check: acceptance rate, output row integrity, RC consistency, convergence, INPUT/ALL_INPUT agreement | PASS/WARN/FAIL/SKIP report |
+| `chmc-cpihmc-sampling/scripts/check_chmc_window.py` | Window health check: acceptance rate, output row integrity, initial RC adjustment, final RC consistency, convergence, INPUT/ALL_INPUT agreement | PASS/WARN/FAIL/SKIP report |
 | `chmc-cpihmc-sampling/scripts/analyze_phy_quant_convergence.py` | Plot and summarize `PHY_QUANT` potential-energy/mean-force convergence for one sampling window | convergence image and optional CSV summary |
 | `ti-tst-rate/scripts/extract_mean_force.py` | Extract one CHMC/CPIHMC sampling output/window into one mean-force CSV row | `mean_force_table.csv` |
 | `ti-tst-rate/scripts/integrate_free_energy.py` | Integrate collected mean-force windows into a relative free-energy profile | `free_energy_profile.csv` |
@@ -127,7 +128,7 @@ Manual behavior tests live in:
 tests/manual_prompts.md
 ```
 
-The full testing workflow is documented in [docs/testing.md](docs/testing.md).
+The full testing workflow is documented in [docs/testing.md](docs/testing.md). Fresh-agent test procedure and record fields are documented in [docs/fresh-agent-testing.md](docs/fresh-agent-testing.md).
 
 Recommended manual test process:
 
