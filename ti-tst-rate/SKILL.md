@@ -34,6 +34,7 @@ Use this skill for the thermodynamic-integration and transition-state-theory sta
 ## What This Skill Must Not Do
 
 - Do not invent mean-force values, reaction-coordinate grids, integration methods, uncertainties, activation barriers, temperatures, or rate constants.
+- Do not infer free-energy profile contents, reaction-coordinate values, barrier heights, units, or state locations from a filename such as `free_energy_profile.csv`. If the file was not inspected in the current task, say it is uninspected.
 - Do not run TI/TST scripts, including bundled demo or smoke-test scripts, when the user asks to "use defaults", "do not ask questions", or has not confirmed integration direction, units, state selection, temperature, and prefactor choices.
 - Do not assume the quantum barrier must be lower in every possible case without checking the documented system and data.
 - Do not claim TST rates are final H2 formation efficiency; KMC is still required for the grain-scale observable.
