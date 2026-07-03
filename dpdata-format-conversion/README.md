@@ -23,14 +23,14 @@ Use this before conversion or before trusting an existing dataset shape:
 ```bash
 python dpdata-format-conversion/scripts/inspect_dpdata_system.py \
   --input PATH_TO_DATA \
-  --format deepmd/npy \
-  --labeled
+  --format TODO_USER_CONFIRMED_INPUT_FORMAT \
+  TODO_ADD_--labeled_ONLY_IF_LABELS_ARE_REQUIRED
 ```
 
 Key arguments:
 
 - `--input`: input file or directory.
-- `--format`: explicit dpdata format string, such as `deepmd/npy`, `deepmd/raw`, or a version-supported ABACUS/LAMMPS format.
+- `--format`: explicit dpdata format string confirmed by the user or official dpdata docs for the installed version.
 - `--labeled`: use `dpdata.LabeledSystem`; use this for DFT-labeled data intended for DeePMD training.
 - `--type-map`: optional comma-separated element/type map. Do not use it for ordinary inspection unless the source format lacks element names or needs an external type ordering.
 - `--json`: print only JSON.
@@ -41,11 +41,11 @@ Use this only after formats, labels, units, atom ordering, and output path are c
 
 ```bash
 python dpdata-format-conversion/scripts/convert_with_dpdata.py \
-  --input PATH_TO_ABACUS_OUTPUT \
-  --input-format abacus/scf \
-  --output deepmd_data \
-  --output-format deepmd/npy \
-  --labeled \
+  --input TODO_USER_CONFIRMED_INPUT_PATH \
+  --input-format TODO_USER_CONFIRMED_INPUT_FORMAT \
+  --output TODO_USER_CONFIRMED_OUTPUT_PATH \
+  --output-format TODO_USER_CONFIRMED_OUTPUT_FORMAT \
+  TODO_ADD_--labeled_ONLY_IF_LABELS_ARE_REQUIRED \
   --confirm
 ```
 
@@ -63,14 +63,16 @@ After conversion, compare source and converted data shape:
 
 ```bash
 python dpdata-format-conversion/scripts/compare_converted_system.py \
-  --source PATH_TO_ABACUS_OUTPUT \
-  --source-format abacus/scf \
-  --converted deepmd_data \
-  --converted-format deepmd/npy \
-  --labeled
+  --source TODO_USER_CONFIRMED_INPUT_PATH \
+  --source-format TODO_USER_CONFIRMED_INPUT_FORMAT \
+  --converted TODO_USER_CONFIRMED_OUTPUT_PATH \
+  --converted-format TODO_USER_CONFIRMED_OUTPUT_FORMAT \
+  TODO_ADD_--labeled_ONLY_IF_LABELS_ARE_REQUIRED
 ```
 
 This checks frame count, atom count, atom names/counts, label presence, array shapes, and optional max absolute numeric differences when NumPy is installed. Passing this comparison means the data shapes are consistent; it does not certify physical correctness.
+
+The `TODO_*` tokens are intentional. Do not replace them with plausible format strings unless the user has confirmed those exact strings or they have been verified against official dpdata documentation for the installed version.
 
 ## Common Failure Modes
 

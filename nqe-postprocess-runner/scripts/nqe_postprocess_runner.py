@@ -316,7 +316,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     run_convergence = as_bool(config, "run_convergence_diagnostics", False)
     convergence_dir = path_from(config_dir, config.get("convergence_output_dir", out / "convergence"))
 
-    out.mkdir(parents=True, exist_ok=True)
+    if not args.dry_run:
+        out.mkdir(parents=True, exist_ok=True)
     if run_convergence and not args.dry_run:
         convergence_dir.mkdir(parents=True, exist_ok=True)
     mean_force = out / "mean_force_table.csv"
@@ -361,6 +362,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not args.dry_run:
         summary.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
         print(f"Wrote summary to {summary}")
+    else:
+        print(f"DRY RUN: generated {len(commands)} command(s); no commands were executed and no output files were written.")
     return 0
 
 

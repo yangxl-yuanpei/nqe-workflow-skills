@@ -56,10 +56,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Extract reaction coordinate and mean force from one CHMC/CPIHMC sampling output."
     )
-    parser.add_argument("--input", required=True, help="Single sampling output file, e.g. PHY_QUANT or one window dat file.")
+    parser.add_argument("--input", help="Single sampling output file, e.g. PHY_QUANT or one window dat file.")
     parser.add_argument("--output", default="mean_force_table.csv", help="CSV file to create or append to.")
     parser.add_argument("--format", choices=["auto", "phy_quant", "table"], default=DEFAULTS["format"], help="Input parser. phy_quant uses header names; table uses numeric columns.")
-    parser.add_argument("--dataset-label", required=True, help="Dataset label, e.g. classical_100K or cpihmc_100K.")
+    parser.add_argument("--dataset-label", help="Dataset label, e.g. classical_100K or cpihmc_100K.")
     parser.add_argument("--sample-label", default="", help="Optional sampling/window label.")
     parser.add_argument("--rc-index", type=int, default=DEFAULTS["rc_index"], help="Reaction-coordinate index. Default: 0.")
     parser.add_argument("--rc-column", default=DEFAULTS["rc_column"], help="Header column for reaction coordinate. Default: RxnCoord for one RC; use RxnCoord_0, RxnCoord_1, ... for multi-RC output.")
@@ -220,6 +220,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         print_defaults()
         print("\nRefusing to extract data until --confirm-parameters is supplied.", file=sys.stderr)
         return 2
+    if not args.input:
+        parser.error("--input is required unless --print-defaults is used")
+    if not args.dataset_label:
+        parser.error("--dataset-label is required unless --print-defaults is used")
 
     input_path = Path(args.input)
     fmt = detect_format(input_path) if args.format == "auto" else args.format

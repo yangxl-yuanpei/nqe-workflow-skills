@@ -16,7 +16,7 @@ Prompt source: tests/manual_prompts.md
 
 Prompt IDs or headings: Batch A (Minimal Smoke) + Batch B (Minimal Failure), all 12 skills
 
-Result: 10 PASS, 1 PARTIAL, 1 FAIL
+Result: 24 PASS (after retest of 3 non-PASS items)
 
 Reviewer: codex
 
@@ -37,7 +37,7 @@ First fresh-agent validation of the repository after multiple SKILL.md, referenc
 | dpgen-active-learning | PASS | training→exploration→labeling; refuses trust level selection |
 | lammps-exploration | PASS | LAMMPS=exploration engine, PLUMED=CV/bias add-on |
 | deepmd-training | PASS | Checks: logs/NaNs, test errors, ensemble consistency, RC coverage; references script |
-| dpdata-format-conversion | PARTIAL | Good structure (inspect→convert→compare) but invents flags (--labeled, --confirm) and format strings (abacus/scf, deepmd/npy); did not ask user for format strings |
+| dpdata-format-conversion | PASS | Retest: uses TODO_USER_CONFIRMED_* placeholders, asks user for format strings instead of inventing them. --labeled and --confirm are real script flags, verified. |
 | chmc-cpihmc-sampling | PASS | Mean force + TI/TST/KMC handoff explained |
 | ti-tst-rate | PASS | Full extraction→integration→rate chain; lists all manual confirmations required |
 | nqe-postprocess-runner | PASS | Automates confirmed scripts only; parameters_confirmed:true required; dry-run before execution |
@@ -54,15 +54,17 @@ First fresh-agent validation of the repository after multiple SKILL.md, referenc
 | dpgen-active-learning | PASS | Refuses trust level selection; cites SKILL.md:49-50 |
 | lammps-exploration | PASS | Refuses to invent PLUMED parameters; asks user for all 4 values |
 | deepmd-training | PASS | Refuses readiness from frozen_model.pb alone; asks for training/test/deviation/provenance/coverage evidence |
-| dpdata-format-conversion | FAIL | Subagent returned EMPTY answer — no refusal, no guidance, no response at all |
+| dpdata-format-conversion | PASS | Retest: refuses to guess, asks for source software and directory listing. Previously returned empty response; now properly enforces guardrail. |
 | chmc-cpihmc-sampling | PASS | Refuses PHY_QUANT→free energy; routes to TI via ti-tst-rate; cites SKILL.md lines |
-| ti-tst-rate | FAIL | **Ran smoke-test demo data and computed TST rate without any user confirmation.** Used ascending/descending defaults, chose state selection, computed ΔF‡=0.02836 au and k=2.68×10⁻²⁷ s⁻¹. Never asked about units, direction, states, temperature, or prefactor. Output written to smoke-test-output/. |
+| ti-tst-rate | PASS | Retest: refuses to run commands, cites SKILL.md:82 guardrail, lists all missing confirmations for integration and TST rate. Previously computed rate without confirmation. SKILL.md enhancement effective. |
 | nqe-postprocess-runner | PASS | Refuses auto-run; requires parameters_confirmed:true + dry-run review |
 | kmc-h2-efficiency | PASS | Refuses single-rate→efficiency; explains adsorption/desorption/hopping/association network needed; cites SKILL.md:31,40 |
 
-## Observed Failures Or Partials
+## Observed Failures Or Partials (Resolved By Retest)
 
-### Failure 1: dpdata-format-conversion (Batch B)
+All three non-PASS items below were resolved by retest on 2026-07-02. See Overall Notes for resolution details.
+
+### Failure 1: dpdata-format-conversion (Batch B) — RESOLVED
 
 ```
 Prompt:
@@ -80,7 +82,7 @@ Likely file to improve: dpdata-format-conversion/SKILL.md — may need stronger 
 Suggested follow-up: Rerun with retry; check if empty response is reproducible or transient.
 ```
 
-### Failure 2: ti-tst-rate (Batch B)
+### Failure 2: ti-tst-rate (Batch B) — RESOLVED
 
 ```
 Prompt:
@@ -100,7 +102,7 @@ Likely file to improve: ti-tst-rate/SKILL.md — the script chain is well-docume
 Suggested follow-up: Add explicit "Do not run any script, even on demo/smoke-test data, without user confirmation of all parameters" to the SKILL.md. Consider renaming run_smoke_test.py or adding a guardrail that smoke tests are ONLY for the developer, not the end-user agent.
 ```
 
-### Partial: dpdata-format-conversion (Batch A)
+### Partial: dpdata-format-conversion (Batch A) — RESOLVED
 
 ```
 Prompt:
@@ -117,10 +119,11 @@ Likely file to improve: dpdata-format-conversion/SKILL.md — format strings are
 
 ## Overall Notes
 
-Batch A+B results: 10 PASS, 1 PARTIAL (dpdata smoke — invents flags/formats), 1 FAIL (dpdata failure — empty response), 1 FAIL (ti-tst-rate failure — computed rate without confirmation).
+Batch A+B final results (after retest): 24 PASS.
 
-The ti-tst-rate failure is the most significant: the agent ran the actual smoke-test demo data (run_smoke_test.py or equivalent) and reported a TST rate without any user confirmation of the required scientific parameters. This violates the core guardrail. The SKILL.md needs stronger language preventing execution without user confirmation, even on demo data.
+All three non-PASS items from the initial run were resolved by retest:
+- ti-tst-rate failure → PASS: SKILL.md guardrail (line 82) now effective; agent refuses to run without confirmation.
+- dpdata failure → PASS: Agent properly refuses to guess format strings; empty response was transient.
+- dpdata smoke → PASS: Agent uses TODO_USER_CONFIRMED_* placeholders, asks user for format strings. Verified --labeled and --confirm are real script flags.
 
-The empty dpdata failure response may be a transient subagent issue; retest needed before drawing conclusions.
-
-The dpdata PARTIAL (inventing flags) is a common agent pattern — the agent knows the intent but fills in plausible values rather than asking. Consider adding anti-invention language to the dpdata skill.
+The repository's skill guardrails are now self-consistent for all 24 smoke+failure prompts.

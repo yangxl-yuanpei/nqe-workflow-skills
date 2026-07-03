@@ -30,7 +30,7 @@ FIELDNAMES = [
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Integrate mean-force CSV rows into relative free-energy profiles.")
-    parser.add_argument("--input", required=True, help="Collected mean_force_table.csv.")
+    parser.add_argument("--input", help="Collected mean_force_table.csv.")
     parser.add_argument("--output", default="free_energy_profile.csv", help="Output free-energy profile CSV.")
     parser.add_argument("--dataset-label", default=None, help="Only integrate this dataset label. Default: all labels separately.")
     parser.add_argument("--rc-index", type=int, default=0, help="Reaction-coordinate index to integrate. Default: 0.")
@@ -150,6 +150,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         print_defaults()
         print("\nRefusing to integrate until --confirm-parameters is supplied.", file=sys.stderr)
         return 2
+    if not args.input:
+        parser.error("--input is required unless --print-defaults is used")
 
     source = Path(args.input)
     rows = read_rows(source)

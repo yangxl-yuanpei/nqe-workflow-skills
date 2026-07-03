@@ -41,7 +41,7 @@ def build_parser() -> argparse.ArgumentParser:
             "for selected columns in CHMC/CPIHMC PHY_QUANT or energy.dat outputs."
         )
     )
-    parser.add_argument("--input", required=True, help="PHY_QUANT/energy.dat-like whitespace table.")
+    parser.add_argument("--input", help="PHY_QUANT/energy.dat-like whitespace table.")
     parser.add_argument("--output", help="Output plot path, for example convergence.png.")
     parser.add_argument("--summary", help="Optional CSV summary path for numerical diagnostics.")
     parser.add_argument("--column", action="append", default=[], help="Column name to analyze. Repeat for multiple columns.")
@@ -365,6 +365,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 0
     if not args.confirm_parameters:
         parser.error("--confirm-parameters is required after reviewing columns, units, and equilibration policy")
+    if not args.input:
+        parser.error("--input is required unless --print-defaults is used")
     if not args.output and not args.no_plot:
         parser.error("--output is required unless --no-plot is used")
     if not args.summary and args.no_plot:

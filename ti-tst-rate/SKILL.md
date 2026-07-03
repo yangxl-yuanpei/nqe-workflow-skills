@@ -34,6 +34,7 @@ Use this skill for the thermodynamic-integration and transition-state-theory sta
 ## What This Skill Must Not Do
 
 - Do not invent mean-force values, reaction-coordinate grids, integration methods, uncertainties, activation barriers, temperatures, or rate constants.
+- Do not run TI/TST scripts, including bundled demo or smoke-test scripts, when the user asks to "use defaults", "do not ask questions", or has not confirmed integration direction, units, state selection, temperature, and prefactor choices.
 - Do not assume the quantum barrier must be lower in every possible case without checking the documented system and data.
 - Do not claim TST rates are final H2 formation efficiency; KMC is still required for the grain-scale observable.
 - Do not ignore recrossing, variational TST, transmission coefficient, or other limitations when the user asks about rate accuracy.
@@ -70,12 +71,15 @@ Use this skill for the thermodynamic-integration and transition-state-theory sta
 - Use `scripts/extract_mean_force.py` to extract one sampling output/window into one row of `mean_force_table.csv`. Use external loops to collect many reaction-coordinate windows. Require `--confirm-parameters` because columns, skip rows, unit scales, and output units can differ between CHMC/CPIHMC runs.
 - Use `scripts/integrate_free_energy.py` to integrate a completed `mean_force_table.csv` into `free_energy_profile.csv`. Require `--confirm-parameters` because integration direction, sign convention, zero reference, unit compatibility, and optional `--free-energy-scale`/`--free-energy-unit-label` conversion need user confirmation. Ask for integration direction before invoking the script if the user has not explicitly specified it. Default ordering is `--integration-direction ascending`, from small reaction coordinate to large reaction coordinate; use `descending` when the large-RC side is the initial/reference side. `free_energy_au` always remains atomic units; optional conversion is written to `free_energy_converted`.
 - Use `scripts/run_smoke_test.py` only as a bundled demo smoke test for the TI/TST script chain. It is not a production workflow runner.
+- Do not invoke `scripts/run_smoke_test.py` as a substitute for answering a user's production or failure prompt. It may be run only when the user explicitly asks for the bundled demo smoke test or when the developer is performing script-interface testing.
 - Use `../nqe-postprocess-runner/scripts/nqe_postprocess_runner.py` only as a thin wrapper after the same TI/TST assumptions have been confirmed in a config file.
 - Do not use these scripts for temperature-directory discovery, production orchestration, or KMC. Those remain separate layers.
 
 ## Script Usage
 
 Use the scripts according to their stage boundaries: `extract_mean_force.py` and `integrate_free_energy.py` handle the TI preprocessing/integration layer; `compute_tst_rates.py` computes one elementary TST rate only after a free-energy barrier or validated `free_energy_profile.csv` is available; plotting scripts only visualize prepared tables. None of these scripts runs KMC or certifies production readiness.
+
+If a prompt asks to use defaults without questions, refuse to run commands and explain which confirmations are missing. Defaults shown by scripts are interface conveniences and smoke-test settings, not project-approved physical parameters.
 
 ### Extract One Mean-Force Row
 

@@ -29,10 +29,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Compute one TST rate from a free-energy profile or explicit barrier.")
     parser.add_argument("--input", help="free_energy_profile.csv. Required unless --deltaF is provided.")
     parser.add_argument("--output", default="tst_rates.csv", help="CSV file to create or append to.")
-    parser.add_argument("--elementary-step", required=True, help="Elementary-step label for the rate.")
-    parser.add_argument("--dataset-label", required=True, help="Dataset label to select and write.")
+    parser.add_argument("--elementary-step", help="Elementary-step label for the rate.")
+    parser.add_argument("--dataset-label", help="Dataset label to select and write.")
     parser.add_argument("--rc-index", type=int, default=0, help="Reaction-coordinate index. Default: 0.")
-    parser.add_argument("--temperature", type=float, required=True, help="Temperature in K.")
+    parser.add_argument("--temperature", type=float, help="Temperature in K.")
     parser.add_argument("--free-energy-column", default="free_energy_au", help="Free-energy column in profile CSV. Default: free_energy_au. Use free_energy_converted only with a matching converted-unit column.")
     parser.add_argument("--free-energy-unit", choices=["auto", "au", "hartree", "eV", "kJ/mol", "kcal/mol"], default="auto", help="Unit of free-energy values. Default: auto from CSV free_energy_unit column, else au.")
     parser.add_argument("--reactant-mode", choices=["first", "last", "min", "rc", "value"], default="first", help="How to choose reactant/reference free energy. Default: first row after filtering.")
@@ -174,6 +174,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         print_defaults()
         print("\nRefusing to compute TST rate until --confirm-parameters is supplied.", file=sys.stderr)
         return 2
+    if not args.elementary_step:
+        parser.error("--elementary-step is required unless --print-defaults is used")
+    if not args.dataset_label:
+        parser.error("--dataset-label is required unless --print-defaults is used")
+    if args.temperature is None:
+        parser.error("--temperature is required unless --print-defaults is used")
     if args.deltaF is not None:
         if args.deltaF_unit is None:
             raise ValueError("--deltaF-unit is required with --deltaF")
