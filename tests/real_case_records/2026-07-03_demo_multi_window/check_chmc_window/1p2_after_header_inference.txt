@@ -1,0 +1,38 @@
+CHMC/CPIHMC Window Check Summary
+==================================================
+
+[FAIL] Acceptance Rate
+  Acceptance rate from energy-delta-inferred 0.410 below threshold 0.500.
+  Details:
+Inferred from neighboring-row KinEng/PotEng changes; HMC 16849/47782 (0.353); MC 24184/52217 (0.463); tolerance=0. This is a fallback diagnostic, not an internal log counter.
+
+[PASS] PHY_QUANT Integrity
+  Found 100000 complete numeric data row(s).
+  Details:
+First data row: 1; columns: 8.
+
+[WARN] Header Inference
+  Header was not read directly from this physical-output file; review inferred column mapping.
+  Details:
+Current file starts with numeric data, so no header was read from this file. Inferred header from sibling file C:\Users\94474\Documents\Codex\2026-06-26\w\demo\0.0\energy.dat: Steps KinEng PotEng TotEng dE_dN ElecNum RxnCoord MeanForce
+
+[PASS] Initial RC Adjustment
+  All 1 matched RC value(s) started within tolerance of the target.
+  Details:
+  DIFF_64_141_91: target=1.2000, first=1.2000, final=1.2000, first_deviation=0.0000, final_deviation=0.0000
+
+[PASS] RC Consistency
+  All 1 RC constraint(s) satisfied.
+  Details:
+  DIFF_64_141_91: target=1.2000, actual=1.2000, deviation=0.0000
+
+[WARN] Convergence
+  Mean force shows 5.10% drift.
+  Details:
+Current file starts with numeric data, so no header was read from this file. Inferred header from sibling file C:\Users\94474\Documents\Codex\2026-06-26\w\demo\0.0\energy.dat: Steps KinEng PotEng TotEng dE_dN ElecNum RxnCoord MeanForce
+Consider longer production run for mean force convergence.
+
+[SKIP] INPUT/ALL_INPUT Agreement
+  ALL_INPUT file is empty or not found.
+
+Summary: 3 PASS, 2 WARN, 1 FAIL, 1 SKIP

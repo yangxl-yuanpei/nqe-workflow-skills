@@ -79,8 +79,9 @@ Agent response:
 1. Read the header and list available `RxnCoord*` and `MeanForce*` columns.
 2. For single-RC output, map `MeanForce` to `RxnCoord`.
 3. For multi-RC output, map `MeanForce_i` to `RxnCoord_i`.
-4. Ask the user which reaction coordinate should be handed to TI.
-5. Do not collapse multi-dimensional mean-force data into 1D TI unless the user provides a path, projection, or marginalization rule.
+4. If a same-batch file starts with numeric rows and lacks a header, infer column names only from a same-named sibling-window file with the same column count, and report the inferred source file and mapping to the user.
+5. Ask the user which reaction coordinate should be handed to TI.
+6. Do not collapse multi-dimensional mean-force data into 1D TI unless the user provides a path, projection, or marginalization rule.
 
 ## Potential Energy Or Mean Force Does Not Look Equilibrated
 

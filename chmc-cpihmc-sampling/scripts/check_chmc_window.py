@@ -44,6 +44,14 @@ class AcceptanceEstimate:
     details: str
 
 
+@dataclass
+class TableData:
+    header: List[str]
+    rows: List[List[float]]
+    header_source: str
+    header_note: Optional[str] = None
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Check CHMC/CPIHMC sampling window for acceptance rate, RC adjustment, convergence, and INPUT/ALL_INPUT agreement."
@@ -75,6 +83,8 @@ def print_defaults() -> None:
     print("  acceptance-energy-tolerance: 0.0 (exact energy-change inference when log acceptance is unavailable)")
     print("  rc-tolerance: 0.05 (in reaction coordinate units)")
     print("  output integrity check: enabled (detects truncated or nonnumeric PHY_QUANT/energy.dat rows)")
+    print("  path resolution: relative input/log/physical-output paths are resolved under --window-dir")
+    print("  missing header handling: numeric-only physical-output files may infer headers from same-named sibling-window files with matching column counts")
     print("  initial RC adjustment check: enabled (diagnostic only; initial mismatch is not an automatic failure)")
     print("  convergence check: enabled (uses PHY_QUANT or energy.dat)")
     print("  INPUT/ALL_INPUT comparison: all parameters")
@@ -105,6 +115,50 @@ def parse_input_file(path: Path) -> Tuple[InputParameters, dict[str, List[str]]]
     return InputParameters(raw=raw, normalized=normalized), multi
 
 
+def resolve_window_path(window_dir: Path, raw_path: str) -> Path:
+    """Resolve window file arguments relative to the window directory.
+
+    Absolute paths are used as-is. Relative paths are interpreted as files inside
+    the window directory, because this script checks one sampling window.
+    """
+    path = Path(raw_path)
+    if path.is_absolute():
+        return path
+    return window_dir / path
+
+
+def infer_header_from_siblings(path: Path, window_dir: Optional[Path], expected_columns: int) -> Tuple[Optional[List[str]], Optional[str]]:
+    """Infer a missing header from same-named files in sibling windows.
+
+    This is only used when the current file starts with numeric data. The
+    inferred header must come from a sibling file with the same name and the same
+    number of columns. The caller must report the inference to the user.
+    """
+    if window_dir is None:
+        return None, None
+    parent = window_dir.parent
+    if not parent.exists():
+        return None, None
+    for sibling in sorted(parent.iterdir(), key=lambda item: item.name):
+        if not sibling.is_dir() or sibling.resolve() == window_dir.resolve():
+            continue
+        candidate = sibling / path.name
+        if not candidate.exists():
+            continue
+        with candidate.open("r", encoding="utf-8") as handle:
+            for raw in handle:
+                stripped = raw.strip()
+                if not stripped or stripped.startswith("#"):
+                    continue
+                parts = stripped.split()
+                if all(is_float(part) for part in parts):
+                    break
+                if len(parts) == expected_columns:
+                    return parts, str(candidate)
+                break
+    return None, None
+
+
 def extract_acceptance_from_log(log_path: Path) -> Optional[float]:
     """Try to extract acceptance rate from log file."""
     if not log_path.exists():
@@ -133,10 +187,12 @@ def extract_acceptance_from_log(log_path: Path) -> Optional[float]:
     return None
 
 
-def parse_table_header_and_rows(path: Path) -> Tuple[List[str], List[List[float]]]:
+def parse_table(path: Path, window_dir: Optional[Path] = None, infer_sibling_header: bool = False) -> TableData:
     """Parse a whitespace table with either a text header or numeric-only rows."""
     header: Optional[List[str]] = None
     rows: List[List[float]] = []
+    header_source = "file"
+    header_note = None
     with path.open("r", encoding="utf-8") as handle:
         for line_no, raw in enumerate(handle, start=1):
             stripped = raw.strip()
@@ -145,10 +201,28 @@ def parse_table_header_and_rows(path: Path) -> Tuple[List[str], List[List[float]
             parts = stripped.split()
             if header is None:
                 if all(is_float(part) for part in parts):
-                    header = [f"col_{idx}" for idx in range(len(parts))]
+                    inferred_header = None
+                    inferred_source = None
+                    if infer_sibling_header:
+                        inferred_header, inferred_source = infer_header_from_siblings(path, window_dir, len(parts))
+                    if inferred_header:
+                        header = inferred_header
+                        header_source = "sibling-inferred"
+                        header_note = (
+                            f"Current file starts with numeric data, so no header was read from this file. "
+                            f"Inferred header from sibling file {inferred_source}: {' '.join(inferred_header)}"
+                        )
+                    else:
+                        header = [f"col_{idx}" for idx in range(len(parts))]
+                        header_source = "numeric-fallback"
+                        header_note = (
+                            "Current file starts with numeric data and no matching sibling header was found; "
+                            "using numeric fallback columns col_0, col_1, ..."
+                        )
                     rows.append([float(part) for part in parts])
                 else:
                     header = parts
+                    header_source = f"file:{line_no}"
                 continue
             if len(parts) != len(header):
                 raise ValueError(f"row {line_no} has {len(parts)} columns, expected {len(header)}")
@@ -158,7 +232,12 @@ def parse_table_header_and_rows(path: Path) -> Tuple[List[str], List[List[float]
                 raise ValueError(f"row {line_no} contains nonnumeric data") from exc
     if header is None:
         raise ValueError("no table header or numeric data rows found")
-    return header, rows
+    return TableData(header=header, rows=rows, header_source=header_source, header_note=header_note)
+
+
+def parse_table_header_and_rows(path: Path) -> Tuple[List[str], List[List[float]]]:
+    table = parse_table(path)
+    return table.header, table.rows
 
 
 def find_column_index(header: List[str], names: List[str], fallback: Optional[int] = None) -> Optional[int]:
@@ -352,34 +431,26 @@ def check_phy_quant_integrity(phy_quant_path: Optional[Path]) -> CheckResult:
     )
 
 
-def parse_phy_quant_rc(path: Path) -> Tuple[List[str], List[float], List[float], List[float]]:
+def parse_phy_quant_rc(path: Path, window_dir: Optional[Path] = None) -> Tuple[List[str], List[int], List[float], List[float], Optional[str]]:
     """Parse PHY_QUANT file to extract RC columns plus first and final values."""
     if not path.exists():
         raise FileNotFoundError(f"PHY_QUANT file not found: {path}")
-    header = None
     rc_columns = []
     rc_indices = []
     first_values = []
     final_values = []
-    with path.open("r", encoding="utf-8") as handle:
-        for line in handle:
-            stripped = line.strip()
-            if not stripped or stripped.startswith("#"):
-                continue
-            if header is None:
-                header = stripped.split()
-                for i, col in enumerate(header):
-                    if col.lower().startswith("rxncoord") or col.lower().startswith("rc"):
-                        rc_columns.append(col)
-                        rc_indices.append(i)
-            else:
-                parts = stripped.split()
-                if rc_indices:
-                    current_values = [float(parts[i]) for i in rc_indices if i < len(parts)]
-                    if not first_values:
-                        first_values = current_values
-                    final_values = current_values
-    return rc_columns, rc_indices, first_values, final_values
+    table = parse_table(path, window_dir=window_dir, infer_sibling_header=True)
+    for i, col in enumerate(table.header):
+        if col.lower().startswith("rxncoord") or col.lower().startswith("rc"):
+            rc_columns.append(col)
+            rc_indices.append(i)
+    for row in table.rows:
+        if rc_indices:
+            current_values = [row[i] for i in rc_indices if i < len(row)]
+            if not first_values:
+                first_values = current_values
+            final_values = current_values
+    return rc_columns, rc_indices, first_values, final_values, table.header_note
 
 
 def parse_input_file_multi(path: Path) -> Tuple[dict[str, str], dict[str, List[str]]]:
@@ -574,7 +645,7 @@ def check_initial_rc_adjustment(first_rcs: List[float], final_rcs: List[float], 
     )
 
 
-def check_convergence(phy_quant_path: Path) -> CheckResult:
+def check_convergence(phy_quant_path: Path, window_dir: Optional[Path] = None) -> CheckResult:
     """Check potential energy and mean force convergence using simple heuristics."""
     if not phy_quant_path or not phy_quant_path.exists():
         return CheckResult(
@@ -583,31 +654,26 @@ def check_convergence(phy_quant_path: Path) -> CheckResult:
             message="PHY_QUANT file not found; skipping convergence check.",
         )
     try:
-        header = None
         pot_eng_values = []
         mean_force_values = []
-        with phy_quant_path.open("r", encoding="utf-8") as handle:
-            for line in handle:
-                stripped = line.strip()
-                if not stripped or stripped.startswith("#"):
-                    continue
-                if header is None:
-                    header = stripped.split()
-                    continue
-                parts = stripped.split()
-                if "PotEng" in header:
-                    idx = header.index("PotEng")
-                    if idx < len(parts):
-                        pot_eng_values.append(float(parts[idx]))
-                if "MeanForce_0" in header:
-                    idx = header.index("MeanForce_0")
-                    if idx < len(parts):
-                        mean_force_values.append(float(parts[idx]))
+        table = parse_table(phy_quant_path, window_dir=window_dir, infer_sibling_header=True)
+        if "PotEng" in table.header:
+            idx = table.header.index("PotEng")
+            pot_eng_values = [row[idx] for row in table.rows if idx < len(row)]
+        mean_force_column = None
+        if "MeanForce_0" in table.header:
+            mean_force_column = "MeanForce_0"
+        elif "MeanForce" in table.header:
+            mean_force_column = "MeanForce"
+        if mean_force_column:
+            idx = table.header.index(mean_force_column)
+            mean_force_values = [row[idx] for row in table.rows if idx < len(row)]
         if len(pot_eng_values) < 10:
             return CheckResult(
                 name="Convergence",
                 status="WARN",
                 message=f"Insufficient samples for convergence check ({len(pot_eng_values)} < 10).",
+                details=table.header_note,
             )
         n = len(pot_eng_values)
         first_half = pot_eng_values[: n // 2]
@@ -620,7 +686,7 @@ def check_convergence(phy_quant_path: Path) -> CheckResult:
                 name="Convergence",
                 status="WARN",
                 message=f"Potential energy shows {rel_diff * 100:.2f}% drift between first and second half.",
-                details="Consider longer equilibration or production run.",
+                details="\n".join(filter(None, [table.header_note, "Consider longer equilibration or production run."])),
             )
         if mean_force_values and len(mean_force_values) >= 10:
             n_mf = len(mean_force_values)
@@ -634,12 +700,13 @@ def check_convergence(phy_quant_path: Path) -> CheckResult:
                     name="Convergence",
                     status="WARN",
                     message=f"Mean force shows {rel_diff_mf * 100:.2f}% drift.",
-                    details="Consider longer production run for mean force convergence.",
+                    details="\n".join(filter(None, [table.header_note, "Consider longer production run for mean force convergence."])),
                 )
         return CheckResult(
             name="Convergence",
             status="PASS",
             message="Potential energy and mean force show reasonable stability.",
+            details=table.header_note,
         )
     except Exception as exc:
         return CheckResult(
@@ -719,14 +786,14 @@ def main(argv: Optional[List[str]] = None) -> int:
     if not window_dir.is_dir():
         print(f"Error: {window_dir} is not a directory.", file=sys.stderr)
         return 1
-    input_path = window_dir / args.input_file
-    all_input_path = window_dir / args.all_input_file
+    input_path = resolve_window_path(window_dir, args.input_file)
+    all_input_path = resolve_window_path(window_dir, args.all_input_file)
     if args.phy_quant_file:
-        phy_quant_path = Path(args.phy_quant_file)
+        phy_quant_path = resolve_window_path(window_dir, args.phy_quant_file)
     else:
         phy_quant_path = auto_detect_phy_quant(window_dir)
     if args.log_file:
-        log_path = Path(args.log_file)
+        log_path = resolve_window_path(window_dir, args.log_file)
     else:
         log_path = auto_detect_log(window_dir)
     results: List[CheckResult] = []
@@ -757,11 +824,16 @@ def main(argv: Optional[List[str]] = None) -> int:
     results.append(phy_quant_integrity)
     if phy_quant_integrity.status == "FAIL":
         rc_columns, rc_indices, first_rcs, final_rcs = ([], [], [], [])
+        header_note = None
     else:
         try:
-            rc_columns, rc_indices, first_rcs, final_rcs = parse_phy_quant_rc(phy_quant_path) if phy_quant_path else ([], [], [], [])
+            if phy_quant_path:
+                rc_columns, rc_indices, first_rcs, final_rcs, header_note = parse_phy_quant_rc(phy_quant_path, window_dir=window_dir)
+            else:
+                rc_columns, rc_indices, first_rcs, final_rcs, header_note = ([], [], [], [], None)
         except Exception as exc:
             rc_columns, rc_indices, first_rcs, final_rcs = ([], [], [], [])
+            header_note = None
             results.append(
                 CheckResult(
                     name="PHY_QUANT Parse",
@@ -770,6 +842,15 @@ def main(argv: Optional[List[str]] = None) -> int:
                     details="Treat this output as failed or incomplete before downstream TI.",
                 )
             )
+    if header_note:
+        results.append(
+            CheckResult(
+                name="Header Inference",
+                status="WARN",
+                message="Header was not read directly from this physical-output file; review inferred column mapping.",
+                details=header_note,
+            )
+        )
     rc_constraints = extract_rc_from_input_multi(input_multi)
     if phy_quant_integrity.status == "FAIL":
         results.append(
@@ -783,7 +864,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         results.append(check_initial_rc_adjustment(first_rcs, final_rcs, rc_constraints, args.rc_tolerance))
         results.append(check_rc_consistency(final_rcs, rc_constraints, args.rc_tolerance))
     if not args.skip_convergence_check and phy_quant_path and phy_quant_integrity.status != "FAIL":
-        results.append(check_convergence(phy_quant_path))
+        results.append(check_convergence(phy_quant_path, window_dir=window_dir))
     results.append(check_input_all_input_agreement(input_params, all_input_params, input_multi))
     for result in results:
         print(f"[{result.status}] {result.name}: {result.message}")

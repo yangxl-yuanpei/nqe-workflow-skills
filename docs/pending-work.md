@@ -1,6 +1,6 @@
 # Pending Work
 
-Last updated: 2026-07-01
+Last updated: 2026-07-03
 
 This file tracks work that remains after the current repository consistency pass. It intentionally separates documented repository state from production readiness.
 
@@ -13,7 +13,8 @@ This file tracks work that remains after the current repository consistency pass
 - `nqe-postprocess-runner` has a basic config example and a convergence-screening config example.
 - `check_chmc_window.py` exists; it is no longer a future script placeholder.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped files, but it is not a real DP-GEN example.
-- Manual prompts exist, but complete fresh-agent pass records are still missing.
+- Manual prompts exist. Targeted fresh-agent records exist for dpdata/TI/TST/runner dry-run behavior, but complete fresh-agent pass records are still missing.
+- A user-confirmed local dpdata mini example exists outside the repository at `../00` for labeled `abacus/scf -> deepmd/npy` inspection/comparison boundaries. It is documented in `dpdata-format-conversion/README.md` and is not a reusable production default.
 
 ## 1. Failure-Case References
 
@@ -71,16 +72,19 @@ Remaining work:
 Current state:
 
 - `inspect_dpdata_system.py`, `convert_with_dpdata.py`, and `compare_converted_system.py` exist.
+- `dpdata-format-conversion/README.md` documents the user-confirmed local `../00` example as labeled `abacus/scf -> deepmd/npy`.
+- A targeted fresh-agent test record confirms the skill now refuses unknown-format guessing and handles the confirmed `../00` example conservatively.
+- `dpdata-format-conversion/references/dpdata-failure-cases.md` is populated with failure patterns and upstream issue references.
 
 Remaining work:
 
-- Add small real or toy conversion examples with explicit format strings.
-- Use the populated dpdata failure cases to design small example checks for wrong format strings, missing labels, element-order mismatch, cell-shape mismatch, and frame-count mismatch.
+- Convert the local `../00` example into repeatable documented checks when a test environment with dpdata is available.
+- Use the populated dpdata failure reference to design small executable or documented checks for wrong format strings, missing labels, element-order mismatch, cell-shape mismatch, and frame-count mismatch.
 - Add a short recipe reference for ABACUS -> DeePMD raw/npy and LAMMPS dump inspection when format names are confirmed.
 
 ## 6. Fresh-Agent Test Records
 
-Manual prompts are available, and the recommended procedure is documented in `docs/fresh-agent-testing.md`. Pass/fail records should still be created with real dated test evidence.
+Manual prompts are available, and the recommended procedure is documented in `docs/fresh-agent-testing.md`. Some pass/fail records now exist with real dated test evidence, but broad coverage is still incomplete.
 
 Recommended record fields:
 
@@ -101,8 +105,8 @@ Highest-priority fresh-agent sections:
 
 - `nqe-postprocess-runner`
 - `chmc-cpihmc-sampling`
-- `ti-tst-rate`
-- `dpdata-format-conversion`
+- `ti-tst-rate` deeper prompts beyond the no-defaults retest
+- `dpdata-format-conversion` checks derived from the existing failure reference, beyond the targeted anti-guessing/example prompts
 - `kmc-h2-efficiency`
 
 ## 7. Documentation Synchronization
@@ -121,8 +125,8 @@ Do not state that all manual tests have passed unless there is a dated test reco
 
 ## Suggested Priority Order
 
-1. Run and record fresh-agent tests for changed skills.
+1. Continue targeted fresh-agent tests for untested or deeper prompt sections.
 2. Validate convergence screening on real multi-window `PHY_QUANT` data.
-3. Add real small dpdata conversion examples and failure-case-driven checks.
+3. Turn the local `../00` dpdata example into repeatable checks and add checks derived from the existing dpdata failure reference.
 4. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
 5. Polish release-facing README and tutorial material after the evidence above is in place.

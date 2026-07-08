@@ -1,0 +1,30 @@
+CHMC/CPIHMC Window Check Summary
+==================================================
+
+[FAIL] Acceptance Rate
+  Acceptance rate from energy-delta-inferred 0.488 below threshold 0.500.
+  Details:
+Inferred from neighboring-row KinEng/PotEng changes; HMC 24961/48150 (0.518); MC 23797/51848 (0.459); tolerance=0. This is a fallback diagnostic, not an internal log counter.
+
+[PASS] PHY_QUANT Integrity
+  Found 99999 complete numeric data row(s).
+  Details:
+First data row: 2; columns: 8.
+
+[WARN] Initial RC Adjustment
+  1 RC value(s) started outside tolerance and ended near target. This can be expected when CHMC/CPIHMC adjusts the initial structure, but review startup behavior.
+  Details:
+  DIFF_64_141_91: target=1.8000, first=2.2000, final=1.8000, first_deviation=0.4000, final_deviation=0.0000
+
+[PASS] RC Consistency
+  All 1 RC constraint(s) satisfied.
+  Details:
+  DIFF_64_141_91: target=1.8000, actual=1.8000, deviation=0.0000
+
+[PASS] Convergence
+  Potential energy and mean force show reasonable stability.
+
+[SKIP] INPUT/ALL_INPUT Agreement
+  ALL_INPUT file is empty or not found.
+
+Summary: 3 PASS, 1 WARN, 1 FAIL, 1 SKIP

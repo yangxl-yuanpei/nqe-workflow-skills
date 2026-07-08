@@ -1,0 +1,28 @@
+CHMC/CPIHMC Window Check Summary
+==================================================
+
+[FAIL] Acceptance Rate
+  Acceptance rate from energy-delta-inferred 0.395 below threshold 0.500.
+  Details:
+Inferred from neighboring-row KinEng/PotEng changes; HMC 15059/48029 (0.314); MC 24423/51970 (0.470); tolerance=0. This is a fallback diagnostic, not an internal log counter.
+
+[PASS] PHY_QUANT Integrity
+  Found 100000 complete numeric data row(s).
+  Details:
+First data row: 1; columns: 8.
+
+[SKIP] Initial RC Adjustment
+  Could not read both first and final reaction-coordinate values.
+
+[FAIL] RC Consistency
+  No reaction coordinate values found in PHY_QUANT output.
+  Details:
+Check that PHY_QUANT file contains RxnCoord columns.
+
+[WARN] Convergence
+  Insufficient samples for convergence check (0 < 10).
+
+[SKIP] INPUT/ALL_INPUT Agreement
+  ALL_INPUT file is empty or not found.
+
+Summary: 1 PASS, 1 WARN, 2 FAIL, 2 SKIP
