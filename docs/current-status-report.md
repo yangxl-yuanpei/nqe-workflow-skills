@@ -48,6 +48,7 @@ initial DFT-labeled dataset
 - Recorded fresh-agent and smoke batches currently pass: Batch A/B minimal smoke and failure prompts, Batch C changed-skill deep tests, Batch D script-interface smoke, and the targeted dpdata/TI/TST/runner retest.
 - Script-level checks on 2026-07-10 passed for Python syntax across all 14 helper scripts, runner positive dry-run, runner implicit-default refusal, and `check_chmc_window.py --print-defaults`.
 - The targeted runner preflight fresh-agent record is `tests/fresh_agent_records/2026-07-10_runner-preflight-targeted_opencode.md`. It passed for implicit-default refusal, `format: auto` refusal, TST default refusal, missing convergence columns, and bundled-config boundary behavior.
+- The real-data runner dry-run record is `tests/real_case_records/2026-07-10_demo_runner_dry_run_record.md`. It validates command generation on the 13-window `../demo` dataset with explicit table columns and no plot/TST commands.
 - The targeted dpdata/TI/TST/runner record is `tests/fresh_agent_records/2026-07-03_dpdata-ti-runner-targeted_opencode.md`. It passed after retesting the TI/TST anti-inference guardrail.
 - Real-data diagnostic records exist for a single large `PHY_QUANT` case and for a 13-window `../demo` CHMC/CPIHMC dataset. The multi-window record is `tests/real_case_records/2026-07-03_demo_multi_window_test_record.md`.
 - Real or semi-real reference examples exist for ABACUS, DP-GEN, LAMMPS/PLUMED, DeePMD, CHMC/CPIHMC, TI/TST handoff, and KMC event-network shape.
@@ -57,7 +58,7 @@ initial DFT-labeled dataset
 - `1/9` failure-case reference file is still a placeholder: `kmc-h2-efficiency/references/kmc-failure-cases.md`. `abacus-dft-labeling/references/abacus-failure-cases.md`, `chmc-cpihmc-sampling/references/chmc-cpihmc-failure-cases.md`, `ti-tst-rate/references/ti-tst-failure-cases.md`, `dpdata-format-conversion/references/dpdata-failure-cases.md`, `nqe-postprocess-runner/references/postprocess-runner-failure-cases.md`, `deepmd-training/references/deepmd-failure-cases.md`, `dpgen-active-learning/references/dpgen-failure-cases.md`, and `lammps-exploration/references/lammps-failure-cases.md` currently contain populated cases.
 - Recorded fresh-agent batches pass, but deeper failure-driven and real-data validation remains incomplete. Do not claim production readiness or exhaustive test coverage.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped `param.json`, `machine.json`, and README files. It is not a real DP-GEN production example.
-- `nqe-postprocess-runner` is still experimental because it needs deeper fresh-agent behavior tests for config/failure cases and more validation against the real multi-window `../demo` style data.
+- `nqe-postprocess-runner` is still experimental because it needs deeper fresh-agent behavior tests for config/failure cases and guarded execution review beyond dry-run command generation.
 - `kmc-h2-efficiency` is still teaching-ready because it lacks an executable schema checker for event networks and rate tables.
 - The repository still lacks target-system-specific production inputs, validated physical parameters, convergence evidence, and provenance records.
 
@@ -84,9 +85,9 @@ Script output remains diagnostic or post-processing output. It is not proof of p
 
 ## Highest-Priority Next Work
 
-1. Validate `nqe-postprocess-runner` convergence-screening and extraction command generation against the real multi-window `../demo` dataset, first with dry-run.
+1. Review whether to execute the `../demo` runner fixture for convergence screening and extraction only, after confirming columns and output policy.
 2. Continue deeper fresh-agent tests for runner config/failure behavior beyond the targeted preflight pass, especially missing windows, bad columns, unexpected dry-run commands, and child-script failures.
-3. If the user confirms TI assumptions, use the recorded `mean_force_table.csv` from the `../demo` test for a guarded TI-only postprocessing test.
+3. If the user confirms TI assumptions, use the recorded `mean_force_table.csv` from the `../demo` test or a newly generated runner output for a guarded TI-only postprocessing test.
 4. Keep dpdata repeatable checks deferred until an environment with dpdata is available; the skill, README example, and populated failure reference already cover the teaching/checking boundary.
 5. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
 6. Keep README, quickstart, testing guide, status report, and pending-work documents synchronized after every script or skill change.

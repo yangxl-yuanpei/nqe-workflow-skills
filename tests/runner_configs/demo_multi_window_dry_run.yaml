@@ -1,0 +1,42 @@
+# Dry-run fixture for the real multi-window ../demo dataset.
+# This config is for runner command-generation validation only.
+# It does not certify sampling convergence, TI direction, free-energy units,
+# TST readiness, or production physical correctness.
+parameters_confirmed: true
+
+sampling_output_root: ../../../demo
+input_file: energy.dat
+window_glob: "*"
+dataset_label: demo_multi_window_dry_run
+output_dir: ../real_case_records/2026-07-10_demo_runner_dry_run/output
+
+run_convergence_diagnostics: true
+convergence_columns: 2,6,7
+convergence_output_dir: ../real_case_records/2026-07-10_demo_runner_dry_run/convergence
+convergence_skiprows: 0
+convergence_step_col_index: 0
+convergence_running_window: 1000
+convergence_auto_equilibration: true
+
+format: table
+skiprows: 0
+rc_raw_unit_label: au
+force_raw_unit_label: au
+rc_scale: 1.0
+force_scale: 1.0
+rc_index: 0
+rc_col_index: 6
+force_col_index: 7
+uncertainty: sem
+
+# Explicit fields are required by runner preflight. These values are included
+# only so the dry-run can show generated integration commands for review.
+# Do not treat them as confirmed production TI assumptions.
+integration_direction: input
+zero: "none"
+free_energy_scale: 1.0
+free_energy_unit_label: au
+
+plots: false
+compute_tst: false
+notes: real demo multi-window runner dry-run fixture; command generation only; no production TI/TST approval
