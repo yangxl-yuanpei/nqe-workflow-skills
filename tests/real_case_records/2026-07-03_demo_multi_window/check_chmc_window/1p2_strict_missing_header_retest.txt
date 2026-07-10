@@ -1,0 +1,11 @@
+[SKIP] Acceptance Rate: Acceptance rate not found in log or energy-table fallback; provide --acceptance-rate or check log/output files.
+[PASS] PHY_QUANT Integrity: Found 100000 complete numeric data row(s).
+    First data row: 1; columns: 8.
+[FAIL] PHY_QUANT Parse: Could not parse reaction-coordinate columns: table starts with numeric data and no reliable header could be inferred from a same-named sibling-window file with matching column count
+    Treat this output as failed or incomplete before downstream TI.
+[SKIP] Initial RC Adjustment: Could not read both first and final reaction-coordinate values.
+[FAIL] RC Consistency: No reaction coordinate values found in PHY_QUANT output.
+    Check that PHY_QUANT file contains RxnCoord columns.
+[SKIP] INPUT/ALL_INPUT Agreement: ALL_INPUT file is empty or not found.
+
+2 check(s) FAILED. Review warnings before using this window's data.

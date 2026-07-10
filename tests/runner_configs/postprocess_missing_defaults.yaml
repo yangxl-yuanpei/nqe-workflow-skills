@@ -1,0 +1,12 @@
+# Negative fixture: parameters_confirmed is true, but the config still relies on
+# parser, column, unit, and TST defaults. The runner should reject this before
+# generating child commands.
+parameters_confirmed: true
+
+sampling_output_root: ../ti-tst-rate/templates/reference-examples/user-tested-ti-tst-chain/demo
+dataset_label: incomplete_runner_guardrail
+integration_direction: descending
+elementary_step: CHO
+temperature_K: 100
+reactant_mode: first
+ts_mode: max

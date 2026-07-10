@@ -59,6 +59,8 @@ Agent response:
 Typical symptoms:
 
 - The runner raises `Missing required config field: sampling_output_root`, `dataset_label`, `integration_direction`, `elementary_step`, `temperature_K`, `reactant_mode`, or `ts_mode`.
+- The runner raises `Refusing to run postprocess runner because the config relies on implicit column or physical defaults`.
+- A config has `parameters_confirmed: true` but omits parser mode, extraction columns, unit scales, TI zero reference, `compute_tst`, `plots`, TST free-energy column/unit, or prefactor units.
 - `compute_tst: true` is enabled but TST-specific fields are absent.
 - A child script fails because a required flag was not generated.
 
@@ -74,7 +76,29 @@ Agent response:
 2. Ask the user to confirm the value rather than filling it from examples.
 3. If TST is not intended, ask whether `compute_tst: false` should be set.
 4. If plotting is not intended or dependencies are unavailable, ask whether `plots: false` should be set.
-5. Do not infer integration direction, state selection, temperature, or prefactor model.
+5. Do not infer parser mode, extraction columns, unit scales, integration direction, state selection, temperature, free-energy unit, or prefactor model.
+
+## Config Relies On Implicit Column Or Physical Defaults
+
+Typical symptoms:
+
+- A dry-run is refused before any child commands are generated.
+- The error lists fields such as `format`, `rc_column`, `force_column`, `rc_col_index`, `force_col_index`, `zero`, `free_energy_column`, `free_energy_unit`, `prefactor_model`, or `prefactor_units`.
+- A user expects `format: auto`, `zero: first`, `free_energy_column: free_energy_au`, or `prefactor_model: kBT_over_h` to be applied silently because child scripts expose those defaults.
+
+Likely causes:
+
+- Child-script interface defaults were mistaken for user-confirmed scientific choices.
+- A config was copied from an old runner example that omitted fields now required by preflight.
+- The config author set `parameters_confirmed: true` before confirming every column, unit, and TST choice.
+
+Agent response:
+
+1. Explain that `parameters_confirmed: true` is necessary but not sufficient.
+2. List the missing explicit fields from the preflight error.
+3. Ask the user to confirm values or set `compute_tst: false` / `plots: false` when those stages are not intended.
+4. Keep drafts non-runnable until the user has confirmed parser mode, extraction columns, units/scales, integration direction, zero reference, state selection, temperature, and prefactor.
+5. Do not use child-script defaults, examples, file order, or directory names to fill the missing values.
 
 ## Path Resolution Points To The Wrong Place
 

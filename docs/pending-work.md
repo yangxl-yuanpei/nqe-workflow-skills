@@ -1,6 +1,6 @@
 # Pending Work
 
-Last updated: 2026-07-03
+Last updated: 2026-07-08
 
 This file tracks work that remains after the current repository consistency pass. It intentionally separates documented repository state from production readiness.
 
@@ -13,8 +13,9 @@ This file tracks work that remains after the current repository consistency pass
 - `nqe-postprocess-runner` has a basic config example and a convergence-screening config example.
 - `check_chmc_window.py` exists; it is no longer a future script placeholder.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped files, but it is not a real DP-GEN example.
-- Manual prompts exist. Targeted fresh-agent records exist for dpdata/TI/TST/runner dry-run behavior, but complete fresh-agent pass records are still missing.
+- Manual prompts exist. Recorded fresh-agent and script-smoke batches currently pass; remaining testing work is deeper failure-driven behavior and real-data validation, not a missing baseline pass.
 - A user-confirmed local dpdata mini example exists outside the repository at `../00` for labeled `abacus/scf -> deepmd/npy` inspection/comparison boundaries. It is documented in `dpdata-format-conversion/README.md` and is not a reusable production default.
+- A real 13-window CHMC/CPIHMC-style dataset exists outside the repository at `../demo`; summaries and diagnostics are recorded under `tests/real_case_records/2026-07-03_demo_multi_window*`.
 
 ## 1. Failure-Case References
 
@@ -26,12 +27,19 @@ High priority. The following files still need real observed failures, causes, ch
 
 ## 2. CHMC/CPIHMC Window Checking
 
-`chmc-cpihmc-sampling/scripts/check_chmc_window.py` exists and should now be exercised on more real or representative windows.
+`chmc-cpihmc-sampling/scripts/check_chmc_window.py` exists and has been exercised on single-window and 13-window real data records.
+
+Current state:
+
+- Relative file arguments are resolved under `--window-dir`.
+- Numeric-first physical-output files can infer missing headers from same-named sibling-window files with matching column count, but fail parsing when no reliable header source is available.
+- Header inference is reported explicitly as a warning.
+- Real multi-window diagnostics are recorded for `../demo`.
 
 Remaining work:
 
 - Validate acceptance-rate parsing on real logs or outputs.
-- Validate final-RC and target-RC checks against real `INPUT`/`ALL_INPUT` examples.
+- Validate final-RC and target-RC checks against more real `INPUT`/`ALL_INPUT` examples when `ALL_INPUT` is available.
 - Continue validating initial-RC adjustment diagnostics on more real windows, including multi-RC cases.
 - Connect recurring diagnostic outcomes to `chmc-cpihmc-failure-cases.md`.
 - Decide which checks should remain in `check_chmc_window.py` and which should remain in `analyze_phy_quant_convergence.py`.
@@ -46,12 +54,13 @@ Current state:
 - Config schema exists.
 - Basic and convergence-screening example configs exist.
 - Dry-run command generation has been exercised for the bundled demo.
+- A preflight guard now rejects runnable configs that still rely on implicit parser, column, unit, TI, TST, or plot defaults.
 
 Remaining work:
 
-- Exercise the populated failure cases with fresh-agent behavior tests for config parsing, missing windows, bad columns, unexpected dry-run commands, and child-script failures.
+- Exercise the populated failure cases with fresh-agent behavior tests for config parsing, missing windows, bad columns, implicit-default refusal, unexpected dry-run commands, and child-script failures.
 - Add fresh-agent behavior tests for runnable versus non-runnable configs.
-- Validate convergence-screening config on real multi-window `PHY_QUANT` data.
+- Validate convergence-screening config on the real multi-window `../demo` data, starting with dry-run command generation and then guarded execution only after parameters are reviewed.
 - Consider adding a `--generate-config` or draft-config mode only if it can preserve `parameters_confirmed: false` for unapproved values.
 
 ## 4. KMC Teaching-Ready To Ready
@@ -78,13 +87,13 @@ Current state:
 
 Remaining work:
 
-- Convert the local `../00` example into repeatable documented checks when a test environment with dpdata is available.
-- Use the populated dpdata failure reference to design small executable or documented checks for wrong format strings, missing labels, element-order mismatch, cell-shape mismatch, and frame-count mismatch.
+- Convert the local `../00` example into repeatable documented checks only when a test environment with dpdata is available.
+- Optionally use the populated dpdata failure reference to design small executable or documented checks for wrong format strings, missing labels, element-order mismatch, cell-shape mismatch, and frame-count mismatch.
 - Add a short recipe reference for ABACUS -> DeePMD raw/npy and LAMMPS dump inspection when format names are confirmed.
 
 ## 6. Fresh-Agent Test Records
 
-Manual prompts are available, and the recommended procedure is documented in `docs/fresh-agent-testing.md`. Some pass/fail records now exist with real dated test evidence, but broad coverage is still incomplete.
+Manual prompts are available, and the recommended procedure is documented in `docs/fresh-agent-testing.md`. Recorded baseline fresh-agent and script-smoke batches pass. Future records should focus on newly changed behavior, deeper failure-driven prompts, and real-data workflow checks.
 
 Recommended record fields:
 
@@ -103,10 +112,10 @@ Use `tests/fresh_agent_record_template.md` as the copyable record template.
 
 Highest-priority fresh-agent sections:
 
-- `nqe-postprocess-runner`
-- `chmc-cpihmc-sampling`
+- `nqe-postprocess-runner` config/failure behavior beyond the current dry-run boundary checks
+- `chmc-cpihmc-sampling` only after further script/reference changes
 - `ti-tst-rate` deeper prompts beyond the no-defaults retest
-- `dpdata-format-conversion` checks derived from the existing failure reference, beyond the targeted anti-guessing/example prompts
+- `dpdata-format-conversion` only when adding new executable checks or changing the anti-guessing/reference behavior
 - `kmc-h2-efficiency`
 
 ## 7. Documentation Synchronization
@@ -121,12 +130,12 @@ After future changes, keep these files aligned:
 - affected `SKILL.md` files
 - affected `references/*.md` files
 
-Do not state that all manual tests have passed unless there is a dated test record. Do not state that a placeholder example is a real production example.
+Do not state that production readiness or exhaustive coverage has been achieved. It is acceptable to state that the currently recorded fresh-agent and script-smoke batches pass. Do not state that a placeholder example is a real production example.
 
 ## Suggested Priority Order
 
-1. Continue targeted fresh-agent tests for untested or deeper prompt sections.
-2. Validate convergence screening on real multi-window `PHY_QUANT` data.
-3. Turn the local `../00` dpdata example into repeatable checks and add checks derived from the existing dpdata failure reference.
+1. Validate `nqe-postprocess-runner` convergence-screening and extraction command generation on the real multi-window `../demo` dataset.
+2. If the user confirms TI assumptions, run a guarded TI-only test from the recorded `mean_force_table.csv`.
+3. Keep dpdata repeatable checks deferred until a dpdata-enabled test environment is available.
 4. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
 5. Polish release-facing README and tutorial material after the evidence above is in place.

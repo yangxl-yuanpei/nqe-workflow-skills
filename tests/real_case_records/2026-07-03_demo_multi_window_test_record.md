@@ -20,7 +20,7 @@ Boundary: this record verifies script behavior and records diagnostics. It does 
 - Per-window `energy.dat` size: about 11.2 MB
 - Detected columns for headered files: `Steps KinEng PotEng TotEng dE_dN ElecNum RxnCoord MeanForce`
 
-Some windows begin with a numeric data row rather than a header: `_1.2`, `1.2`, `2.2`, and `2.6`. These windows are useful for testing numeric-column fallback behavior.
+Some windows begin with a numeric data row rather than a header: `_1.2`, `1.2`, `2.2`, and `2.6`. These windows are useful for testing same-batch header inference and strict failure when no reliable header source is available.
 
 ## Commands Exercised
 
@@ -96,7 +96,7 @@ Notable suggested equilibration cutoffs:
 - `0.0`: `MeanForce` suggested `eq_index=10000`.
 - `1.8`: `RxnCoord` suggested `eq_index=10000`; `MeanForce` suggested `eq_index=5000`.
 
-For no-header windows, summary column names are numeric fallback names such as `col_2`, `col_6`, and `col_7`.
+For no-header windows, the explicit-column convergence-script summaries use numeric fallback names such as `col_2`, `col_6`, and `col_7`. This is separate from `check_chmc_window.py`, which now requires either a file header or reliable same-batch sibling-header inference.
 
 ## Mean-Force Extraction
 
@@ -130,7 +130,7 @@ TI integration and TST-rate computation were not run. They require explicit user
 ## Follow-Up
 
 - Retest `check_chmc_window.py` on the headerless windows after the relative-path and sibling-header-inference update.
-- Consider whether explicit numeric-column options are still needed for cases where no reliable sibling header exists.
+- Confirm that `check_chmc_window.py` fails directly when a numeric-first physical-output file has no reliable file header or same-batch sibling header.
 - For startup-adjustment windows such as `1.8` and `3.0`, test extraction with equilibration discard or explicit `--window-rc`.
 - If the user confirms TI assumptions, integrate `mean_force_table.csv` as a separate postprocessing test.
 - Keep the 139 MB raw `../demo` dataset outside the repository; only small summaries and records are stored here.
@@ -144,18 +144,26 @@ Script update tested:
 - Relative `--input-file`, `--all-input-file`, `--phy-quant-file`, and `--log-file` paths are resolved under `--window-dir`.
 - Numeric-first physical-output files can infer a missing header from same-named sibling-window files with matching column counts.
 - Header inference is reported explicitly as a `Header Inference` warning.
+- If no reliable file header or same-batch sibling header exists, `check_chmc_window.py` fails parsing instead of inventing numeric column names.
 
 Retest commands:
 
 ```text
 check_chmc_window.py --window-dir ../demo/0.4 --phy-quant-file energy.dat --confirm-parameters
 check_chmc_window.py --window-dir ../demo/1.2 --phy-quant-file energy.dat --confirm-parameters
+check_chmc_window.py --window-dir . --input-file ../demo/1.2/INPUT --phy-quant-file ../demo/1.2/energy.dat --confirm-parameters --skip-convergence-check
 ```
 
 Observed outcome:
 
 - `0.4`: relative `energy.dat` resolved correctly under the window directory. RC consistency passed. Acceptance remained below the default threshold, which is a diagnostic result unrelated to path resolution.
 - `1.2`: headerless `energy.dat` was parsed by inferring the header from sibling file `../demo/0.0/energy.dat`, with mapping `Steps KinEng PotEng TotEng dE_dN ElecNum RxnCoord MeanForce`. The script reported this as `Header Inference` and RC consistency passed.
+- Isolated-header test: the same `1.2/energy.dat` was intentionally run with a `--window-dir` that has no same-batch sibling header. The script reported `PHY_QUANT Parse: FAIL` with the message that no reliable header could be inferred, and did not fall back to `col_0` mappings.
+
+Recorded outputs:
+
+- `tests/real_case_records/2026-07-03_demo_multi_window/check_chmc_window/1p2_strict_header_inference_retest.txt`
+- `tests/real_case_records/2026-07-03_demo_multi_window/check_chmc_window/1p2_strict_missing_header_retest.txt`
 
 Additional note:
 

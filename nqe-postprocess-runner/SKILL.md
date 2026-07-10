@@ -12,6 +12,7 @@ Use this skill as the thin automation layer above `ti-tst-rate`. It discovers sa
 ## Boundaries
 
 - Require `parameters_confirmed: true` in the config before running scripts.
+- Treat `parameters_confirmed: true` as necessary but not sufficient: the script also performs preflight checks that reject implicit parser, column, unit, integration, state-selection, temperature, and prefactor defaults.
 - Ask the user to confirm every config parameter before writing it into a runnable YAML file.
 - Treat `assets/config.example.yaml` as a format example only, not as approved defaults for a new project.
 - Do not choose reaction coordinates, units, integration direction, reactant/transition-state selection, temperature, prefactor model, or KMC event definitions.
@@ -23,7 +24,7 @@ Use this skill as the thin automation layer above `ti-tst-rate`. It discovers sa
 1. Read `references/config-schema.md` when creating or reviewing a runner config.
 2. When the user needs a new config, use `assets/config.example.yaml` only as a field/layout example. Do not copy its values into the user's YAML unless the user explicitly approves each value.
 3. Before writing a runnable YAML file, ask the user to confirm every parameter listed in `references/config-schema.md`. If values are unknown, produce a question checklist or non-runnable draft with TODOs instead of setting `parameters_confirmed: true`.
-4. Inspect the config before running anything. Confirm that paths exist, `parameters_confirmed: true` is present, and all required scientific choices are explicit.
+4. Inspect the config before running anything. Confirm that paths exist, `parameters_confirmed: true` is present, and all required scientific choices are explicit. Expect the runner to refuse configs that still rely on `format: auto`, missing extraction columns, missing unit/scale fields, missing TI zero references, or missing TST free-energy/prefactor fields.
 5. If any required value is missing or ambiguous, ask the user before editing or running the config. Do not infer it from file order, directory names, or examples.
 6. If the config enables convergence screening, confirm the selected `PHY_QUANT`/`energy.dat` diagnostic columns, skip policy, and whether `--auto-equilibration` is only being used as a screening aid.
 7. Run `--dry-run` first and show the generated child commands to the user unless the user explicitly says they already dry-ran the same config.
@@ -69,6 +70,8 @@ When the user asks an agent to run this postprocessing workflow:
 - write `summary.json`
 
 The script supports a small YAML subset and JSON using only the Python standard library.
+
+Before generating child commands, the script rejects runnable configs that still rely on implicit column choices or physical defaults.
 
 The optional convergence step is still a pre-TI screening layer, not automatic convergence proof and not automatic equilibration trimming.
 

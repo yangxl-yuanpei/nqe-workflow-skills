@@ -88,6 +88,115 @@ def require(config: dict[str, Any], key: str) -> Any:
     return value
 
 
+def has_value(config: dict[str, Any], key: str) -> bool:
+    value = config.get(key)
+    return value is not None and value != ""
+
+
+def require_explicit(config: dict[str, Any], key: str, problems: list[str], reason: str) -> None:
+    if not has_value(config, key):
+        problems.append(f"{key}: {reason}")
+
+
+def value_contains_placeholder(value: Any) -> bool:
+    if isinstance(value, str):
+        upper = value.upper()
+        return "TODO" in upper or "USER_APPROVAL" in upper or "PLACEHOLDER" in upper
+    if isinstance(value, (list, tuple)):
+        return any(value_contains_placeholder(item) for item in value)
+    if isinstance(value, dict):
+        return any(value_contains_placeholder(item) for item in value.values())
+    return False
+
+
+def preflight_config(config: dict[str, Any]) -> None:
+    """Reject configs that rely on implicit column or physical defaults."""
+    problems: list[str] = []
+
+    for key, value in config.items():
+        if value_contains_placeholder(value):
+            problems.append(f"{key}: placeholder value remains in runnable config")
+
+    common_required = {
+        "sampling_output_root": "input window root must be user-confirmed",
+        "input_file": "sampling output file name must be user-confirmed",
+        "window_glob": "window discovery pattern must be user-confirmed",
+        "dataset_label": "dataset label must be user-confirmed",
+        "format": "parser mode must be explicit; do not rely on auto-detection",
+        "rc_index": "reaction-coordinate index must be user-confirmed",
+        "skiprows": "equilibration/skip-row handling must be user-confirmed",
+        "rc_scale": "reaction-coordinate unit conversion must be user-confirmed",
+        "force_scale": "mean-force unit conversion must be user-confirmed",
+        "rc_raw_unit_label": "raw reaction-coordinate unit label must be user-confirmed",
+        "force_raw_unit_label": "raw mean-force unit label must be user-confirmed",
+        "uncertainty": "uncertainty policy must be user-confirmed",
+        "integration_direction": "TI integration direction must be user-confirmed",
+        "zero": "free-energy zero reference must be user-confirmed",
+        "free_energy_scale": "free-energy conversion factor must be user-confirmed",
+        "free_energy_unit_label": "free-energy unit label must be user-confirmed",
+        "plots": "plot generation choice must be explicit",
+        "compute_tst": "TST computation choice must be explicit",
+    }
+    for key, reason in common_required.items():
+        require_explicit(config, key, problems, reason)
+
+    fmt = str(config.get("format", "")).strip().lower()
+    if fmt == "auto":
+        problems.append("format: use phy_quant or table explicitly; runner preflight refuses parser auto-detection")
+    elif fmt == "phy_quant":
+        require_explicit(config, "rc_column", problems, "headered extraction requires an explicit reaction-coordinate column")
+        require_explicit(config, "force_column", problems, "headered extraction requires an explicit mean-force column")
+    elif fmt == "table":
+        require_explicit(config, "rc_col_index", problems, "table extraction requires an explicit zero-based reaction-coordinate column index")
+        require_explicit(config, "force_col_index", problems, "table extraction requires an explicit zero-based mean-force column index")
+    elif fmt:
+        problems.append(f"format: unsupported parser mode {fmt!r}; use phy_quant or table")
+
+    if as_bool(config, "run_convergence_diagnostics", False):
+        require_explicit(config, "convergence_columns", problems, "convergence screening columns must be explicit")
+        require_explicit(config, "convergence_skiprows", problems, "convergence skip-row handling must be explicit")
+        require_explicit(config, "convergence_auto_equilibration", problems, "auto-equilibration screening choice must be explicit")
+
+    if has_value(config, "compute_tst") and as_bool(config, "compute_tst", False):
+        tst_required = {
+            "elementary_step": "elementary step label must be user-confirmed",
+            "temperature_K": "temperature must be user-confirmed",
+            "free_energy_column": "free-energy column must be user-confirmed",
+            "free_energy_unit": "free-energy unit must be user-confirmed",
+            "reactant_mode": "reactant/reference state selection must be user-confirmed",
+            "ts_mode": "transition-state selection must be user-confirmed",
+            "prefactor_model": "prefactor model must be user-confirmed",
+            "prefactor_units": "prefactor/rate units must be user-confirmed",
+        }
+        for key, reason in tst_required.items():
+            require_explicit(config, key, problems, reason)
+
+        reactant_mode = str(config.get("reactant_mode", "")).strip().lower()
+        ts_mode = str(config.get("ts_mode", "")).strip().lower()
+        prefactor_model = str(config.get("prefactor_model", "")).strip()
+        if reactant_mode == "rc":
+            require_explicit(config, "reactant_rc", problems, "reactant_mode=rc requires reactant_rc")
+        if reactant_mode == "value":
+            require_explicit(config, "reactant_value", problems, "reactant_mode=value requires reactant_value")
+        if ts_mode == "rc":
+            require_explicit(config, "ts_rc", problems, "ts_mode=rc requires ts_rc")
+        if ts_mode == "value":
+            require_explicit(config, "ts_value", problems, "ts_mode=value requires ts_value")
+        if prefactor_model == "custom_numeric":
+            require_explicit(config, "prefactor_value", problems, "custom_numeric prefactor requires prefactor_value")
+        if prefactor_model == "adsorption_flux_n_v_S":
+            require_explicit(config, "density", problems, "adsorption_flux_n_v_S requires density")
+            require_explicit(config, "mean_speed", problems, "adsorption_flux_n_v_S requires mean_speed")
+            require_explicit(config, "site_area", problems, "adsorption_flux_n_v_S requires site_area")
+
+    if problems:
+        formatted = "\n".join(f"- {problem}" for problem in problems)
+        raise ValueError(
+            "Refusing to run postprocess runner because the config relies on implicit column or physical defaults:\n"
+            f"{formatted}"
+        )
+
+
 def path_from(config_dir: Path, value: Any) -> Path:
     path = Path(str(value)).expanduser()
     if not path.is_absolute():
@@ -159,14 +268,14 @@ def build_extract_cmd(python: str, scripts: Path, config: dict[str, Any], window
         "--output", str(output),
         "--dataset-label", str(require(config, "dataset_label")),
         "--sample-label", window.name,
-        "--format", str(config.get("format", "auto")),
-        "--rc-index", str(config.get("rc_index", 0)),
-        "--skiprows", str(config.get("skiprows", 0)),
-        "--rc-scale", str(config.get("rc_scale", 1.0)),
-        "--force-scale", str(config.get("force_scale", 1.0)),
-        "--rc-raw-unit-label", str(config.get("rc_raw_unit_label", "input")),
-        "--force-raw-unit-label", str(config.get("force_raw_unit_label", "input")),
-        "--uncertainty", str(config.get("uncertainty", "sem")),
+        "--format", str(require(config, "format")),
+        "--rc-index", str(require(config, "rc_index")),
+        "--skiprows", str(require(config, "skiprows")),
+        "--rc-scale", str(require(config, "rc_scale")),
+        "--force-scale", str(require(config, "force_scale")),
+        "--rc-raw-unit-label", str(require(config, "rc_raw_unit_label")),
+        "--force-raw-unit-label", str(require(config, "force_raw_unit_label")),
+        "--uncertainty", str(require(config, "uncertainty")),
         "--confirm-parameters",
     ]
     add_opt(cmd, "--rc-column", config, "rc_column")
@@ -227,9 +336,9 @@ def build_integrate_cmd(python: str, scripts: Path, config: dict[str, Any], mean
         "--dataset-label", str(require(config, "dataset_label")),
         "--rc-index", str(config.get("rc_index", 0)),
         "--integration-direction", str(require(config, "integration_direction")),
-        "--zero", str(config.get("zero", "first")),
-        "--free-energy-scale", str(config.get("free_energy_scale", 1.0)),
-        "--free-energy-unit-label", str(config.get("free_energy_unit_label", "au")),
+        "--zero", str(require(config, "zero")),
+        "--free-energy-scale", str(require(config, "free_energy_scale")),
+        "--free-energy-unit-label", str(require(config, "free_energy_unit_label")),
         "--confirm-parameters",
     ]
     add_opt(cmd, "--notes", config, "notes")
@@ -252,7 +361,7 @@ def build_plot_cmds(python: str, scripts: Path, config: dict[str, Any], mean_for
             "--curve", f"file={free_energy},dataset={dataset},label=FreeEnergy,marker=o",
             "--output", str(out / "free_energy.png"),
             "--rc-order", direction,
-            "--free-energy-unit-label", str(config.get("free_energy_plot_unit_label", "au")),
+            "--free-energy-unit-label", str(config.get("free_energy_plot_unit_label", require(config, "free_energy_unit_label"))),
             "--confirm-parameters",
         ],
     ]
@@ -266,14 +375,14 @@ def build_tst_cmd(python: str, scripts: Path, config: dict[str, Any], free_energ
         "--output", str(rates),
         "--elementary-step", str(require(config, "elementary_step")),
         "--dataset-label", str(require(config, "dataset_label")),
-        "--rc-index", str(config.get("rc_index", 0)),
+        "--rc-index", str(require(config, "rc_index")),
         "--temperature", str(require(config, "temperature_K")),
-        "--free-energy-column", str(config.get("free_energy_column", "free_energy_au")),
-        "--free-energy-unit", str(config.get("free_energy_unit", "auto")),
+        "--free-energy-column", str(require(config, "free_energy_column")),
+        "--free-energy-unit", str(require(config, "free_energy_unit")),
         "--reactant-mode", str(require(config, "reactant_mode")),
         "--ts-mode", str(require(config, "ts_mode")),
-        "--prefactor-model", str(config.get("prefactor_model", "kBT_over_h")),
-        "--prefactor-units", str(config.get("prefactor_units", "s^-1")),
+        "--prefactor-model", str(require(config, "prefactor_model")),
+        "--prefactor-units", str(require(config, "prefactor_units")),
         "--confirm-parameters",
     ]
     for key, flag in [
@@ -304,6 +413,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     config = load_config(config_path)
     if not as_bool(config, "parameters_confirmed", False):
         raise ValueError("Refusing to run until config contains parameters_confirmed: true")
+    preflight_config(config)
 
     config_dir = config_path.parent
     repo_root = Path(__file__).resolve().parents[2]
@@ -311,8 +421,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     out = path_from(config_dir, config.get("output_dir", "nqe-postprocess-output"))
     scripts = script_paths(config, config_dir)
     python = str(config.get("python", sys.executable))
-    input_file = str(config.get("input_file", "energy.dat"))
-    windows = discover_windows(root, input_file, str(config.get("window_glob", "*")))
+    input_file = str(require(config, "input_file"))
+    windows = discover_windows(root, input_file, str(require(config, "window_glob")))
     run_convergence = as_bool(config, "run_convergence_diagnostics", False)
     convergence_dir = path_from(config_dir, config.get("convergence_output_dir", out / "convergence"))
 
@@ -333,10 +443,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     for window in windows:
         run(build_extract_cmd(python, scripts, config, window, mean_force, input_file), args.dry_run, commands)
     run(build_integrate_cmd(python, scripts, config, mean_force, free_energy), args.dry_run, commands)
-    if as_bool(config, "plots", True):
+    if as_bool(config, "plots", False):
         for cmd in build_plot_cmds(python, scripts, config, mean_force, free_energy, out):
             run(cmd, args.dry_run, commands)
-    if as_bool(config, "compute_tst", True):
+    if as_bool(config, "compute_tst", False):
         run(build_tst_cmd(python, scripts, config, free_energy, rates), args.dry_run, commands)
 
     payload = {
@@ -348,9 +458,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             "convergence_dir": str(convergence_dir) if run_convergence else None,
             "mean_force_table": str(mean_force),
             "free_energy_profile": str(free_energy),
-            "tst_rates": str(rates) if as_bool(config, "compute_tst", True) else None,
-            "mean_force_plot": str(out / "mean_force.png") if as_bool(config, "plots", True) else None,
-            "free_energy_plot": str(out / "free_energy.png") if as_bool(config, "plots", True) else None,
+            "tst_rates": str(rates) if as_bool(config, "compute_tst", False) else None,
+            "mean_force_plot": str(out / "mean_force.png") if as_bool(config, "plots", False) else None,
+            "free_energy_plot": str(out / "free_energy.png") if as_bool(config, "plots", False) else None,
         },
         "commands": commands,
         "notes": [
@@ -368,4 +478,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except Exception as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        raise SystemExit(1)

@@ -16,13 +16,16 @@ convergence_skiprows: 1
 convergence_running_window: 1000
 convergence_auto_equilibration: true
 
-format: auto
+format: phy_quant
 skiprows: 1
 rc_raw_unit_label: au
 force_raw_unit_label: au
 rc_scale: 1.0
 force_scale: 1.0
 rc_index: 0
+rc_column: RxnCoord
+force_column: MeanForce
+uncertainty: sem
 
 integration_direction: descending
 zero: first
@@ -33,6 +36,9 @@ plots: true
 compute_tst: true
 elementary_step: CHO
 temperature_K: 100
+free_energy_column: free_energy_au
+free_energy_unit: auto
 reactant_mode: first
 ts_mode: max
 prefactor_model: kBT_over_h
+prefactor_units: s^-1

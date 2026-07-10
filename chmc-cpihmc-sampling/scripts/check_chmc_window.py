@@ -84,7 +84,7 @@ def print_defaults() -> None:
     print("  rc-tolerance: 0.05 (in reaction coordinate units)")
     print("  output integrity check: enabled (detects truncated or nonnumeric PHY_QUANT/energy.dat rows)")
     print("  path resolution: relative input/log/physical-output paths are resolved under --window-dir")
-    print("  missing header handling: numeric-only physical-output files may infer headers from same-named sibling-window files with matching column counts")
+    print("  missing header handling: numeric-first physical-output files may infer headers from same-named sibling-window files with matching column counts; if no reliable header is available, the check fails")
     print("  initial RC adjustment check: enabled (diagnostic only; initial mismatch is not an automatic failure)")
     print("  convergence check: enabled (uses PHY_QUANT or energy.dat)")
     print("  INPUT/ALL_INPUT comparison: all parameters")
@@ -187,7 +187,11 @@ def extract_acceptance_from_log(log_path: Path) -> Optional[float]:
     return None
 
 
-def parse_table(path: Path, window_dir: Optional[Path] = None, infer_sibling_header: bool = False) -> TableData:
+def parse_table(
+    path: Path,
+    window_dir: Optional[Path] = None,
+    infer_sibling_header: bool = False,
+) -> TableData:
     """Parse a whitespace table with either a text header or numeric-only rows."""
     header: Optional[List[str]] = None
     rows: List[List[float]] = []
@@ -213,11 +217,9 @@ def parse_table(path: Path, window_dir: Optional[Path] = None, infer_sibling_hea
                             f"Inferred header from sibling file {inferred_source}: {' '.join(inferred_header)}"
                         )
                     else:
-                        header = [f"col_{idx}" for idx in range(len(parts))]
-                        header_source = "numeric-fallback"
-                        header_note = (
-                            "Current file starts with numeric data and no matching sibling header was found; "
-                            "using numeric fallback columns col_0, col_1, ..."
+                        raise ValueError(
+                            "table starts with numeric data and no reliable header could be inferred from "
+                            "a same-named sibling-window file with matching column count"
                         )
                     rows.append([float(part) for part in parts])
                 else:
@@ -235,11 +237,6 @@ def parse_table(path: Path, window_dir: Optional[Path] = None, infer_sibling_hea
     return TableData(header=header, rows=rows, header_source=header_source, header_note=header_note)
 
 
-def parse_table_header_and_rows(path: Path) -> Tuple[List[str], List[List[float]]]:
-    table = parse_table(path)
-    return table.header, table.rows
-
-
 def find_column_index(header: List[str], names: List[str], fallback: Optional[int] = None) -> Optional[int]:
     """Find a column by exact case-insensitive name, then by fallback index."""
     normalized = {name.lower(): idx for idx, name in enumerate(header)}
@@ -251,7 +248,11 @@ def find_column_index(header: List[str], names: List[str], fallback: Optional[in
     return None
 
 
-def infer_acceptance_from_energy_table(path: Optional[Path], tolerance: float = 0.0) -> Optional[AcceptanceEstimate]:
+def infer_acceptance_from_energy_table(
+    path: Optional[Path],
+    tolerance: float = 0.0,
+    window_dir: Optional[Path] = None,
+) -> Optional[AcceptanceEstimate]:
     """Infer acceptance from KinEng/PotEng changes when log acceptance is unavailable.
 
     The rule follows the user-provided legacy script:
@@ -262,7 +263,12 @@ def infer_acceptance_from_energy_table(path: Optional[Path], tolerance: float = 
     if path is None or not path.exists():
         return None
     try:
-        header, rows = parse_table_header_and_rows(path)
+        table = parse_table(
+            path,
+            window_dir=window_dir,
+            infer_sibling_header=window_dir is not None,
+        )
+        header, rows = table.header, table.rows
     except ValueError:
         return None
     numeric_only_table = all(name.startswith("col_") for name in header)
@@ -815,7 +821,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             acceptance_source = f"log:{log_path.name}"
     phy_quant_integrity = check_phy_quant_integrity(phy_quant_path)
     if acceptance is None and phy_quant_integrity.status != "FAIL":
-        acceptance_estimate = infer_acceptance_from_energy_table(phy_quant_path, args.acceptance_energy_tolerance)
+        acceptance_estimate = infer_acceptance_from_energy_table(phy_quant_path, args.acceptance_energy_tolerance, window_dir=window_dir)
         if acceptance_estimate is not None:
             acceptance = acceptance_estimate.rate
             acceptance_source = acceptance_estimate.source

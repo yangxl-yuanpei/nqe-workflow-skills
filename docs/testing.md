@@ -82,6 +82,7 @@ python ti-tst-rate/scripts/plot_mean_force.py --help
 python ti-tst-rate/scripts/plot_free_energy.py --help
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py nqe-postprocess-runner/assets/config.example.yaml --dry-run
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py nqe-postprocess-runner/assets/config.convergence-screening.example.yaml --dry-run
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/postprocess_missing_defaults.yaml --dry-run
 ```
 
 These checks only confirm that minimal static checkers and script interfaces load and expose expected options. They do not validate convergence, parameter quality, or physical correctness. The CHMC/CPIHMC convergence helper reports screening diagnostics only; plot review and user-approved equilibration choices are still required.
@@ -90,6 +91,29 @@ For ABACUS, the static checker also checks INPUT-declared STRU/KPT paths and pse
 
 The postprocess runner smoke test uses `--dry-run` so it checks config parsing, window discovery, and generated child commands without executing the TI/TST scripts or requiring plotting dependencies.
 The convergence-screening example extends this check by verifying that per-window `analyze_phy_quant_convergence.py` commands are generated before mean-force extraction, without treating suggested cutoffs as automatic TI discard lengths.
+The `postprocess_missing_defaults.yaml` check is expected to fail with a preflight error. It verifies that `parameters_confirmed: true` is not enough when parser mode, columns, units, TI zero reference, or TST/plot choices are still implicit.
+
+## Real-Data Diagnostic Records
+
+Small summaries from real or representative data are stored under `tests/real_case_records/`. The raw large data are intentionally kept outside the repository.
+
+Current records include:
+
+- `2026-07-02_real_phy_quant_test_record.md`: single real `PHY_QUANT` case with `INPUT`/`ALL_INPUT` checks, convergence diagnostics, acceptance fallback, and initial-RC adjustment behavior.
+- `2026-07-03_demo_multi_window_test_record.md`: 13-window `../demo` CHMC/CPIHMC-style `energy.dat` case with per-window `check_chmc_window.py` summaries, convergence CSVs, and a diagnostic `mean_force_table.csv`.
+
+Use these records to understand script behavior on real file shapes. Do not treat them as production convergence evidence or reusable physical defaults.
+
+When testing `check_chmc_window.py` on a window directory, relative file arguments are expected to resolve under `--window-dir`:
+
+```bash
+python chmc-cpihmc-sampling/scripts/check_chmc_window.py \
+  --window-dir PATH_TO_WINDOW \
+  --phy-quant-file energy.dat \
+  --confirm-parameters
+```
+
+If an `energy.dat` or `PHY_QUANT` file starts with numeric data and lacks a header, `check_chmc_window.py` may infer the header only from a same-named sibling-window file with matching column count. This must be reported as `Header Inference` in the output and reviewed by the user before downstream TI. If no reliable file header or sibling header exists, the script should fail parsing instead of inventing column names.
 
 ## TI/TST Demo Chain
 
