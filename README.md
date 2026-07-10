@@ -52,10 +52,10 @@ Current repository state:
 - 12 skills cover the full teaching workflow from initial DFT data through KMC reasoning.
 - 14 Python helper scripts are available for static checks, data conversion, diagnostics, and guarded post-processing.
 - 19 `.template` files provide input or handoff scaffolds with explicit `TODO_USER_APPROVAL` placeholders.
-- `nqe-postprocess-runner` now has both a basic demo config and an optional convergence-screening config.
+- `nqe-postprocess-runner` now has both a basic demo config and an optional convergence-screening config, plus a preflight guard that rejects runnable configs relying on implicit parser, column, unit, TI, TST, or plot defaults.
 - `check_chmc_window.py` and `analyze_phy_quant_convergence.py` support the current CHMC/CPIHMC pre-TI checking path.
 - 9 failure-case reference files exist; 1 is still a placeholder and should not be treated as a reliable diagnosis guide yet.
-- Manual prompt coverage exists, but complete fresh-agent pass records are not yet documented.
+- Manual prompt coverage exists. Recorded baseline fresh-agent and script-smoke batches pass, while deeper failure-driven and real-data validation remains open.
 
 The most up-to-date status and pending-work summaries live in [docs/current-status-report.md](docs/current-status-report.md) and [docs/pending-work.md](docs/pending-work.md).
 
@@ -156,9 +156,12 @@ python ti-tst-rate/scripts/plot_mean_force.py --help
 python ti-tst-rate/scripts/plot_free_energy.py --help
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py nqe-postprocess-runner/assets/config.example.yaml --dry-run
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py nqe-postprocess-runner/assets/config.convergence-screening.example.yaml --dry-run
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/postprocess_missing_defaults.yaml --dry-run
 ```
 
 For production-like tests, use copies of real or mock data and keep the expected behavior conservative: the scripts can summarize, extract, integrate, compute, and plot, but the user still confirms physical interpretation.
+
+The `postprocess_missing_defaults.yaml` command is a negative smoke test. It should fail before command generation, demonstrating that `parameters_confirmed: true` is not enough if the runner config still relies on implicit parser, column, unit, TI, TST, or plot defaults.
 
 ## Current Boundaries
 

@@ -1,6 +1,6 @@
 # Pending Work
 
-Last updated: 2026-07-08
+Last updated: 2026-07-10
 
 This file tracks work that remains after the current repository consistency pass. It intentionally separates documented repository state from production readiness.
 
@@ -14,6 +14,8 @@ This file tracks work that remains after the current repository consistency pass
 - `check_chmc_window.py` exists; it is no longer a future script placeholder.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped files, but it is not a real DP-GEN example.
 - Manual prompts exist. Recorded fresh-agent and script-smoke batches currently pass; remaining testing work is deeper failure-driven behavior and real-data validation, not a missing baseline pass.
+- A runner negative smoke fixture exists at `tests/runner_configs/postprocess_missing_defaults.yaml`; it is expected to fail and verifies implicit-default refusal.
+- A targeted runner preflight fresh-agent record exists at `tests/fresh_agent_records/2026-07-10_runner-preflight-targeted_opencode.md`; it passed the current implicit-default and bundled-config boundary prompts.
 - A user-confirmed local dpdata mini example exists outside the repository at `../00` for labeled `abacus/scf -> deepmd/npy` inspection/comparison boundaries. It is documented in `dpdata-format-conversion/README.md` and is not a reusable production default.
 - A real 13-window CHMC/CPIHMC-style dataset exists outside the repository at `../demo`; summaries and diagnostics are recorded under `tests/real_case_records/2026-07-03_demo_multi_window*`.
 
@@ -55,11 +57,12 @@ Current state:
 - Basic and convergence-screening example configs exist.
 - Dry-run command generation has been exercised for the bundled demo.
 - A preflight guard now rejects runnable configs that still rely on implicit parser, column, unit, TI, TST, or plot defaults.
+- A negative smoke config exists to check that `parameters_confirmed: true` alone does not bypass preflight.
 
 Remaining work:
 
-- Exercise the populated failure cases with fresh-agent behavior tests for config parsing, missing windows, bad columns, implicit-default refusal, unexpected dry-run commands, and child-script failures.
-- Add fresh-agent behavior tests for runnable versus non-runnable configs.
+- Exercise the populated failure cases with deeper fresh-agent behavior tests for config parsing, missing windows, bad columns, unexpected dry-run commands, and child-script failures.
+- Add fresh-agent behavior tests for additional runnable versus non-runnable config shapes beyond the current implicit-default targeted pass.
 - Validate convergence-screening config on the real multi-window `../demo` data, starting with dry-run command generation and then guarded execution only after parameters are reviewed.
 - Consider adding a `--generate-config` or draft-config mode only if it can preserve `parameters_confirmed: false` for unapproved values.
 
@@ -112,7 +115,7 @@ Use `tests/fresh_agent_record_template.md` as the copyable record template.
 
 Highest-priority fresh-agent sections:
 
-- `nqe-postprocess-runner` config/failure behavior beyond the current dry-run boundary checks
+- `nqe-postprocess-runner` config/failure behavior beyond the current preflight targeted pass
 - `chmc-cpihmc-sampling` only after further script/reference changes
 - `ti-tst-rate` deeper prompts beyond the no-defaults retest
 - `dpdata-format-conversion` only when adding new executable checks or changing the anti-guessing/reference behavior
@@ -136,6 +139,7 @@ Do not state that production readiness or exhaustive coverage has been achieved.
 
 1. Validate `nqe-postprocess-runner` convergence-screening and extraction command generation on the real multi-window `../demo` dataset.
 2. If the user confirms TI assumptions, run a guarded TI-only test from the recorded `mean_force_table.csv`.
-3. Keep dpdata repeatable checks deferred until a dpdata-enabled test environment is available.
-4. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
-5. Polish release-facing README and tutorial material after the evidence above is in place.
+3. Add deeper runner failure-case fresh-agent tests for missing windows, bad columns, unexpected dry-run commands, and child-script failures.
+4. Keep dpdata repeatable checks deferred until a dpdata-enabled test environment is available.
+5. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
+6. Polish release-facing README and tutorial material after the evidence above is in place.

@@ -1,6 +1,6 @@
 # NQE Workflow Skills Current Status Report
 
-Last updated: 2026-07-08
+Last updated: 2026-07-10
 
 ## Overall Status
 
@@ -46,6 +46,8 @@ initial DFT-labeled dataset
 - `dpdata-format-conversion` provides inspect, convert, and compare helpers for dpdata-readable systems.
 - `dpdata-format-conversion/README.md` documents a user-confirmed local mini example, `../00`, for labeled `abacus/scf -> deepmd/npy` inspection/comparison boundaries. This example is for local file-shape testing only and is not a reusable production default.
 - Recorded fresh-agent and smoke batches currently pass: Batch A/B minimal smoke and failure prompts, Batch C changed-skill deep tests, Batch D script-interface smoke, and the targeted dpdata/TI/TST/runner retest.
+- Script-level checks on 2026-07-10 passed for Python syntax across all 14 helper scripts, runner positive dry-run, runner implicit-default refusal, and `check_chmc_window.py --print-defaults`.
+- The targeted runner preflight fresh-agent record is `tests/fresh_agent_records/2026-07-10_runner-preflight-targeted_opencode.md`. It passed for implicit-default refusal, `format: auto` refusal, TST default refusal, missing convergence columns, and bundled-config boundary behavior.
 - The targeted dpdata/TI/TST/runner record is `tests/fresh_agent_records/2026-07-03_dpdata-ti-runner-targeted_opencode.md`. It passed after retesting the TI/TST anti-inference guardrail.
 - Real-data diagnostic records exist for a single large `PHY_QUANT` case and for a 13-window `../demo` CHMC/CPIHMC dataset. The multi-window record is `tests/real_case_records/2026-07-03_demo_multi_window_test_record.md`.
 - Real or semi-real reference examples exist for ABACUS, DP-GEN, LAMMPS/PLUMED, DeePMD, CHMC/CPIHMC, TI/TST handoff, and KMC event-network shape.
@@ -83,7 +85,7 @@ Script output remains diagnostic or post-processing output. It is not proof of p
 ## Highest-Priority Next Work
 
 1. Validate `nqe-postprocess-runner` convergence-screening and extraction command generation against the real multi-window `../demo` dataset, first with dry-run.
-2. Continue deeper fresh-agent tests for runner config/failure behavior and any newly changed CHMC/CPIHMC script behavior.
+2. Continue deeper fresh-agent tests for runner config/failure behavior beyond the targeted preflight pass, especially missing windows, bad columns, unexpected dry-run commands, and child-script failures.
 3. If the user confirms TI assumptions, use the recorded `mean_force_table.csv` from the `../demo` test for a guarded TI-only postprocessing test.
 4. Keep dpdata repeatable checks deferred until an environment with dpdata is available; the skill, README example, and populated failure reference already cover the teaching/checking boundary.
 5. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
