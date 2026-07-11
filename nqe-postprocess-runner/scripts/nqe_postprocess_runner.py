@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import shlex
 import subprocess
@@ -109,9 +110,30 @@ def value_contains_placeholder(value: Any) -> bool:
     return False
 
 
+STOP_AFTER_ORDER = {
+    "convergence": 0,
+    "extraction": 1,
+    "integration": 2,
+    "all": 3,
+}
+
+
+def get_stop_after(config: dict[str, Any]) -> str:
+    stop_after = str(config.get("stop_after", "all")).strip().lower()
+    if stop_after not in STOP_AFTER_ORDER:
+        allowed = ", ".join(STOP_AFTER_ORDER)
+        raise ValueError(f"stop_after must be one of: {allowed}")
+    return stop_after
+
+
+def reaches_stage(stop_after: str, stage: str) -> bool:
+    return STOP_AFTER_ORDER[stop_after] >= STOP_AFTER_ORDER[stage]
+
+
 def preflight_config(config: dict[str, Any]) -> None:
     """Reject configs that rely on implicit column or physical defaults."""
     problems: list[str] = []
+    stop_after = get_stop_after(config)
 
     for key, value in config.items():
         if value_contains_placeholder(value):
@@ -122,6 +144,21 @@ def preflight_config(config: dict[str, Any]) -> None:
         "input_file": "sampling output file name must be user-confirmed",
         "window_glob": "window discovery pattern must be user-confirmed",
         "dataset_label": "dataset label must be user-confirmed",
+    }
+    for key, reason in common_required.items():
+        require_explicit(config, key, problems, reason)
+
+    if stop_after == "convergence" and not as_bool(config, "run_convergence_diagnostics", False):
+        problems.append("stop_after: convergence requires run_convergence_diagnostics: true")
+
+    if as_bool(config, "run_convergence_diagnostics", False):
+        require_explicit(config, "convergence_columns", problems, "convergence screening columns must be explicit")
+        require_explicit(config, "convergence_skiprows", problems, "convergence skip-row handling must be explicit")
+        require_explicit(config, "convergence_auto_equilibration", problems, "auto-equilibration screening choice must be explicit")
+        require_explicit(config, "convergence_plot", problems, "convergence plot/summary-only choice must be explicit")
+
+    if reaches_stage(stop_after, "extraction"):
+        extraction_required = {
         "format": "parser mode must be explicit; do not rely on auto-detection",
         "rc_index": "reaction-coordinate index must be user-confirmed",
         "skiprows": "equilibration/skip-row handling must be user-confirmed",
@@ -130,34 +167,41 @@ def preflight_config(config: dict[str, Any]) -> None:
         "rc_raw_unit_label": "raw reaction-coordinate unit label must be user-confirmed",
         "force_raw_unit_label": "raw mean-force unit label must be user-confirmed",
         "uncertainty": "uncertainty policy must be user-confirmed",
+        }
+        for key, reason in extraction_required.items():
+            require_explicit(config, key, problems, reason)
+
+        fmt = str(config.get("format", "")).strip().lower()
+        if fmt == "auto":
+            problems.append("format: use phy_quant or table explicitly; runner preflight refuses parser auto-detection")
+        elif fmt == "phy_quant":
+            require_explicit(config, "rc_column", problems, "headered extraction requires an explicit reaction-coordinate column")
+            require_explicit(config, "force_column", problems, "headered extraction requires an explicit mean-force column")
+        elif fmt == "table":
+            require_explicit(config, "rc_col_index", problems, "table extraction requires an explicit zero-based reaction-coordinate column index")
+            require_explicit(config, "force_col_index", problems, "table extraction requires an explicit zero-based mean-force column index")
+        elif fmt:
+            problems.append(f"format: unsupported parser mode {fmt!r}; use phy_quant or table")
+
+    if reaches_stage(stop_after, "integration"):
+        integration_required = {
         "integration_direction": "TI integration direction must be user-confirmed",
         "zero": "free-energy zero reference must be user-confirmed",
         "free_energy_scale": "free-energy conversion factor must be user-confirmed",
         "free_energy_unit_label": "free-energy unit label must be user-confirmed",
+        }
+        for key, reason in integration_required.items():
+            require_explicit(config, key, problems, reason)
+
+    if stop_after == "all":
+        final_stage_required = {
         "plots": "plot generation choice must be explicit",
         "compute_tst": "TST computation choice must be explicit",
-    }
-    for key, reason in common_required.items():
-        require_explicit(config, key, problems, reason)
+        }
+        for key, reason in final_stage_required.items():
+            require_explicit(config, key, problems, reason)
 
-    fmt = str(config.get("format", "")).strip().lower()
-    if fmt == "auto":
-        problems.append("format: use phy_quant or table explicitly; runner preflight refuses parser auto-detection")
-    elif fmt == "phy_quant":
-        require_explicit(config, "rc_column", problems, "headered extraction requires an explicit reaction-coordinate column")
-        require_explicit(config, "force_column", problems, "headered extraction requires an explicit mean-force column")
-    elif fmt == "table":
-        require_explicit(config, "rc_col_index", problems, "table extraction requires an explicit zero-based reaction-coordinate column index")
-        require_explicit(config, "force_col_index", problems, "table extraction requires an explicit zero-based mean-force column index")
-    elif fmt:
-        problems.append(f"format: unsupported parser mode {fmt!r}; use phy_quant or table")
-
-    if as_bool(config, "run_convergence_diagnostics", False):
-        require_explicit(config, "convergence_columns", problems, "convergence screening columns must be explicit")
-        require_explicit(config, "convergence_skiprows", problems, "convergence skip-row handling must be explicit")
-        require_explicit(config, "convergence_auto_equilibration", problems, "auto-equilibration screening choice must be explicit")
-
-    if has_value(config, "compute_tst") and as_bool(config, "compute_tst", False):
+    if stop_after == "all" and has_value(config, "compute_tst") and as_bool(config, "compute_tst", False):
         tst_required = {
             "elementary_step": "elementary step label must be user-confirmed",
             "temperature_K": "temperature must be user-confirmed",
@@ -202,6 +246,37 @@ def path_from(config_dir: Path, value: Any) -> Path:
     if not path.is_absolute():
         path = config_dir / path
     return path.resolve()
+
+
+def load_per_window_skiprows(path: Path) -> dict[str, dict[str, str]]:
+    with path.open("r", newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        required = {"sample_label", "skiprows"}
+        missing = required.difference(reader.fieldnames or [])
+        if missing:
+            raise ValueError(
+                f"per-window skiprows file {path} is missing required column(s): "
+                + ", ".join(sorted(missing))
+            )
+        mapping: dict[str, dict[str, str]] = {}
+        for line_number, row in enumerate(reader, start=2):
+            sample = (row.get("sample_label") or "").strip()
+            skiprows = (row.get("skiprows") or "").strip()
+            reason = (row.get("reason") or "").strip()
+            if not sample:
+                raise ValueError(f"Missing sample_label in per-window skiprows file {path} line {line_number}")
+            if sample in mapping:
+                raise ValueError(f"Duplicate sample_label {sample!r} in per-window skiprows file {path}")
+            try:
+                parsed_skiprows = int(skiprows)
+            except ValueError as exc:
+                raise ValueError(
+                    f"Invalid skiprows value for sample_label {sample!r} in {path}: {skiprows!r}"
+                ) from exc
+            if parsed_skiprows < 0:
+                raise ValueError(f"skiprows must be non-negative for sample_label {sample!r} in {path}")
+            mapping[sample] = {"skiprows": str(parsed_skiprows), "reason": reason}
+    return mapping
 
 
 def script_paths(config: dict[str, Any], config_dir: Path) -> Path:
@@ -260,7 +335,21 @@ def unlink_outputs(paths: Sequence[Path], dry_run: bool) -> None:
             path.unlink()
 
 
-def build_extract_cmd(python: str, scripts: Path, config: dict[str, Any], window: Path, output: Path, input_file: str) -> list[str]:
+def build_extract_cmd(
+    python: str,
+    scripts: Path,
+    config: dict[str, Any],
+    window: Path,
+    output: Path,
+    input_file: str,
+    skiprows: str | None = None,
+    skip_reason: str | None = None,
+) -> list[str]:
+    effective_skiprows = str(config.get("skiprows") if skiprows is None else skiprows)
+    notes = str(config.get("notes", ""))
+    if skip_reason:
+        suffix = f"per-window skiprows={effective_skiprows}; reason={skip_reason}"
+        notes = f"{notes}; {suffix}" if notes else suffix
     cmd = [
         python,
         str(scripts / "extract_mean_force.py"),
@@ -270,7 +359,7 @@ def build_extract_cmd(python: str, scripts: Path, config: dict[str, Any], window
         "--sample-label", window.name,
         "--format", str(require(config, "format")),
         "--rc-index", str(require(config, "rc_index")),
-        "--skiprows", str(require(config, "skiprows")),
+        "--skiprows", effective_skiprows,
         "--rc-scale", str(require(config, "rc_scale")),
         "--force-scale", str(require(config, "force_scale")),
         "--rc-raw-unit-label", str(require(config, "rc_raw_unit_label")),
@@ -282,7 +371,8 @@ def build_extract_cmd(python: str, scripts: Path, config: dict[str, Any], window
     add_opt(cmd, "--force-column", config, "force_column")
     add_opt(cmd, "--rc-col-index", config, "rc_col_index")
     add_opt(cmd, "--force-col-index", config, "force_col_index")
-    add_opt(cmd, "--notes", config, "notes")
+    if notes:
+        cmd.extend(["--notes", notes])
     return cmd
 
 
@@ -324,6 +414,7 @@ def build_convergence_cmd(
     add_opt(cmd, "--xlabel", config, "convergence_xlabel")
     add_opt(cmd, "--ylabel", config, "convergence_ylabel")
     add_flag(cmd, "--auto-equilibration", as_bool(config, "convergence_auto_equilibration", False))
+    add_flag(cmd, "--no-plot", not as_bool(config, "convergence_plot", True))
     return cmd
 
 
@@ -414,6 +505,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not as_bool(config, "parameters_confirmed", False):
         raise ValueError("Refusing to run until config contains parameters_confirmed: true")
     preflight_config(config)
+    stop_after = get_stop_after(config)
 
     config_dir = config_path.parent
     repo_root = Path(__file__).resolve().parents[2]
@@ -425,6 +517,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     windows = discover_windows(root, input_file, str(require(config, "window_glob")))
     run_convergence = as_bool(config, "run_convergence_diagnostics", False)
     convergence_dir = path_from(config_dir, config.get("convergence_output_dir", out / "convergence"))
+    per_window_skiprows: dict[str, dict[str, str]] = {}
+    if has_value(config, "per_window_skiprows_file"):
+        per_window_skiprows_path = path_from(config_dir, config["per_window_skiprows_file"])
+        per_window_skiprows = load_per_window_skiprows(per_window_skiprows_path)
+        window_names = {window.name for window in windows}
+        unknown = sorted(set(per_window_skiprows).difference(window_names))
+        if unknown:
+            raise ValueError(
+                "per_window_skiprows_file contains sample_label value(s) not discovered as windows: "
+                + ", ".join(unknown)
+            )
 
     if not args.dry_run:
         out.mkdir(parents=True, exist_ok=True)
@@ -440,34 +543,58 @@ def main(argv: Sequence[str] | None = None) -> int:
     if run_convergence:
         for window in windows:
             run(build_convergence_cmd(python, repo_root, config, window, convergence_dir, input_file), args.dry_run, commands)
-    for window in windows:
-        run(build_extract_cmd(python, scripts, config, window, mean_force, input_file), args.dry_run, commands)
-    run(build_integrate_cmd(python, scripts, config, mean_force, free_energy), args.dry_run, commands)
-    if as_bool(config, "plots", False):
-        for cmd in build_plot_cmds(python, scripts, config, mean_force, free_energy, out):
-            run(cmd, args.dry_run, commands)
-    if as_bool(config, "compute_tst", False):
-        run(build_tst_cmd(python, scripts, config, free_energy, rates), args.dry_run, commands)
+    if reaches_stage(stop_after, "extraction"):
+        for window in windows:
+            override = per_window_skiprows.get(window.name)
+            run(
+                build_extract_cmd(
+                    python,
+                    scripts,
+                    config,
+                    window,
+                    mean_force,
+                    input_file,
+                    skiprows=override["skiprows"] if override else None,
+                    skip_reason=override.get("reason") if override else None,
+                ),
+                args.dry_run,
+                commands,
+            )
+    if reaches_stage(stop_after, "integration"):
+        run(build_integrate_cmd(python, scripts, config, mean_force, free_energy), args.dry_run, commands)
+    if stop_after == "all":
+        if as_bool(config, "plots", False):
+            for cmd in build_plot_cmds(python, scripts, config, mean_force, free_energy, out):
+                run(cmd, args.dry_run, commands)
+        if as_bool(config, "compute_tst", False):
+            run(build_tst_cmd(python, scripts, config, free_energy, rates), args.dry_run, commands)
+
+    notes = [
+        "All numerical choices come from the confirmed config.",
+        "Convergence diagnostics remain screening outputs; review plots or CSV summaries and do not treat suggested cutoffs as proof of equilibration.",
+    ]
+    if reaches_stage(stop_after, "integration"):
+        notes.append("Inspect integration direction, zero reference, units, and sign convention before using the free-energy profile.")
+    if stop_after == "all" and as_bool(config, "compute_tst", False):
+        notes.append("Inspect reactant and transition-state selections before treating rates as final.")
 
     payload = {
         "config": str(config_path),
         "dataset_label": str(require(config, "dataset_label")),
+        "stop_after": stop_after,
         "window_count": len(windows),
         "windows": [{"sample_label": window.name, "input": str(window / input_file)} for window in windows],
         "outputs": {
             "convergence_dir": str(convergence_dir) if run_convergence else None,
-            "mean_force_table": str(mean_force),
-            "free_energy_profile": str(free_energy),
-            "tst_rates": str(rates) if as_bool(config, "compute_tst", False) else None,
-            "mean_force_plot": str(out / "mean_force.png") if as_bool(config, "plots", False) else None,
-            "free_energy_plot": str(out / "free_energy.png") if as_bool(config, "plots", False) else None,
+            "mean_force_table": str(mean_force) if reaches_stage(stop_after, "extraction") else None,
+            "free_energy_profile": str(free_energy) if reaches_stage(stop_after, "integration") else None,
+            "tst_rates": str(rates) if stop_after == "all" and as_bool(config, "compute_tst", False) else None,
+            "mean_force_plot": str(out / "mean_force.png") if stop_after == "all" and as_bool(config, "plots", False) else None,
+            "free_energy_plot": str(out / "free_energy.png") if stop_after == "all" and as_bool(config, "plots", False) else None,
         },
+        "per_window_skiprows": per_window_skiprows,
         "commands": commands,
-        "notes": [
-            "All numerical choices come from the confirmed config.",
-            "Convergence diagnostics remain screening outputs; review plots and do not treat suggested cutoffs as proof of equilibration.",
-            "Inspect reactant and transition-state selections before treating rates as final.",
-        ],
+        "notes": notes,
     }
     if not args.dry_run:
         summary.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")

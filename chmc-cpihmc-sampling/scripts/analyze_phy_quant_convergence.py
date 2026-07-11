@@ -326,6 +326,26 @@ def write_summary(path: str, diagnostics: Sequence[SeriesDiagnostic]) -> None:
             writer.writerow({"column": item.column, "total_samples": item.total_samples, "used_samples": item.used_samples, "equilibration_index_zero_based": item.equilibration_index, "equilibration_step": "" if item.equilibration_step is None else item.equilibration_step, "mean": item.mean, "std": item.std, "sem": item.sem, "final_cumulative_mean": item.final_cumulative_mean, "auto_status": item.auto_status, "auto_reason": item.auto_reason})
 
 
+def configure_y_axis(ax: Any, values: Sequence[float]) -> None:
+    """Avoid misleading offset notation for nearly constant reaction coordinates."""
+    from matplotlib.ticker import ScalarFormatter  # type: ignore
+
+    formatter = ScalarFormatter(useOffset=False)
+    formatter.set_scientific(False)
+    ax.yaxis.set_major_formatter(formatter)
+
+    if not values:
+        return
+    vmin = min(values)
+    vmax = max(values)
+    center = 0.5 * (vmin + vmax)
+    span = vmax - vmin
+    near_constant_tol = max(abs(center) * 1.0e-8, 1.0e-10)
+    if span <= near_constant_tol:
+        padding = max(abs(center) * 0.05, 0.02)
+        ax.set_ylim(center - padding, center + padding)
+
+
 def make_plot(output: str, title: Optional[str], steps: Sequence[float], series: Sequence[Tuple[str, List[float], SeriesDiagnostic]], running_window: int, xlabel: str, ylabel: str, width: float, height_per_panel: float, dpi: int) -> None:
     try:
         import matplotlib.pyplot as plt  # type: ignore
@@ -349,6 +369,7 @@ def make_plot(output: str, title: Optional[str], steps: Sequence[float], series:
         if diagnostic.equilibration_index > 0:
             ax.axvline(steps[diagnostic.equilibration_index], color="tab:green", linestyle=":", linewidth=1.3, label="equilibration cutoff")
         ax.set_ylabel(f"{ylabel}: {column}")
+        configure_y_axis(ax, values)
         ax.grid(True, linewidth=0.4, alpha=0.35)
         ax.legend(loc="best", fontsize=8, frameon=False)
     axes[-1].set_xlabel(xlabel)

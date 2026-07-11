@@ -24,6 +24,7 @@ Before outputting a runnable YAML and before setting `parameters_confirmed: true
 - whether plots should be generated
 - whether TST should be computed
 - elementary-step label, temperature, free-energy column/unit, reactant state, transition-state selection, prefactor model, and prefactor units when TST is enabled
+- optional `stop_after` stage when intentionally stopping before integration, plotting, or TST
 
 Window discovery:
 
@@ -32,6 +33,16 @@ Window discovery:
 - `window_glob`: confirmed direct-child glob for window directories. Required in runnable configs; do not rely on `*` as an implicit default.
 - `dataset_label`: label written to output CSVs.
 - `output_dir`: output directory. Default: `nqe-postprocess-output`.
+- `stop_after`: optional stage boundary, one of `convergence`, `extraction`, `integration`, or `all`. Default: `all`.
+
+Stage boundary:
+
+- `stop_after: convergence` generates or runs only convergence-screening commands and requires `run_convergence_diagnostics: true`.
+- `stop_after: extraction` generates or runs convergence screening, if enabled, and mean-force extraction. It does not require TI, plot, or TST fields.
+- `stop_after: integration` generates or runs through TI integration but skips plot and TST commands.
+- `stop_after: all` preserves the full runner behavior and requires explicit plot and TST choices.
+- For broad user requests such as "postprocess this batch", do not infer a full pipeline. Default to `stop_after: convergence` or `stop_after: extraction` until the user separately confirms integration direction, zero reference, unit conversion, and mean-force sign convention.
+- When asking for `sampling_output_root`, state the intended first stop stage and the downstream confirmation gates. Do not ask for the path as if it were enough to authorize TI or TST.
 
 Optional convergence screening before TI:
 
@@ -44,11 +55,13 @@ Optional convergence screening before TI:
 - `convergence_x_scale`, `convergence_y_scale`: optional axis scaling for the diagnostic script.
 - `convergence_xlabel`, `convergence_ylabel`: optional axis labels for the diagnostic script.
 - `convergence_auto_equilibration`: `true` or `false`. Required when convergence screening is enabled.
+- `convergence_plot`: `true` or `false`. Required when convergence screening is enabled. Use `false` for CSV summary-only mode, for example in environments without `matplotlib`.
 
 Convergence-screening boundary:
 
 - These diagnostics call `chmc-cpihmc-sampling/scripts/analyze_phy_quant_convergence.py` once per window before mean-force extraction.
 - The generated plot/CSV outputs are screening aids only. They do not automatically rewrite `skiprows`, do not prove equilibration, and still require user review before TI handoff.
+- If `convergence_plot: false`, the runner generates only per-window CSV summaries via `--no-plot`; this avoids adding plotting dependencies but removes the visual inspection artifact.
 
 Mean-force extraction:
 
@@ -57,12 +70,14 @@ Mean-force extraction:
 - `rc_column`, `force_column`: required header names for `phy_quant`/headered data.
 - `rc_col_index`, `force_col_index`: required zero-based numeric columns for `table` data.
 - `skiprows`: confirmed numeric rows to discard after header/comment handling.
+- `per_window_skiprows_file`: optional CSV path for confirmed per-window extraction discard overrides. Required columns: `sample_label`, `skiprows`; optional column: `reason`. Values in this file override global `skiprows` for matching windows only.
 - `rc_scale`, `force_scale`: confirmed raw-to-atomic-unit conversion factors.
 - `rc_raw_unit_label`, `force_raw_unit_label`: confirmed raw unit labels preserved in CSV.
 - `uncertainty`: confirmed policy, `sem`, `std`, or `none`.
 
 Thermodynamic integration:
 
+- Required only when `stop_after` reaches `integration` or `all`.
 - `integration_direction`: required; use `ascending`, `descending`, or `input`.
 - `zero`: confirmed reference-zero convention, `first`, `last`, `min`, or `none`.
 - `free_energy_scale`: confirmed conversion factor for `free_energy_converted`.
@@ -70,11 +85,13 @@ Thermodynamic integration:
 
 Plotting:
 
+- Required only when `stop_after: all`.
 - `plots`: `true` or `false`. Required in runnable configs.
 - `free_energy_plot_unit_label`: optional y-axis unit label for the free-energy plot. If omitted, the runner uses `free_energy_unit_label`.
 
 TST:
 
+- Required only when `stop_after: all`.
 - `compute_tst`: `true` or `false`. Required in runnable configs.
 - `elementary_step`: required when `compute_tst` is true.
 - `temperature_K`: required when `compute_tst` is true.
@@ -99,6 +116,15 @@ Agent execution rule:
 1. Read this schema and the config file.
 2. When creating YAML, ask for every parameter before writing a runnable config; otherwise write only a non-runnable draft with `parameters_confirmed: false`.
 3. Refuse dry-run and real execution if required explicit fields are missing, if `format: auto` is used, if placeholders remain, or if `parameters_confirmed` is not true.
-4. Run the runner with `--dry-run` first.
-5. Ask for user confirmation if the dry-run commands reveal unexpected paths, units, ordering, convergence columns, state selection, temperature, or prefactor.
-6. Run without `--dry-run` only after the dry-run is accepted.
+4. If the user only asks generally to postprocess sampling results, stop at convergence or extraction unless TI choices are explicitly confirmed.
+5. If more path information is needed, ask for `sampling_output_root` while also explaining the staged stop point and the TI/TST confirmations that are still missing.
+6. Run the runner with `--dry-run` first.
+7. Ask for user confirmation if the dry-run commands reveal unexpected paths, units, ordering, convergence columns, state selection, temperature, or prefactor.
+8. Run without `--dry-run` only after the dry-run is accepted.
+
+Per-window discard boundary:
+
+- Use `per_window_skiprows_file` only after the user has reviewed convergence plots/CSVs and approved the per-window discard choices.
+- Do not generate or apply this file automatically from `auto_status: SUGGESTED`; suggested equilibration indices are screening aids, not production cutoffs.
+- If a per-window discard file is used, review the dry-run commands and confirm that only intended windows receive non-global `--skiprows` values.
+- In production-facing prompts or records, remind the user to inspect the convergence plots directly and personally approve whether the proposed discard length is reasonable for the physical system.

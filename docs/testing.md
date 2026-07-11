@@ -101,6 +101,11 @@ Current records include:
 
 - `2026-07-02_real_phy_quant_test_record.md`: single real `PHY_QUANT` case with `INPUT`/`ALL_INPUT` checks, convergence diagnostics, acceptance fallback, and initial-RC adjustment behavior.
 - `2026-07-03_demo_multi_window_test_record.md`: 13-window `../demo` CHMC/CPIHMC-style `energy.dat` case with per-window `check_chmc_window.py` summaries, convergence CSVs, and a diagnostic `mean_force_table.csv`.
+- `2026-07-10_demo_runner_dry_run_record.md`: `nqe-postprocess-runner` staged dry-run and real execution on the same 13-window `../demo` dataset, stopping after convergence CSV summaries and mean-force extraction.
+- `2026-07-11_demo_runner_output_review.md`: review of the generated runner outputs, corrected convergence plots, TI-handoff risks, and discard sensitivity for windows `0.0` and `1.8`.
+- `2026-07-11_candidate_skiprows_dry_run_record.md`: dry-run record for the candidate `per_window_skiprows_file` fixture. It verifies command generation only and does not approve a production discard policy.
+- `2026-07-11_reviewed_skiprows_execution_record.md`: executed reviewed demo extraction with user-accepted `10000`-row discard for windows `0.0` and `1.8`; not reusable as a production default.
+- `2026-07-11_reviewed_ti_only_record.md`: guarded TI-only execution using user-confirmed ascending integration, most-negative-RC endpoint zero, eV conversion, and `dF/dRC` mean-force sign. It does not approve TST.
 
 Use these records to understand script behavior on real file shapes. Do not treat them as production convergence evidence or reusable physical defaults.
 
@@ -114,6 +119,12 @@ python chmc-cpihmc-sampling/scripts/check_chmc_window.py \
 ```
 
 If an `energy.dat` or `PHY_QUANT` file starts with numeric data and lacks a header, `check_chmc_window.py` may infer the header only from a same-named sibling-window file with matching column count. This must be reported as `Header Inference` in the output and reviewed by the user before downstream TI. If no reliable file header or sibling header exists, the script should fail parsing instead of inventing column names.
+
+For staged runner tests, use `stop_after` to avoid fake downstream physical approvals. For example, `stop_after: extraction` may run convergence screening and mean-force extraction without requiring TI direction, zero reference, plots, or TST fields. If convergence screening is enabled, `convergence_plot` must be explicit; set it to `false` for CSV summary-only mode in environments without plotting dependencies.
+
+For broad prompts such as "postprocess this batch", the expected fresh-agent behavior is to stage the workflow and stop before TI unless integration direction, zero reference, unit conversion, and mean-force sign convention have been explicitly confirmed. If the agent asks for `sampling_output_root`, it should also state the intended first stop stage and the downstream confirmation gates. A generic postprocessing request should not trigger `stop_after: integration`, plots, TST, or rate calculation by default.
+
+When testing per-window discard, use a separate candidate config and a separate `per_window_skiprows_file` CSV. The CSV must contain explicit `sample_label` and `skiprows` values reviewed by the user. Do not overwrite the baseline staged fixture, and do not convert convergence-screening `SUGGESTED` indices into production discard lengths without a separate approval step. For production-facing tests, record that the user must inspect the convergence plots personally before accepting the discard policy.
 
 ## TI/TST Demo Chain
 

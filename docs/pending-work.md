@@ -1,6 +1,6 @@
 # Pending Work
 
-Last updated: 2026-07-10
+Last updated: 2026-07-11
 
 This file tracks work that remains after the current repository consistency pass. It intentionally separates documented repository state from production readiness.
 
@@ -10,7 +10,7 @@ This file tracks work that remains after the current repository consistency pass
 - 14 Python helper scripts exist.
 - 19 `.template` files exist.
 - 9 failure-case references exist; 1 is still a placeholder.
-- `nqe-postprocess-runner` has a basic config example and a convergence-screening config example.
+- `nqe-postprocess-runner` has a basic config example, a convergence-screening config example, staged `stop_after` control for convergence/extraction/integration/all, and a user-reviewed `per_window_skiprows_file` mechanism for per-window extraction discard overrides.
 - `check_chmc_window.py` exists; it is no longer a future script placeholder.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped files, but it is not a real DP-GEN example.
 - Manual prompts exist. Recorded fresh-agent and script-smoke batches currently pass; remaining testing work is deeper failure-driven behavior and real-data validation, not a missing baseline pass.
@@ -18,7 +18,10 @@ This file tracks work that remains after the current repository consistency pass
 - A targeted runner preflight fresh-agent record exists at `tests/fresh_agent_records/2026-07-10_runner-preflight-targeted_opencode.md`; it passed the current implicit-default and bundled-config boundary prompts.
 - A user-confirmed local dpdata mini example exists outside the repository at `../00` for labeled `abacus/scf -> deepmd/npy` inspection/comparison boundaries. It is documented in `dpdata-format-conversion/README.md` and is not a reusable production default.
 - A real 13-window CHMC/CPIHMC-style dataset exists outside the repository at `../demo`; summaries and diagnostics are recorded under `tests/real_case_records/2026-07-03_demo_multi_window*`.
-- A runner dry-run fixture for `../demo` exists at `tests/runner_configs/demo_multi_window_dry_run.yaml`; the record is `tests/real_case_records/2026-07-10_demo_runner_dry_run_record.md`.
+- A runner staged fixture for `../demo` exists at `tests/runner_configs/demo_multi_window_dry_run.yaml`; the record is `tests/real_case_records/2026-07-10_demo_runner_dry_run_record.md`. It has been dry-run and executed through convergence CSV summaries plus mean-force extraction, without TI/TST.
+- The staged runner outputs have been reviewed in `tests/real_case_records/2026-07-11_demo_runner_output_review.md`, including corrected convergence plots and discard sensitivity for `0.0` and `1.8`.
+- A separate per-window discard fixture exists at `tests/runner_configs/demo_multi_window_candidate_skiprows.yaml` with `tests/runner_configs/demo_multi_window_candidate_skiprows.csv`. The user accepted `10000` discarded rows for `0.0` and `1.8` in this demo review only; production use still requires direct convergence plot/CSV review.
+- A guarded TI-only fixture exists at `tests/runner_configs/demo_multi_window_reviewed_ti_only.yaml`; its execution record is `tests/real_case_records/2026-07-11_reviewed_ti_only_record.md`.
 
 ## 1. Failure-Case References
 
@@ -59,13 +62,14 @@ Current state:
 - Dry-run command generation has been exercised for the bundled demo.
 - A preflight guard now rejects runnable configs that still rely on implicit parser, column, unit, TI, TST, or plot defaults.
 - A negative smoke config exists to check that `parameters_confirmed: true` alone does not bypass preflight.
-- Real-data dry-run command generation has been exercised on the `../demo` 13-window dataset.
+- Real-data dry-run command generation and staged execution through extraction have been exercised on the `../demo` 13-window dataset.
+- Per-window discard command generation and reviewed demo execution have been exercised with explicit `10000`-row overrides for `0.0` and `1.8`.
 
 Remaining work:
 
-- Exercise the populated failure cases with deeper fresh-agent behavior tests for config parsing, missing windows, bad columns, unexpected dry-run commands, and child-script failures.
+- Exercise the populated failure cases with deeper fresh-agent behavior tests for config parsing, missing windows, bad columns, unexpected dry-run commands, child-script failures, and per-window discard errors.
 - Add fresh-agent behavior tests for additional runnable versus non-runnable config shapes beyond the current implicit-default targeted pass.
-- Decide whether to execute the `../demo` runner fixture for convergence screening and extraction only, after reviewing columns, output policy, and the fact that generated TI commands are not production-approved.
+- Review the guarded TI-only free-energy profile before any TST handoff. TST still requires explicit reactant/transition-state selection, free-energy column/unit, temperature, prefactor model, and prefactor units.
 - Consider adding a `--generate-config` or draft-config mode only if it can preserve `parameters_confirmed: false` for unapproved values.
 
 ## 4. KMC Teaching-Ready To Ready
@@ -158,10 +162,9 @@ Do not state that production readiness or exhaustive coverage has been achieved.
 
 ## Suggested Priority Order
 
-1. Review and, if approved, execute only the convergence-screening and extraction portions of the `../demo` runner fixture.
-2. If the user confirms TI assumptions, run a guarded TI-only test from the recorded `mean_force_table.csv` or reviewed runner output.
-3. Add deeper runner failure-case fresh-agent tests for missing windows, bad columns, unexpected dry-run commands, and child-script failures.
-4. Keep dpdata repeatable checks deferred until a dpdata-enabled test environment is available.
-5. Choose at most one optional static checker to implement next if it directly supports current validation needs; otherwise keep this section as a backlog.
-6. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
-7. Polish release-facing README and tutorial material after the evidence above is in place.
+1. Review the guarded TI-only profile and decide whether to stop at TI or prepare a separate TST-confirmation checklist.
+2. Add deeper runner failure-case fresh-agent tests for missing windows, bad columns, unexpected dry-run commands, child-script failures, `stop_after`, `convergence_plot`, and `per_window_skiprows_file`.
+3. Keep dpdata repeatable checks deferred until a dpdata-enabled test environment is available.
+4. Choose at most one optional static checker to implement next if it directly supports current validation needs; otherwise keep this section as a backlog.
+5. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
+6. Polish release-facing README and tutorial material after the evidence above is in place.

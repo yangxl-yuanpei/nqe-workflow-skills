@@ -438,7 +438,26 @@ Expected behavior:
 - State that the runner can orchestrate per-window diagnostic plots and summaries before TI only when the config explicitly confirms the convergence columns and screening options.
 - State that any suggested cutoff still requires user review and does not automatically rewrite TI extraction `skiprows`.
 
-### Test 4: Runner Failure-Case Routing
+### Test 4: Broad Batch Postprocess Staging
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+Here is a directory containing many CHMC/CPIHMC sampling windows. Help me postprocess this batch of results.
+```
+
+Expected behavior:
+
+- Treat the request as broad and staged, not as permission to run the full pipeline.
+- Ask for `sampling_output_root` if needed, but also state the intended first stop stage and the downstream confirmation gates.
+- A strong answer may closely follow the `Broad Request Default Response` template in `nqe-postprocess-runner/SKILL.md`.
+- Ask for or inspect only the file-shape/config choices needed for convergence screening or extraction.
+- Default to `stop_after: convergence` or `stop_after: extraction` if the required parser, column, unit, and screening choices are confirmed.
+- Stop before TI unless the user explicitly confirms integration direction, zero reference, unit conversion, and mean-force sign convention.
+- Do not run TST, choose reactant/transition-state selections, choose temperature, or choose prefactor model.
+
+### Test 5: Runner Failure-Case Routing
 
 Prompt:
 

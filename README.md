@@ -52,7 +52,7 @@ Current repository state:
 - 12 skills cover the full teaching workflow from initial DFT data through KMC reasoning.
 - 14 Python helper scripts are available for static checks, data conversion, diagnostics, and guarded post-processing.
 - 19 `.template` files provide input or handoff scaffolds with explicit `TODO_USER_APPROVAL` placeholders.
-- `nqe-postprocess-runner` now has both a basic demo config and an optional convergence-screening config, plus a preflight guard that rejects runnable configs relying on implicit parser, column, unit, TI, TST, or plot defaults.
+- `nqe-postprocess-runner` now has both a basic demo config and an optional convergence-screening config, staged `stop_after` control, explicit user-reviewed per-window discard overrides, and a preflight guard that rejects runnable configs relying on implicit parser, column, unit, TI, TST, convergence-plot, or plot defaults.
 - `check_chmc_window.py` and `analyze_phy_quant_convergence.py` support the current CHMC/CPIHMC pre-TI checking path.
 - 9 failure-case reference files exist; 1 is still a placeholder and should not be treated as a reliable diagnosis guide yet.
 - Manual prompt coverage exists. Recorded baseline fresh-agent and script-smoke batches pass, while deeper failure-driven and real-data validation remains open.
@@ -95,7 +95,7 @@ The scripts are deterministic helpers for diagnostics and post-processing. They 
 | `ti-tst-rate/scripts/plot_mean_force.py` | Plot one or more mean-force curves versus reaction coordinate | image file |
 | `ti-tst-rate/scripts/plot_free_energy.py` | Plot one or more free-energy curves versus reaction coordinate | image file |
 | `ti-tst-rate/scripts/run_smoke_test.py` | Run the bundled TI/TST demo chain as a smoke test | mean-force/free-energy/rate CSVs and optional plots |
-| `nqe-postprocess-runner/scripts/nqe_postprocess_runner.py` | Run the confirmed TI/TST postprocessing chain from a flat YAML/JSON config, optionally generating pre-TI convergence-screening commands | CSVs, plots, `summary.json` |
+| `nqe-postprocess-runner/scripts/nqe_postprocess_runner.py` | Run the confirmed TI/TST postprocessing chain from a flat YAML/JSON config, optionally stopping after convergence, extraction, or integration | CSVs, plots, `summary.json` |
 
 Most TI/TST scripts require `--confirm-parameters`. This is intentional. The agent or user must confirm columns, unit conversions, equilibration discard, mean-force sign convention, integration direction, free-energy zero, initial/transition-state selection, and prefactor model before treating the result as meaningful.
 
@@ -119,6 +119,14 @@ The postprocess runner also includes two config examples:
 
 - `nqe-postprocess-runner/assets/config.example.yaml`: basic TI/TST demo wrapper
 - `nqe-postprocess-runner/assets/config.convergence-screening.example.yaml`: same demo shape with optional per-window `PHY_QUANT` convergence screening before TI
+
+Runner configs may use `stop_after: convergence`, `extraction`, or `integration` to avoid inventing downstream TI/TST choices before the user confirms them.
+
+For real multi-window CHMC/CPIHMC data, the runner can also accept a user-reviewed `per_window_skiprows_file` CSV with `sample_label` and `skiprows` columns. This is intended for sensitivity-reviewed discard choices only. Convergence-screening `SUGGESTED` indices must not be auto-promoted into production discard lengths, and production use must still prompt the user to inspect the convergence plots directly before approving any discard policy.
+
+For real multi-window CHMC/CPIHMC data, the runner can also accept a user-reviewed `per_window_skiprows_file` CSV with `sample_label` and `skiprows` columns. This is intended for sensitivity-reviewed discard choices only. Convergence-screening `SUGGESTED` indices must not be auto-promoted into production discard lengths.
+
+For real multi-window CHMC/CPIHMC data, the runner can also accept a user-reviewed `per_window_skiprows_file` CSV with `sample_label` and `skiprows` columns. This is intended for sensitivity-reviewed discard choices only. Convergence-screening `SUGGESTED` indices must not be auto-promoted into production discard lengths.
 
 ## How To Test
 

@@ -1,0 +1,4 @@
+column,total_samples,used_samples,equilibration_index_zero_based,equilibration_step,mean,std,sem,final_cumulative_mean,auto_status,auto_reason
+col_2,100000,100000,0,199999.0,-11412.95273029232,0.013783145482960172,4.3586133047615655e-05,-11412.952730292373,SUGGESTED,"first stable candidate at fraction=0.000; early_late_diff=0.00643164, combined_sem=0.00363939, rel_abs_tol=228.259, total_block_drift=0.00988943, drift_limit=57.0648"
+col_6,100000,100000,0,199999.0,1.2,0.0,0.0,1.1999999999980246,SUGGESTED,"first stable candidate at fraction=0.000; early_late_diff=0, combined_sem=0, rel_abs_tol=0.024, total_block_drift=0, drift_limit=0.006"
+col_7,100000,100000,0,199999.0,-0.015490678840000001,0.007426093561615832,2.3483369772217978e-05,-0.015490678840000249,SUGGESTED,"first stable candidate at fraction=0.000; early_late_diff=0.000810369, combined_sem=0.00095003, rel_abs_tol=0.02, total_block_drift=9.1596e-05, drift_limit=0.005"

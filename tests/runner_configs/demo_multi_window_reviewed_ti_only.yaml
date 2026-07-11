@@ -1,0 +1,40 @@
+# Guarded TI-only fixture for the real multi-window ../demo dataset.
+# This config uses the reviewed demo per-window discard policy and explicit
+# user-confirmed TI assumptions. It stops after integration and does not run TST.
+# It does not certify production convergence or physical correctness.
+parameters_confirmed: true
+
+sampling_output_root: ../../../demo
+input_file: energy.dat
+window_glob: "*"
+dataset_label: demo_multi_window_reviewed_ti_only
+output_dir: ../real_case_records/2026-07-11_reviewed_ti_only/output
+stop_after: integration
+
+run_convergence_diagnostics: true
+convergence_columns: 2,6,7
+convergence_output_dir: ../real_case_records/2026-07-11_reviewed_ti_only/convergence
+convergence_skiprows: 0
+convergence_step_col_index: 0
+convergence_running_window: 1000
+convergence_auto_equilibration: true
+convergence_plot: false
+
+format: table
+skiprows: 0
+per_window_skiprows_file: demo_multi_window_candidate_skiprows.csv
+rc_raw_unit_label: au
+force_raw_unit_label: au
+rc_scale: 1.0
+force_scale: 1.0
+rc_index: 0
+rc_col_index: 6
+force_col_index: 7
+uncertainty: sem
+
+integration_direction: ascending
+zero: first
+free_energy_scale: 27.211386245988
+free_energy_unit_label: eV
+
+notes: guarded TI-only demo; ascending integration; zero at most-negative RC endpoint; mean force treated as dF/dRC; eV conversion applied only to free_energy_converted; no TST approval
