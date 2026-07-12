@@ -8,7 +8,8 @@ Generated outputs:
 
 - `tests/real_case_records/2026-07-11_candidate_skiprows/output/mean_force_table.csv`
 - `tests/real_case_records/2026-07-11_candidate_skiprows/output/summary.json`
-- `tests/real_case_records/2026-07-11_candidate_skiprows/convergence/*.csv`
+
+Note: duplicate convergence CSV attachments from this execution were pruned during repository cleanup. Use the canonical baseline convergence summaries in `tests/real_case_records/2026-07-10_demo_runner_dry_run/convergence/` plus the reviewed output table above.
 
 Boundary: this record accepts `10000` discarded rows for windows `0.0` and `1.8` in this demo review only. It does not approve a reusable production discard policy, does not certify convergence, and does not approve TI/TST. In production-facing use, the user must inspect the convergence plots/CSVs directly and personally decide whether the discard length is scientifically reasonable.
 

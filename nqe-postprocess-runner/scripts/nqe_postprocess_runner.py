@@ -111,6 +111,7 @@ def value_contains_placeholder(value: Any) -> bool:
 
 
 STOP_AFTER_ORDER = {
+    "plot": -1,
     "convergence": 0,
     "extraction": 1,
     "integration": 2,
@@ -127,6 +128,8 @@ def get_stop_after(config: dict[str, Any]) -> str:
 
 
 def reaches_stage(stop_after: str, stage: str) -> bool:
+    if stop_after == "plot":
+        return False
     return STOP_AFTER_ORDER[stop_after] >= STOP_AFTER_ORDER[stage]
 
 
@@ -139,14 +142,33 @@ def preflight_config(config: dict[str, Any]) -> None:
         if value_contains_placeholder(value):
             problems.append(f"{key}: placeholder value remains in runnable config")
 
-    common_required = {
-        "sampling_output_root": "input window root must be user-confirmed",
-        "input_file": "sampling output file name must be user-confirmed",
-        "window_glob": "window discovery pattern must be user-confirmed",
-        "dataset_label": "dataset label must be user-confirmed",
-    }
+    common_required = {"dataset_label": "dataset label must be user-confirmed"}
+    if stop_after != "plot":
+        common_required.update({
+            "sampling_output_root": "input window root must be user-confirmed",
+            "input_file": "sampling output file name must be user-confirmed",
+            "window_glob": "window discovery pattern must be user-confirmed",
+        })
     for key, reason in common_required.items():
         require_explicit(config, key, problems, reason)
+
+    if stop_after == "plot":
+        plot_mean_force = as_bool(config, "plot_mean_force", False) if has_value(config, "plot_mean_force") else False
+        plot_free_energy = as_bool(config, "plot_free_energy", False) if has_value(config, "plot_free_energy") else False
+        require_explicit(config, "plot_mean_force", problems, "plot-only mean-force plotting choice must be explicit")
+        require_explicit(config, "plot_free_energy", problems, "plot-only free-energy plotting choice must be explicit")
+        require_explicit(config, "plot_rc_order", problems, "plot-only RC order must be user-confirmed")
+        if has_value(config, "plot_rc_order") and str(config["plot_rc_order"]).strip().lower() not in {"ascending", "descending", "input"}:
+            problems.append("plot_rc_order: use ascending, descending, or input")
+        if not plot_mean_force and not plot_free_energy:
+            problems.append("plot-only mode requires at least one of plot_mean_force or plot_free_energy to be true")
+        if plot_mean_force:
+            require_explicit(config, "mean_force_table", problems, "plot_mean_force requires an existing mean-force CSV path")
+            require_explicit(config, "mean_force_y_column", problems, "plot_mean_force requires an explicit y-column")
+        if plot_free_energy:
+            require_explicit(config, "free_energy_profile", problems, "plot_free_energy requires an existing free-energy CSV path")
+            require_explicit(config, "free_energy_y_column", problems, "plot_free_energy requires an explicit y-column")
+            require_explicit(config, "free_energy_plot_unit_label", problems, "plot_free_energy requires an explicit plotted free-energy unit label")
 
     if stop_after == "convergence" and not as_bool(config, "run_convergence_diagnostics", False):
         problems.append("stop_after: convergence requires run_convergence_diagnostics: true")
@@ -436,26 +458,56 @@ def build_integrate_cmd(python: str, scripts: Path, config: dict[str, Any], mean
     return cmd
 
 
+def add_plot_style_options(cmd: list[str], config: dict[str, Any], prefix: str = "plot") -> None:
+    for key, flag in [
+        (f"{prefix}_xlabel", "--xlabel"),
+        (f"{prefix}_ylabel", "--ylabel"),
+        (f"{prefix}_title", "--title"),
+        (f"{prefix}_width", "--width"),
+        (f"{prefix}_height", "--height"),
+        (f"{prefix}_dpi", "--dpi"),
+        (f"{prefix}_linewidth", "--linewidth"),
+        (f"{prefix}_markersize", "--markersize"),
+    ]:
+        add_opt(cmd, flag, config, key)
+    if has_value(config, f"{prefix}_grid"):
+        add_flag(cmd, "--grid", as_bool(config, f"{prefix}_grid", False))
+
+
 def build_plot_cmds(python: str, scripts: Path, config: dict[str, Any], mean_force: Path, free_energy: Path, out: Path) -> list[list[str]]:
     dataset = str(require(config, "dataset_label"))
-    direction = str(require(config, "integration_direction"))
-    return [
-        [
+    direction = str(config["plot_rc_order"] if has_value(config, "plot_rc_order") else require(config, "integration_direction"))
+    commands: list[list[str]] = []
+    plot_mean_force = as_bool(config, "plot_mean_force", True)
+    plot_free_energy = as_bool(config, "plot_free_energy", True)
+    if plot_mean_force:
+        cmd = [
             python, str(scripts / "plot_mean_force.py"),
-            "--curve", f"file={mean_force},dataset={dataset},label=MeanForce,marker=o",
-            "--output", str(out / "mean_force.png"),
+            "--curve", f"file={mean_force},dataset={dataset},label={config.get('mean_force_curve_label', 'MeanForce')},marker=o",
+            "--output", str(config.get("mean_force_plot_output", out / "mean_force.png")),
             "--rc-order", direction,
             "--confirm-parameters",
-        ],
-        [
+        ]
+        add_opt(cmd, "--y-column", config, "mean_force_y_column")
+        add_plot_style_options(cmd, config, "mean_force_plot")
+        commands.append(cmd)
+    if plot_free_energy:
+        cmd = [
             python, str(scripts / "plot_free_energy.py"),
-            "--curve", f"file={free_energy},dataset={dataset},label=FreeEnergy,marker=o",
-            "--output", str(out / "free_energy.png"),
+            "--curve", f"file={free_energy},dataset={dataset},label={config.get('free_energy_curve_label', 'FreeEnergy')},marker=o",
+            "--output", str(config.get("free_energy_plot_output", out / "free_energy.png")),
             "--rc-order", direction,
-            "--free-energy-unit-label", str(config.get("free_energy_plot_unit_label", require(config, "free_energy_unit_label"))),
+            "--free-energy-unit-label", str(
+                config["free_energy_plot_unit_label"]
+                if has_value(config, "free_energy_plot_unit_label")
+                else require(config, "free_energy_unit_label")
+            ),
             "--confirm-parameters",
-        ],
-    ]
+        ]
+        add_opt(cmd, "--y-column", config, "free_energy_y_column")
+        add_plot_style_options(cmd, config, "free_energy_plot")
+        commands.append(cmd)
+    return commands
 
 
 def build_tst_cmd(python: str, scripts: Path, config: dict[str, Any], free_energy: Path, rates: Path) -> list[str]:
@@ -509,12 +561,20 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     config_dir = config_path.parent
     repo_root = Path(__file__).resolve().parents[2]
-    root = path_from(config_dir, require(config, "sampling_output_root"))
     out = path_from(config_dir, config.get("output_dir", "nqe-postprocess-output"))
     scripts = script_paths(config, config_dir)
     python = str(config.get("python", sys.executable))
-    input_file = str(require(config, "input_file"))
-    windows = discover_windows(root, input_file, str(require(config, "window_glob")))
+    if has_value(config, "mean_force_plot_output"):
+        config["mean_force_plot_output"] = str(path_from(config_dir, config["mean_force_plot_output"]))
+    if has_value(config, "free_energy_plot_output"):
+        config["free_energy_plot_output"] = str(path_from(config_dir, config["free_energy_plot_output"]))
+
+    input_file = ""
+    windows: list[Path] = []
+    if stop_after != "plot":
+        root = path_from(config_dir, require(config, "sampling_output_root"))
+        input_file = str(require(config, "input_file"))
+        windows = discover_windows(root, input_file, str(require(config, "window_glob")))
     run_convergence = as_bool(config, "run_convergence_diagnostics", False)
     convergence_dir = path_from(config_dir, config.get("convergence_output_dir", out / "convergence"))
     per_window_skiprows: dict[str, dict[str, str]] = {}
@@ -533,11 +593,30 @@ def main(argv: Sequence[str] | None = None) -> int:
         out.mkdir(parents=True, exist_ok=True)
     if run_convergence and not args.dry_run:
         convergence_dir.mkdir(parents=True, exist_ok=True)
-    mean_force = out / "mean_force_table.csv"
-    free_energy = out / "free_energy_profile.csv"
+    if stop_after == "plot":
+        mean_force = (
+            path_from(config_dir, require(config, "mean_force_table"))
+            if as_bool(config, "plot_mean_force", False)
+            else out / "mean_force_table.csv"
+        )
+        free_energy = (
+            path_from(config_dir, require(config, "free_energy_profile"))
+            if as_bool(config, "plot_free_energy", False)
+            else out / "free_energy_profile.csv"
+        )
+        if as_bool(config, "plot_mean_force", False) and not mean_force.exists():
+            raise FileNotFoundError(f"mean_force_table does not exist: {mean_force}")
+        if as_bool(config, "plot_free_energy", False) and not free_energy.exists():
+            raise FileNotFoundError(f"free_energy_profile does not exist: {free_energy}")
+    else:
+        mean_force = out / "mean_force_table.csv"
+        free_energy = out / "free_energy_profile.csv"
     rates = out / "tst_rates.csv"
     summary = out / "summary.json"
-    unlink_outputs([mean_force, free_energy, rates, summary], args.dry_run)
+    if stop_after == "plot":
+        unlink_outputs([summary], args.dry_run)
+    else:
+        unlink_outputs([mean_force, free_energy, rates, summary], args.dry_run)
 
     commands: list[list[str]] = []
     if run_convergence:
@@ -562,11 +641,16 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
     if reaches_stage(stop_after, "integration"):
         run(build_integrate_cmd(python, scripts, config, mean_force, free_energy), args.dry_run, commands)
-    if stop_after == "all":
-        if as_bool(config, "plots", False):
+    if stop_after in {"all", "plot"}:
+        if stop_after == "plot" or as_bool(config, "plots", False):
+            if not args.dry_run:
+                if as_bool(config, "plot_mean_force", True):
+                    Path(str(config.get("mean_force_plot_output", out / "mean_force.png"))).parent.mkdir(parents=True, exist_ok=True)
+                if as_bool(config, "plot_free_energy", True):
+                    Path(str(config.get("free_energy_plot_output", out / "free_energy.png"))).parent.mkdir(parents=True, exist_ok=True)
             for cmd in build_plot_cmds(python, scripts, config, mean_force, free_energy, out):
                 run(cmd, args.dry_run, commands)
-        if as_bool(config, "compute_tst", False):
+        if stop_after == "all" and as_bool(config, "compute_tst", False):
             run(build_tst_cmd(python, scripts, config, free_energy, rates), args.dry_run, commands)
 
     notes = [
@@ -575,6 +659,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     ]
     if reaches_stage(stop_after, "integration"):
         notes.append("Inspect integration direction, zero reference, units, and sign convention before using the free-energy profile.")
+    if stop_after == "plot":
+        notes.append("Plot-only mode visualizes existing CSV files; it does not approve convergence, TI choices, TST state selection, or rates.")
     if stop_after == "all" and as_bool(config, "compute_tst", False):
         notes.append("Inspect reactant and transition-state selections before treating rates as final.")
 
@@ -586,11 +672,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         "windows": [{"sample_label": window.name, "input": str(window / input_file)} for window in windows],
         "outputs": {
             "convergence_dir": str(convergence_dir) if run_convergence else None,
-            "mean_force_table": str(mean_force) if reaches_stage(stop_after, "extraction") else None,
-            "free_energy_profile": str(free_energy) if reaches_stage(stop_after, "integration") else None,
+            "mean_force_table": str(mean_force) if reaches_stage(stop_after, "extraction") or (stop_after == "plot" and as_bool(config, "plot_mean_force", False)) else None,
+            "free_energy_profile": str(free_energy) if reaches_stage(stop_after, "integration") or (stop_after == "plot" and as_bool(config, "plot_free_energy", False)) else None,
             "tst_rates": str(rates) if stop_after == "all" and as_bool(config, "compute_tst", False) else None,
-            "mean_force_plot": str(out / "mean_force.png") if stop_after == "all" and as_bool(config, "plots", False) else None,
-            "free_energy_plot": str(out / "free_energy.png") if stop_after == "all" and as_bool(config, "plots", False) else None,
+            "mean_force_plot": str(config.get("mean_force_plot_output", out / "mean_force.png")) if (stop_after == "plot" or (stop_after == "all" and as_bool(config, "plots", False))) and as_bool(config, "plot_mean_force", True) else None,
+            "free_energy_plot": str(config.get("free_energy_plot_output", out / "free_energy.png")) if (stop_after == "plot" or (stop_after == "all" and as_bool(config, "plots", False))) and as_bool(config, "plot_free_energy", True) else None,
         },
         "per_window_skiprows": per_window_skiprows,
         "commands": commands,

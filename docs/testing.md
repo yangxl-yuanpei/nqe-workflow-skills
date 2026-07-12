@@ -82,6 +82,7 @@ python ti-tst-rate/scripts/plot_mean_force.py --help
 python ti-tst-rate/scripts/plot_free_energy.py --help
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py nqe-postprocess-runner/assets/config.example.yaml --dry-run
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py nqe-postprocess-runner/assets/config.convergence-screening.example.yaml --dry-run
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/demo_multi_window_plot_only.yaml --dry-run
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/postprocess_missing_defaults.yaml --dry-run
 ```
 
@@ -91,6 +92,7 @@ For ABACUS, the static checker also checks INPUT-declared STRU/KPT paths and pse
 
 The postprocess runner smoke test uses `--dry-run` so it checks config parsing, window discovery, and generated child commands without executing the TI/TST scripts or requiring plotting dependencies.
 The convergence-screening example extends this check by verifying that per-window `analyze_phy_quant_convergence.py` commands are generated before mean-force extraction, without treating suggested cutoffs as automatic TI discard lengths.
+The plot-only fixture verifies that `stop_after: plot` can generate plot commands from existing reviewed CSV files without rediscovering windows, re-extracting mean forces, reintegrating free energy, or running TST.
 The `postprocess_missing_defaults.yaml` check is expected to fail with a preflight error. It verifies that `parameters_confirmed: true` is not enough when parser mode, columns, units, TI zero reference, or TST/plot choices are still implicit.
 
 ## Real-Data Diagnostic Records
@@ -99,6 +101,7 @@ Small summaries from real or representative data are stored under `tests/real_ca
 
 Current records include:
 
+- `MANIFEST.md`: canonical index for retained records, representative attachments, and pruned duplicate artifacts.
 - `2026-07-02_real_phy_quant_test_record.md`: single real `PHY_QUANT` case with `INPUT`/`ALL_INPUT` checks, convergence diagnostics, acceptance fallback, and initial-RC adjustment behavior.
 - `2026-07-03_demo_multi_window_test_record.md`: 13-window `../demo` CHMC/CPIHMC-style `energy.dat` case with per-window `check_chmc_window.py` summaries, convergence CSVs, and a diagnostic `mean_force_table.csv`.
 - `2026-07-10_demo_runner_dry_run_record.md`: `nqe-postprocess-runner` staged dry-run and real execution on the same 13-window `../demo` dataset, stopping after convergence CSV summaries and mean-force extraction.
@@ -122,7 +125,11 @@ If an `energy.dat` or `PHY_QUANT` file starts with numeric data and lacks a head
 
 For staged runner tests, use `stop_after` to avoid fake downstream physical approvals. For example, `stop_after: extraction` may run convergence screening and mean-force extraction without requiring TI direction, zero reference, plots, or TST fields. If convergence screening is enabled, `convergence_plot` must be explicit; set it to `false` for CSV summary-only mode in environments without plotting dependencies.
 
-For broad prompts such as "postprocess this batch", the expected fresh-agent behavior is to stage the workflow and stop before TI unless integration direction, zero reference, unit conversion, and mean-force sign convention have been explicitly confirmed. If the agent asks for `sampling_output_root`, it should also state the intended first stop stage and the downstream confirmation gates. A generic postprocessing request should not trigger `stop_after: integration`, plots, TST, or rate calculation by default.
+For plot-only runner tests, use `stop_after: plot` with existing CSV inputs. The config must explicitly confirm dataset label, `plot_rc_order`, selected y-columns, plotted free-energy unit label, and which plots to generate. Plot-only mode is visualization only and must not be treated as approval to rerun TI or compute TST rates.
+
+For broad prompts such as "postprocess this batch", the expected fresh-agent behavior is to stage the workflow and stop before TI unless integration direction, zero reference, unit conversion, and mean-force sign convention have been explicitly confirmed. If the agent asks for `sampling_output_root`, it should also state the intended first stop stage and the downstream confirmation gates. If it discovers plausible directories such as `demo/`, it should present them as candidates only and ask the user to confirm the intended root. A generic postprocessing request should not trigger `stop_after: integration`, plots, TST, or rate calculation by default.
+
+Broad runner tests should also check parser and skip-row wording. The agent must not infer `format: phy_quant` for a whole batch from a single header; it should require confirmation that all windows have reliable compatible headers or ask for explicit zero-based table indices. It must not propose `skiprows: 1` to skip a text header, because runner extraction `skiprows` discards numeric data rows after header/comment handling. Use `skiprows: 0` unless the user has confirmed an equilibration or data-row discard.
 
 When testing per-window discard, use a separate candidate config and a separate `per_window_skiprows_file` CSV. The CSV must contain explicit `sample_label` and `skiprows` values reviewed by the user. Do not overwrite the baseline staged fixture, and do not convert convergence-screening `SUGGESTED` indices into production discard lengths without a separate approval step. For production-facing tests, record that the user must inspect the convergence plots personally before accepting the discard policy.
 

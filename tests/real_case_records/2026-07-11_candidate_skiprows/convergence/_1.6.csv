@@ -1,4 +1,0 @@
-column,total_samples,used_samples,equilibration_index_zero_based,equilibration_step,mean,std,sem,final_cumulative_mean,auto_status,auto_reason
-PotEng,99999,99999,0,0.0,-11412.957272060781,0.014084892273489302,4.4540562885704624e-05,-11412.957272060854,SUGGESTED,"first stable candidate at fraction=0.000; early_late_diff=0.00905819, combined_sem=0.00313578, rel_abs_tol=228.259, total_block_drift=0.00918894, drift_limit=57.0648"
-RxnCoord,99999,99999,0,0.0,-1.6000000000000003,2.220457151674852e-16,7.021737154876042e-19,-1.6000000000030157,SUGGESTED,"first stable candidate at fraction=0.000; early_late_diff=0, combined_sem=0, rel_abs_tol=0.032, total_block_drift=0, drift_limit=0.008"
-MeanForce,99999,99999,0,0.0,0.0036042637526375264,0.010921825878332595,3.453801867382515e-05,0.003604263752637636,SUGGESTED,"first stable candidate at fraction=0.000; early_late_diff=0.00366786, combined_sem=0.00120946, rel_abs_tol=0.02, total_block_drift=0.00479868, drift_limit=0.005"

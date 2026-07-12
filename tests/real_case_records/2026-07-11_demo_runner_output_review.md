@@ -5,7 +5,7 @@ Reviewed outputs:
 - `tests/real_case_records/2026-07-10_demo_runner_dry_run/output/summary.json`
 - `tests/real_case_records/2026-07-10_demo_runner_dry_run/output/mean_force_table.csv`
 - `tests/real_case_records/2026-07-10_demo_runner_dry_run/convergence/*.csv`
-- `tests/real_case_records/2026-07-10_demo_runner_dry_run/convergence/*.png`
+- representative convergence PNGs in `tests/real_case_records/2026-07-10_demo_runner_dry_run/convergence/`
 
 Raw dataset:
 
@@ -75,7 +75,7 @@ Interpretation: the table is complete and numerically parseable, but it should n
 
 Status: `REVIEW BEFORE TI`
 
-PNG plots were generated after installing `matplotlib` in the local Python environment. Because the bundled Python did not automatically include the user site-packages directory, plotting was run with a temporary `PYTHONPATH` pointing to `C:\Users\94474\AppData\Roaming\Python\Python312\site-packages`.
+PNG plots were generated after installing `matplotlib` in the local Python environment. Because the bundled Python did not automatically include the user site-packages directory, plotting was run with a temporary `PYTHONPATH` pointing to `C:\Users\94474\AppData\Roaming\Python\Python312\site-packages`. During later repository cleanup, only representative plots were retained: `_0.4.png`, `0.0.png`, and `1.8.png`.
 
 Plot-display correction: the first generated PNGs used Matplotlib's default y-axis offset notation. For near-constant reaction-coordinate panels, for example `_0.4`, this made a numerically flat `RxnCoord = -0.4` series look like a large trend. `analyze_phy_quant_convergence.py` was updated to disable misleading y-axis offset notation and to give near-constant series a centered y-axis range. The PNGs were regenerated after this correction.
 

@@ -1,0 +1,25 @@
+# Plot-only fixture for already reviewed ../demo TI outputs.
+# This config reads existing CSV files and generates plot commands only.
+# It does not discover windows, extract mean force, integrate free energy, or run TST.
+parameters_confirmed: true
+
+dataset_label: demo_multi_window_reviewed_ti_only
+output_dir: ../real_case_records/2026-07-11_reviewed_ti_only/output
+stop_after: plot
+
+plot_mean_force: true
+plot_free_energy: true
+mean_force_table: ../real_case_records/2026-07-11_reviewed_ti_only/output/mean_force_table.csv
+free_energy_profile: ../real_case_records/2026-07-11_reviewed_ti_only/output/free_energy_profile.csv
+plot_rc_order: ascending
+
+mean_force_y_column: mean_force_au
+free_energy_y_column: free_energy_converted
+free_energy_plot_unit_label: eV
+
+mean_force_plot_output: ../real_case_records/2026-07-11_reviewed_ti_only/output/mean_force_plot_only.png
+free_energy_plot_output: ../real_case_records/2026-07-11_reviewed_ti_only/output/free_energy_plot_only.png
+mean_force_plot_title: Reviewed TI-only mean force
+free_energy_plot_title: Reviewed TI-only free energy
+mean_force_plot_grid: true
+free_energy_plot_grid: true

@@ -10,7 +10,7 @@ This file tracks work that remains after the current repository consistency pass
 - 14 Python helper scripts exist.
 - 19 `.template` files exist.
 - 9 failure-case references exist; 1 is still a placeholder.
-- `nqe-postprocess-runner` has a basic config example, a convergence-screening config example, staged `stop_after` control for convergence/extraction/integration/all, and a user-reviewed `per_window_skiprows_file` mechanism for per-window extraction discard overrides.
+- `nqe-postprocess-runner` has a basic config example, a convergence-screening config example, staged `stop_after` control for convergence/extraction/integration/plot/all, and a user-reviewed `per_window_skiprows_file` mechanism for per-window extraction discard overrides.
 - `check_chmc_window.py` exists; it is no longer a future script placeholder.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped files, but it is not a real DP-GEN example.
 - Manual prompts exist. Recorded fresh-agent and script-smoke batches currently pass; remaining testing work is deeper failure-driven behavior and real-data validation, not a missing baseline pass.
@@ -22,6 +22,8 @@ This file tracks work that remains after the current repository consistency pass
 - The staged runner outputs have been reviewed in `tests/real_case_records/2026-07-11_demo_runner_output_review.md`, including corrected convergence plots and discard sensitivity for `0.0` and `1.8`.
 - A separate per-window discard fixture exists at `tests/runner_configs/demo_multi_window_candidate_skiprows.yaml` with `tests/runner_configs/demo_multi_window_candidate_skiprows.csv`. The user accepted `10000` discarded rows for `0.0` and `1.8` in this demo review only; production use still requires direct convergence plot/CSV review.
 - A guarded TI-only fixture exists at `tests/runner_configs/demo_multi_window_reviewed_ti_only.yaml`; its execution record is `tests/real_case_records/2026-07-11_reviewed_ti_only_record.md`.
+- A plot-only fixture exists at `tests/runner_configs/demo_multi_window_plot_only.yaml`; it verifies command generation from reviewed CSV outputs without rerunning extraction, integration, or TST.
+- Real-case test records are indexed by `tests/real_case_records/MANIFEST.md`. Duplicate convergence CSV attachments and non-representative per-window PNG plots have been pruned; canonical summaries, final outputs, and representative plots remain.
 
 ## 1. Failure-Case References
 
@@ -64,6 +66,7 @@ Current state:
 - A negative smoke config exists to check that `parameters_confirmed: true` alone does not bypass preflight.
 - Real-data dry-run command generation and staged execution through extraction have been exercised on the `../demo` 13-window dataset.
 - Per-window discard command generation and reviewed demo execution have been exercised with explicit `10000`-row overrides for `0.0` and `1.8`.
+- Plot-only command generation has been exercised on reviewed demo mean-force and free-energy CSV outputs.
 
 Remaining work:
 

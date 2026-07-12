@@ -40,7 +40,7 @@ initial DFT-labeled dataset
 - The README, quickstart, testing guide, and major skills now agree on the repository boundary: useful for teaching, guarded checking, and deterministic post-processing helpers, not automatic production.
 - The TI/TST script chain exists and is split into extraction, integration, plotting, and TST-rate computation.
 - `nqe-postprocess-runner` can dry-run or execute a confirmed config in guarded stages. It now includes a preflight guard that rejects runnable configs relying on implicit parser, column, unit, integration, state-selection, temperature, prefactor, or convergence-plot defaults.
-- `nqe-postprocess-runner` now has `stop_after` stage control, optional convergence-screening mode, and an explicit `per_window_skiprows_file` mechanism for user-reviewed per-window extraction discard overrides. `convergence_plot: false` enables CSV summary-only mode when plotting dependencies are unavailable.
+- `nqe-postprocess-runner` now has `stop_after` stage control, optional convergence-screening mode, plot-only mode for existing CSV outputs, and an explicit `per_window_skiprows_file` mechanism for user-reviewed per-window extraction discard overrides. `convergence_plot: false` enables CSV summary-only mode when plotting dependencies are unavailable.
 - `analyze_phy_quant_convergence.py` supports single-RC demo files and real multi-column `PHY_QUANT` shapes such as `PotEng` plus `MeanForce_0`.
 - `check_chmc_window.py` exists as a CHMC/CPIHMC window health-check helper for acceptance, physical-output row integrity, initial RC adjustment, final RC consistency, convergence screening, and `INPUT`/`ALL_INPUT` comparison. It now resolves relative input/log/physical-output paths under `--window-dir`, reports explicit `Header Inference` warnings when a numeric-first `energy.dat` header is inferred from a sibling window, and fails parsing when no reliable header source is available.
 - `dpdata-format-conversion` provides inspect, convert, and compare helpers for dpdata-readable systems.
@@ -53,6 +53,8 @@ initial DFT-labeled dataset
 - A candidate per-window discard dry-run fixture exists at `tests/runner_configs/demo_multi_window_candidate_skiprows.yaml`, with its CSV override in `tests/runner_configs/demo_multi_window_candidate_skiprows.csv`. This is for command review and sensitivity testing only, not a production discard policy.
 - The reviewed per-window extraction record is `tests/real_case_records/2026-07-11_reviewed_skiprows_execution_record.md`. It uses the user-accepted `10000`-row discard for `0.0` and `1.8` in the `../demo` review only and explicitly requires plot/CSV review before any production reuse.
 - The guarded TI-only record is `tests/real_case_records/2026-07-11_reviewed_ti_only_record.md`. It integrates the reviewed mean-force table with ascending RC order, zero at the most-negative RC endpoint, eV conversion for `free_energy_converted`, and no TST.
+- A plot-only dry-run fixture exists at `tests/runner_configs/demo_multi_window_plot_only.yaml`. It generates plot commands from the reviewed mean-force and free-energy CSV files without rerunning extraction, integration, or TST.
+- Real-case attachments are now indexed by `tests/real_case_records/MANIFEST.md`. Duplicate convergence CSV directories and non-representative per-window PNG plots were pruned while retaining canonical CSV summaries, final outputs, and representative plots.
 - The targeted dpdata/TI/TST/runner record is `tests/fresh_agent_records/2026-07-03_dpdata-ti-runner-targeted_opencode.md`. It passed after retesting the TI/TST anti-inference guardrail.
 - Real-data diagnostic records exist for a single large `PHY_QUANT` case and for a 13-window `../demo` CHMC/CPIHMC dataset. The multi-window record is `tests/real_case_records/2026-07-03_demo_multi_window_test_record.md`.
 - Real or semi-real reference examples exist for ABACUS, DP-GEN, LAMMPS/PLUMED, DeePMD, CHMC/CPIHMC, TI/TST handoff, and KMC event-network shape.
@@ -91,9 +93,9 @@ Script output remains diagnostic or post-processing output. It is not proof of p
 
 1. Review the guarded TI-only free-energy profile before any TST handoff, especially the zero convention, reactant/transition-state definition, free-energy column/unit, temperature, and prefactor model.
 2. Continue deeper fresh-agent tests for runner config/failure behavior beyond the targeted preflight pass, especially missing windows, bad columns, unexpected dry-run commands, child-script failures, `stop_after`, `convergence_plot`, and `per_window_skiprows_file`.
-5. Keep dpdata repeatable checks deferred until an environment with dpdata is available; the skill, README example, and populated failure reference already cover the teaching/checking boundary.
-6. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
-7. Keep README, quickstart, testing guide, status report, and pending-work documents synchronized after every script or skill change.
+3. Keep dpdata repeatable checks deferred until an environment with dpdata is available; the skill, README example, and populated failure reference already cover the teaching/checking boundary.
+4. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
+5. Keep README, quickstart, testing guide, status report, and pending-work documents synchronized after every script or skill change.
 
 ## Scientific Guardrails
 

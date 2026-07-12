@@ -24,7 +24,7 @@ Before outputting a runnable YAML and before setting `parameters_confirmed: true
 - whether plots should be generated
 - whether TST should be computed
 - elementary-step label, temperature, free-energy column/unit, reactant state, transition-state selection, prefactor model, and prefactor units when TST is enabled
-- optional `stop_after` stage when intentionally stopping before integration, plotting, or TST
+- optional `stop_after` stage when intentionally stopping before integration, plotting, or TST, or when plotting only from existing CSVs
 
 Window discovery:
 
@@ -33,16 +33,19 @@ Window discovery:
 - `window_glob`: confirmed direct-child glob for window directories. Required in runnable configs; do not rely on `*` as an implicit default.
 - `dataset_label`: label written to output CSVs.
 - `output_dir`: output directory. Default: `nqe-postprocess-output`.
-- `stop_after`: optional stage boundary, one of `convergence`, `extraction`, `integration`, or `all`. Default: `all`.
+- `stop_after`: optional stage boundary, one of `convergence`, `extraction`, `integration`, `plot`, or `all`. Default: `all`.
+- Directories discovered during workspace inspection are candidates only. Do not silently promote a discovered directory such as `demo/` or `results/` to `sampling_output_root`; ask the user to confirm the intended root before writing a runnable config or running commands.
 
 Stage boundary:
 
 - `stop_after: convergence` generates or runs only convergence-screening commands and requires `run_convergence_diagnostics: true`.
 - `stop_after: extraction` generates or runs convergence screening, if enabled, and mean-force extraction. It does not require TI, plot, or TST fields.
 - `stop_after: integration` generates or runs through TI integration but skips plot and TST commands.
+- `stop_after: plot` plots existing user-confirmed CSV files only. It does not discover windows, run convergence diagnostics, extract mean force, integrate free energy, or run TST.
 - `stop_after: all` preserves the full runner behavior and requires explicit plot and TST choices.
 - For broad user requests such as "postprocess this batch", do not infer a full pipeline. Default to `stop_after: convergence` or `stop_after: extraction` until the user separately confirms integration direction, zero reference, unit conversion, and mean-force sign convention.
 - When asking for `sampling_output_root`, state the intended first stop stage and the downstream confirmation gates. Do not ask for the path as if it were enough to authorize TI or TST.
+- If candidate directories are found before the user confirms `sampling_output_root`, list them as candidates and ask which one is intended. Discovery is not confirmation.
 
 Optional convergence screening before TI:
 
@@ -75,6 +78,12 @@ Mean-force extraction:
 - `rc_raw_unit_label`, `force_raw_unit_label`: confirmed raw unit labels preserved in CSV.
 - `uncertainty`: confirmed policy, `sem`, `std`, or `none`.
 
+Parser and skip-row boundaries:
+
+- Do not infer `format: phy_quant` for the whole batch from one file or one representative header. Use `phy_quant` only when all included windows have reliable compatible headers containing the confirmed `rc_column` and `force_column`.
+- If headers are missing, inconsistent, truncated, or only partially inspected, do not guess column names. Ask the user whether to use `format: table` with explicit zero-based `rc_col_index` and `force_col_index`, or stop for manual inspection.
+- `skiprows` is not a header-skip parameter. It discards numeric data rows after header/comment parsing. Do not set `skiprows: 1` to skip a text header; use `skiprows: 0` unless the user has confirmed an equilibration or data-row discard length.
+
 Thermodynamic integration:
 
 - Required only when `stop_after` reaches `integration` or `all`.
@@ -85,9 +94,26 @@ Thermodynamic integration:
 
 Plotting:
 
-- Required only when `stop_after: all`.
-- `plots`: `true` or `false`. Required in runnable configs.
+- Required when `stop_after: all` uses generated plots, or when `stop_after: plot` plots existing CSVs.
+- `plots`: `true` or `false`. Required for `stop_after: all`; not required for `stop_after: plot` because plot-only mode is already explicit.
 - `free_energy_plot_unit_label`: optional y-axis unit label for the free-energy plot. If omitted, the runner uses `free_energy_unit_label`.
+
+Plot-only mode:
+
+- Use `stop_after: plot` when mean-force and/or free-energy CSV files already exist and the user only wants plots.
+- `sampling_output_root`, `input_file`, `window_glob`, parser fields, extraction fields, and TI fields are not required in plot-only mode because no sampling-output parsing or integration is performed.
+- `plot_mean_force`: `true` or `false`. Required in plot-only mode.
+- `plot_free_energy`: `true` or `false`. Required in plot-only mode.
+- At least one of `plot_mean_force` or `plot_free_energy` must be `true`.
+- `mean_force_table`: existing `mean_force_table.csv` path. Required when `plot_mean_force: true`.
+- `free_energy_profile`: existing `free_energy_profile.csv` path. Required when `plot_free_energy: true`.
+- `plot_rc_order`: confirmed plotting order, `ascending`, `descending`, or `input`.
+- `mean_force_y_column`: confirmed mean-force column to plot, for example `mean_force_au`. Required when `plot_mean_force: true`.
+- `free_energy_y_column`: confirmed free-energy column to plot, for example `free_energy_converted`. Required when `plot_free_energy: true`.
+- `free_energy_plot_unit_label`: confirmed plotted free-energy unit label. Required when `plot_free_energy: true`.
+- `mean_force_plot_output`, `free_energy_plot_output`: optional output image paths. If omitted, the runner writes `mean_force.png` and `free_energy.png` under `output_dir`.
+- Optional style fields use the prefixes `mean_force_plot_` or `free_energy_plot_`: `xlabel`, `ylabel`, `title`, `width`, `height`, `dpi`, `linewidth`, `markersize`, and `grid`.
+- Plot-only mode is visualization only. It does not certify convergence, approve TI conventions, choose TST states, or compute rates.
 
 TST:
 
@@ -116,11 +142,14 @@ Agent execution rule:
 1. Read this schema and the config file.
 2. When creating YAML, ask for every parameter before writing a runnable config; otherwise write only a non-runnable draft with `parameters_confirmed: false`.
 3. Refuse dry-run and real execution if required explicit fields are missing, if `format: auto` is used, if placeholders remain, or if `parameters_confirmed` is not true.
-4. If the user only asks generally to postprocess sampling results, stop at convergence or extraction unless TI choices are explicitly confirmed.
+4. If the user only asks generally to postprocess sampling results, stop at convergence or extraction unless TI choices are explicitly confirmed. If the user only asks to plot already generated CSV outputs, use `stop_after: plot` rather than rerunning extraction or integration.
 5. If more path information is needed, ask for `sampling_output_root` while also explaining the staged stop point and the TI/TST confirmations that are still missing.
-6. Run the runner with `--dry-run` first.
-7. Ask for user confirmation if the dry-run commands reveal unexpected paths, units, ordering, convergence columns, state selection, temperature, or prefactor.
-8. Run without `--dry-run` only after the dry-run is accepted.
+6. If local inspection finds plausible directories, treat them as candidates and ask the user to confirm the intended `sampling_output_root`; do not choose a candidate silently.
+7. Before proposing `format: phy_quant`, verify or ask the user to confirm that every included window has reliable compatible headers. Otherwise require explicit table column indices.
+8. Before proposing any nonzero `skiprows`, state that it discards numeric data rows, not headers, and require user approval of the discard length.
+9. Run the runner with `--dry-run` first.
+10. Ask for user confirmation if the dry-run commands reveal unexpected paths, units, ordering, convergence columns, state selection, temperature, or prefactor.
+11. Run without `--dry-run` only after the dry-run is accepted.
 
 Per-window discard boundary:
 

@@ -8,7 +8,7 @@ dataset_label: demo_cpihmc_100K
 output_dir: ../../tmp/nqe-postprocess-demo-output
 
 format: phy_quant
-skiprows: 1
+skiprows: 0
 rc_raw_unit_label: au
 force_raw_unit_label: au
 rc_scale: 1.0
@@ -28,7 +28,7 @@ compute_tst: true
 elementary_step: CHO
 temperature_K: 100
 free_energy_column: free_energy_au
-free_energy_unit: auto
+free_energy_unit: au
 reactant_mode: first
 ts_mode: max
 prefactor_model: kBT_over_h

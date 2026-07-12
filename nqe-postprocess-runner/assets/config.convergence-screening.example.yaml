@@ -12,12 +12,13 @@ output_dir: ../../tmp/nqe-postprocess-demo-with-convergence
 run_convergence_diagnostics: true
 convergence_columns: PotEng,MeanForce
 convergence_output_dir: ../../tmp/nqe-postprocess-demo-with-convergence/convergence
-convergence_skiprows: 1
+convergence_skiprows: 0
 convergence_running_window: 1000
 convergence_auto_equilibration: true
+convergence_plot: false
 
 format: phy_quant
-skiprows: 1
+skiprows: 0
 rc_raw_unit_label: au
 force_raw_unit_label: au
 rc_scale: 1.0
@@ -37,7 +38,7 @@ compute_tst: true
 elementary_step: CHO
 temperature_K: 100
 free_energy_column: free_energy_au
-free_energy_unit: auto
+free_energy_unit: au
 reactant_mode: first
 ts_mode: max
 prefactor_model: kBT_over_h

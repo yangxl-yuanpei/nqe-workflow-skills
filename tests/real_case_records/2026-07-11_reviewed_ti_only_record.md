@@ -10,7 +10,8 @@ Generated outputs:
 - `tests/real_case_records/2026-07-11_reviewed_ti_only/output/free_energy_profile.csv`
 - `tests/real_case_records/2026-07-11_reviewed_ti_only/output/free_energy_profile.png`
 - `tests/real_case_records/2026-07-11_reviewed_ti_only/output/summary.json`
-- `tests/real_case_records/2026-07-11_reviewed_ti_only/convergence/*.csv`
+
+Note: duplicate convergence CSV attachments from this TI-only execution were pruned during repository cleanup. Use the canonical baseline convergence summaries in `tests/real_case_records/2026-07-10_demo_runner_dry_run/convergence/` and the reviewed extraction/TI outputs listed above.
 
 Boundary: this record verifies a guarded TI-only postprocessing run with user-confirmed integration choices. It does not certify production convergence, does not propagate uncertainty, does not select a TST reactant/transition state, and does not compute rates.
 

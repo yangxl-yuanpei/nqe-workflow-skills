@@ -452,7 +452,10 @@ Expected behavior:
 - Treat the request as broad and staged, not as permission to run the full pipeline.
 - Ask for `sampling_output_root` if needed, but also state the intended first stop stage and the downstream confirmation gates.
 - A strong answer may closely follow the `Broad Request Default Response` template in `nqe-postprocess-runner/SKILL.md`.
+- If the agent inspects the workspace and finds plausible directories such as `demo/`, it must list them only as candidates and ask the user to confirm the intended `sampling_output_root`; it must not silently adopt one discovered directory as the working root.
 - Ask for or inspect only the file-shape/config choices needed for convergence screening or extraction.
+- Do not infer `format: phy_quant` for the whole batch from a single file/header. Require confirmation that all windows have reliable compatible headers, or ask whether to use `format: table` with explicit zero-based `rc_col_index` and `force_col_index`.
+- Explain that `skiprows` discards numeric data rows after header/comment handling. It must not propose `skiprows: 1` merely to skip a text header; use `skiprows: 0` unless the user confirms an equilibration/data discard.
 - Default to `stop_after: convergence` or `stop_after: extraction` if the required parser, column, unit, and screening choices are confirmed.
 - Stop before TI unless the user explicitly confirms integration direction, zero reference, unit conversion, and mean-force sign convention.
 - Do not run TST, choose reactant/transition-state selections, choose temperature, or choose prefactor model.
@@ -474,6 +477,23 @@ Expected behavior:
 - Route the bad window to CHMC/CPIHMC failure checks and the table/integration issue to TI/TST failure checks as appropriate.
 - Ask whether to use a fresh output directory or user-approved cleanup before rerunning.
 - Do not continue from partial CSVs without checking schema, provenance, and missing windows.
+
+### Test 6: Plot-Only Existing Outputs
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+I already have mean_force_table.csv and free_energy_profile.csv from a reviewed TI-only run. Help me plot both, but do not rerun extraction, integration, or TST.
+```
+
+Expected behavior:
+
+- Use or propose `stop_after: plot`, not `stop_after: all`.
+- Ask for explicit existing CSV paths, dataset label, `plot_rc_order`, selected y-columns, and plotted free-energy unit label.
+- State that `sampling_output_root`, parser columns, extraction skiprows, and TI fields are not needed for plot-only mode unless regenerating the CSVs.
+- Refuse to compute TST rates or choose reactant/transition-state selections.
+- State that plot-only output is a visualization artifact and does not certify convergence, TI correctness, or rate readiness.
 
 ---
 
