@@ -1,0 +1,57 @@
+{
+  "config": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\runner_configs\\demo_multi_window_plot_only.yaml",
+  "dataset_label": "demo_multi_window_reviewed_ti_only",
+  "stop_after": "plot",
+  "window_count": 0,
+  "windows": [],
+  "outputs": {
+    "convergence_dir": null,
+    "mean_force_table": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\mean_force_table.csv",
+    "free_energy_profile": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\free_energy_profile.csv",
+    "tst_rates": null,
+    "mean_force_plot": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\mean_force_plot_only.png",
+    "free_energy_plot": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\free_energy_plot_only.png"
+  },
+  "per_window_skiprows": {},
+  "commands": [
+    [
+      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\plot_mean_force.py",
+      "--curve",
+      "file=C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\mean_force_table.csv,dataset=demo_multi_window_reviewed_ti_only,label=MeanForce,marker=o",
+      "--output",
+      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\mean_force_plot_only.png",
+      "--rc-order",
+      "ascending",
+      "--confirm-parameters",
+      "--y-column",
+      "mean_force_au",
+      "--title",
+      "Reviewed TI-only mean force",
+      "--grid"
+    ],
+    [
+      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\plot_free_energy.py",
+      "--curve",
+      "file=C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\free_energy_profile.csv,dataset=demo_multi_window_reviewed_ti_only,label=FreeEnergy,marker=o",
+      "--output",
+      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\free_energy_plot_only.png",
+      "--rc-order",
+      "ascending",
+      "--free-energy-unit-label",
+      "eV",
+      "--confirm-parameters",
+      "--y-column",
+      "free_energy_converted",
+      "--title",
+      "Reviewed TI-only free energy",
+      "--grid"
+    ]
+  ],
+  "notes": [
+    "All numerical choices come from the confirmed config.",
+    "Convergence diagnostics remain screening outputs; review plots or CSV summaries and do not treat suggested cutoffs as proof of equilibration.",
+    "Plot-only mode visualizes existing CSV files; it does not approve convergence, TI choices, TST state selection, or rates."
+  ]
+}

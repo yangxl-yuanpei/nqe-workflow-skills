@@ -612,7 +612,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         mean_force = out / "mean_force_table.csv"
         free_energy = out / "free_energy_profile.csv"
     rates = out / "tst_rates.csv"
-    summary = out / "summary.json"
+    summary = out / ("plot_summary.json" if stop_after == "plot" else "summary.json")
     if stop_after == "plot":
         unlink_outputs([summary], args.dry_run)
     else:

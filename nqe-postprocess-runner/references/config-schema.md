@@ -113,6 +113,7 @@ Plot-only mode:
 - `free_energy_plot_unit_label`: confirmed plotted free-energy unit label. Required when `plot_free_energy: true`.
 - `mean_force_plot_output`, `free_energy_plot_output`: optional output image paths. If omitted, the runner writes `mean_force.png` and `free_energy.png` under `output_dir`.
 - Optional style fields use the prefixes `mean_force_plot_` or `free_energy_plot_`: `xlabel`, `ylabel`, `title`, `width`, `height`, `dpi`, `linewidth`, `markersize`, and `grid`.
+- The runner writes `plot_summary.json` in `output_dir` by default, so plot-only provenance does not overwrite an existing postprocessing `summary.json`.
 - Plot-only mode is visualization only. It does not certify convergence, approve TI conventions, choose TST states, or compute rates.
 
 TST:

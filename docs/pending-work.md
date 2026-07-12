@@ -23,7 +23,7 @@ This file tracks work that remains after the current repository consistency pass
 - The staged runner outputs have been reviewed in `tests/real_case_records/2026-07-11_demo_runner_output_review.md`, including corrected convergence plots and discard sensitivity for `0.0` and `1.8`.
 - A separate per-window discard fixture exists at `tests/runner_configs/demo_multi_window_candidate_skiprows.yaml` with `tests/runner_configs/demo_multi_window_candidate_skiprows.csv`. The user accepted `10000` discarded rows for `0.0` and `1.8` in this demo review only; production use still requires direct convergence plot/CSV review.
 - A guarded TI-only fixture exists at `tests/runner_configs/demo_multi_window_reviewed_ti_only.yaml`; its execution record is `tests/real_case_records/2026-07-11_reviewed_ti_only_record.md`.
-- A plot-only fixture exists at `tests/runner_configs/demo_multi_window_plot_only.yaml`; it verifies command generation from reviewed CSV outputs without rerunning extraction, integration, or TST.
+- A plot-only fixture exists at `tests/runner_configs/demo_multi_window_plot_only.yaml`; it verifies command generation and execution from reviewed CSV outputs without rerunning extraction, integration, or TST. The execution record is `tests/real_case_records/2026-07-12_plot_only_execution_record.md`.
 - Real-case test records are indexed by `tests/real_case_records/MANIFEST.md`. Duplicate convergence CSV attachments and non-representative per-window PNG plots have been pruned; canonical summaries, final outputs, and representative plots remain.
 
 ## 1. Failure-Case References

@@ -73,7 +73,7 @@ When the user asks an agent to run this postprocessing workflow:
 - If the user later confirms TI choices, create a separate `stop_after: integration` config or clearly update the existing config, then dry-run again before execution. Do not proceed from a generic postprocessing request directly to integration or TST.
 - If the user only wants plots from existing `mean_force_table.csv` or `free_energy_profile.csv`, use `stop_after: plot`. Require explicit existing CSV paths, dataset label, `plot_rc_order`, y-column choices, and unit labels. Do not rerun extraction/integration or fill fake TST fields just to reach plotting.
 - If the dry-run output is surprising, stop and ask the user whether to edit the config.
-- After a real run, summarize `summary.json` when present, list generated CSV/plot files, and report selected reactant and transition-state coordinates from the TST output when `compute_tst: true`.
+- After a real run, summarize `summary.json` when present. For `stop_after: plot`, summarize `plot_summary.json` instead. List generated CSV/plot files, and report selected reactant and transition-state coordinates from the TST output when `compute_tst: true`.
 - Do not proceed from dry-run to real execution silently in the same response unless the user explicitly requested that behavior and the config is complete.
 
 ## Script
@@ -86,7 +86,7 @@ When the user asks an agent to run this postprocessing workflow:
 - call `ti-tst-rate/scripts/integrate_free_energy.py`
 - optionally call `plot_mean_force.py` and `plot_free_energy.py`
 - optionally call `compute_tst_rates.py`
-- write `summary.json`
+- write `summary.json`, or `plot_summary.json` for `stop_after: plot`
 
 The `stop_after` config field can intentionally stop at `convergence`, `extraction`, or `integration` so the runner does not require or generate later-stage commands before those physical choices are confirmed. `stop_after: plot` is a separate plot-only mode for already generated CSV files.
 

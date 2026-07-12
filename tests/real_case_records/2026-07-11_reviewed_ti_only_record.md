@@ -70,6 +70,8 @@ python ti-tst-rate/scripts/plot_free_energy.py \
 
 This plotting step is allowed after the integration convention, selected dataset, RC order, y-column, and unit label are confirmed. It is a visualization artifact only and does not approve TST state selection or rate calculation.
 
+Additional plot-only runner execution is recorded in `tests/real_case_records/2026-07-12_plot_only_execution_record.md`. That run uses the already generated CSV outputs and writes separate `mean_force_plot_only.png`, `free_energy_plot_only.png`, and `plot_summary.json` artifacts without modifying the original TI-only `summary.json`.
+
 ## Review Before TST
 
 Before any TST or rate calculation, the user must still confirm:

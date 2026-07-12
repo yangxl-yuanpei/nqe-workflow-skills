@@ -10,6 +10,7 @@ This directory stores compact evidence from real or semi-real script checks. It 
 - `2026-07-11_demo_runner_output_review.md`: manual review of the staged runner outputs, convergence summaries, selected diagnostic plots, and discard sensitivity.
 - `2026-07-11_reviewed_skiprows_execution_record.md`: reviewed per-window extraction record with user-accepted demo-only discard for `0.0` and `1.8`.
 - `2026-07-11_reviewed_ti_only_record.md`: guarded TI-only record after user-confirmed integration direction, zero reference, unit conversion, and mean-force sign convention.
+- `2026-07-12_plot_only_execution_record.md`: plot-only runner execution record for already reviewed mean-force and free-energy CSV outputs.
 
 ## Retained Attachments
 
@@ -19,6 +20,7 @@ This directory stores compact evidence from real or semi-real script checks. It 
 - `2026-07-10_demo_runner_dry_run/convergence/1.8.png`: representative plot for initial RC-adjustment review.
 - `2026-07-11_candidate_skiprows/output/*`: reviewed extraction output for the per-window discard fixture.
 - `2026-07-11_reviewed_ti_only/output/*`: reviewed TI-only output, including `free_energy_profile.png`.
+- `2026-07-11_reviewed_ti_only/output/mean_force_plot_only.png`, `free_energy_plot_only.png`, and `plot_summary.json`: plot-only outputs generated without rerunning extraction, integration, or TST.
 
 ## Pruned Attachments
 
