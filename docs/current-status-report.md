@@ -48,6 +48,7 @@ initial DFT-labeled dataset
 - Recorded fresh-agent and smoke batches currently pass: Batch A/B minimal smoke and failure prompts, Batch C changed-skill deep tests, Batch D script-interface smoke, and the targeted dpdata/TI/TST/runner retest.
 - Script-level checks on 2026-07-10 passed for Python syntax across all 14 helper scripts, runner positive dry-run, runner implicit-default refusal, and `check_chmc_window.py --print-defaults`.
 - The targeted runner preflight fresh-agent record is `tests/fresh_agent_records/2026-07-10_runner-preflight-targeted_opencode.md`. It passed for implicit-default refusal, `format: auto` refusal, TST default refusal, missing convergence columns, and bundled-config boundary behavior.
+- The targeted runner plot-only fresh-agent record is `tests/fresh_agent_records/2026-07-12_runner-plot-only-targeted_subagent.md`. It passed for using `stop_after: plot`, asking for explicit existing CSV paths and plotting choices, and refusing extraction, integration, and TST.
 - The real-data runner staged execution record is `tests/real_case_records/2026-07-10_demo_runner_dry_run_record.md`. It validates dry-run plus real execution through convergence CSV summaries and mean-force extraction on the 13-window `../demo` dataset with explicit table columns and no TI/TST commands.
 - The real-data runner output review is `tests/real_case_records/2026-07-11_demo_runner_output_review.md`. It records plot-axis correction, output completeness, TI-handoff risks, and discard sensitivity for windows `0.0` and `1.8`.
 - A candidate per-window discard dry-run fixture exists at `tests/runner_configs/demo_multi_window_candidate_skiprows.yaml`, with its CSV override in `tests/runner_configs/demo_multi_window_candidate_skiprows.csv`. This is for command review and sensitivity testing only, not a production discard policy.
@@ -92,7 +93,7 @@ Script output remains diagnostic or post-processing output. It is not proof of p
 ## Highest-Priority Next Work
 
 1. Review the guarded TI-only free-energy profile before any TST handoff, especially the zero convention, reactant/transition-state definition, free-energy column/unit, temperature, and prefactor model.
-2. Continue deeper fresh-agent tests for runner config/failure behavior beyond the targeted preflight pass, especially missing windows, bad columns, unexpected dry-run commands, child-script failures, `stop_after`, `convergence_plot`, and `per_window_skiprows_file`.
+2. Continue deeper fresh-agent tests for runner config/failure behavior beyond the targeted preflight and plot-only passes, especially missing windows, bad columns, unexpected dry-run commands, child-script failures, `stop_after`, `convergence_plot`, `stop_after: plot`, and `per_window_skiprows_file`.
 3. Keep dpdata repeatable checks deferred until an environment with dpdata is available; the skill, README example, and populated failure reference already cover the teaching/checking boundary.
 4. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
 5. Keep README, quickstart, testing guide, status report, and pending-work documents synchronized after every script or skill change.
