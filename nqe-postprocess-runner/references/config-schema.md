@@ -10,6 +10,7 @@ Required guardrail:
 - Set `parameters_confirmed: true` only after every included parameter has been explicitly approved by the user or copied from a user-provided config.
 - Use `parameters_confirmed: false` for drafts, examples, or partially filled configs.
 - `parameters_confirmed: true` is necessary but not sufficient. The runner also refuses runnable configs that still rely on implicit parser, column, unit, integration, state-selection, temperature, or prefactor defaults.
+- Optional fields with documented defaults may be omitted. If an optional field is written explicitly in a runnable config, it is still a config parameter and must be user-confirmed or copied from a user-provided config.
 
 Before outputting a runnable YAML and before setting `parameters_confirmed: true`, the user must confirm every applicable parameter:
 
@@ -34,7 +35,7 @@ Window discovery:
 - `dataset_label`: label written to output CSVs.
 - `output_dir`: output directory. Default: `nqe-postprocess-output`.
 - `stop_after`: optional stage boundary, one of `convergence`, `extraction`, `integration`, `plot`, or `all`. Default: `all`.
-- Directories discovered during workspace inspection are candidates only. Do not silently promote a discovered directory such as `demo/` or `results/` to `sampling_output_root`; ask the user to confirm the intended root before writing a runnable config or running commands.
+- Directories discovered during workspace inspection are candidates only. Do not silently promote a discovered directory such as `demo/` or `results/` to `sampling_output_root`; ask the user to confirm the intended root before writing a runnable config or running commands. Do not describe a discovered candidate as the user's dataset until the user confirms it.
 
 Stage boundary:
 
@@ -45,7 +46,7 @@ Stage boundary:
 - `stop_after: all` preserves the full runner behavior and requires explicit plot and TST choices.
 - For broad user requests such as "postprocess this batch", do not infer a full pipeline. Default to `stop_after: convergence` or `stop_after: extraction` until the user separately confirms integration direction, zero reference, unit conversion, and mean-force sign convention.
 - When asking for `sampling_output_root`, state the intended first stop stage and the downstream confirmation gates. Do not ask for the path as if it were enough to authorize TI or TST.
-- If candidate directories are found before the user confirms `sampling_output_root`, list them as candidates and ask which one is intended. Discovery is not confirmation.
+- If candidate directories are found before the user confirms `sampling_output_root`, list them as candidates and ask which one is intended. Discovery is not confirmation; a bundled `demo/` or previous real-case record is not the user's new batch just because it exists in the repository.
 
 Optional convergence screening before TI:
 
@@ -111,6 +112,7 @@ Plot-only mode:
 - `mean_force_y_column`: confirmed mean-force column to plot, for example `mean_force_au`. Required when `plot_mean_force: true`.
 - `free_energy_y_column`: confirmed free-energy column to plot, for example `free_energy_converted`. Required when `plot_free_energy: true`.
 - `free_energy_plot_unit_label`: confirmed plotted free-energy unit label. Required when `plot_free_energy: true`.
+- Observed CSV headers and unit-label columns are candidates only. They can help form a checklist, but they do not authorize setting `parameters_confirmed: true` unless the user explicitly confirms the selected y-columns, plotted unit label, and `plot_rc_order`, or those values are copied from a user-provided config.
 - `mean_force_plot_output`, `free_energy_plot_output`: optional output image paths. If omitted, the runner writes `mean_force.png` and `free_energy.png` under `output_dir`.
 - Optional style fields use the prefixes `mean_force_plot_` or `free_energy_plot_`: `xlabel`, `ylabel`, `title`, `width`, `height`, `dpi`, `linewidth`, `markersize`, and `grid`.
 - The runner writes `plot_summary.json` in `output_dir` by default, so plot-only provenance does not overwrite an existing postprocessing `summary.json`.
@@ -130,6 +132,9 @@ TST:
 - `prefactor_model`: `kBT_over_h`, `custom_numeric`, or `adsorption_flux_n_v_S`.
 - `prefactor_units`: required when `compute_tst` is true.
 - `prefactor_value`, `density`, `mean_speed`, `site_area`: required only for matching prefactor models.
+- If the user says to use "defaults", do not mark TST choices as confirmed, even if the prompt also mentions candidate values such as `free_energy_converted`, `min`, `max`, or `kBT_over_h`. These are proposed settings until the user confirms their physical meaning and units.
+- `reactant_mode: min` and `ts_mode: max` are mathematical selections from the profile, not automatic identification of the physical reactant and transition state. Require user confirmation that those selections match the intended elementary step.
+- `kBT_over_h` is an allowed prefactor model, not a universal default. Require confirmation that it is appropriate for the elementary step and that the rate units are correct.
 
 Optional:
 
@@ -145,12 +150,13 @@ Agent execution rule:
 3. Refuse dry-run and real execution if required explicit fields are missing, if `format: auto` is used, if placeholders remain, or if `parameters_confirmed` is not true.
 4. If the user only asks generally to postprocess sampling results, stop at convergence or extraction unless TI choices are explicitly confirmed. If the user only asks to plot already generated CSV outputs, use `stop_after: plot` rather than rerunning extraction or integration.
 5. If more path information is needed, ask for `sampling_output_root` while also explaining the staged stop point and the TI/TST confirmations that are still missing.
-6. If local inspection finds plausible directories, treat them as candidates and ask the user to confirm the intended `sampling_output_root`; do not choose a candidate silently.
+6. If local inspection finds plausible directories, treat them as candidates and ask the user to confirm the intended `sampling_output_root`; do not choose a candidate silently and do not rank which candidate is "probably" the real dataset.
 7. Before proposing `format: phy_quant`, verify or ask the user to confirm that every included window has reliable compatible headers. Otherwise require explicit table column indices.
 8. Before proposing any nonzero `skiprows`, state that it discards numeric data rows, not headers, and require user approval of the discard length.
-9. Run the runner with `--dry-run` first.
-10. Ask for user confirmation if the dry-run commands reveal unexpected paths, units, ordering, convergence columns, state selection, temperature, or prefactor.
-11. Run without `--dry-run` only after the dry-run is accepted.
+9. If a TST request includes the word "default", respond with a confirmation checklist rather than a runnable config. Mentioned min/max/free-energy-column/prefactor choices are candidates only until explicitly confirmed.
+10. Run the runner with `--dry-run` first.
+11. Ask for user confirmation if the dry-run commands reveal unexpected paths, units, ordering, convergence columns, state selection, temperature, or prefactor.
+12. Run without `--dry-run` only after the dry-run is accepted.
 
 Per-window discard boundary:
 

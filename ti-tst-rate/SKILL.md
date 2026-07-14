@@ -80,7 +80,7 @@ Use this skill for the thermodynamic-integration and transition-state-theory sta
 
 Use the scripts according to their stage boundaries: `extract_mean_force.py` and `integrate_free_energy.py` handle the TI preprocessing/integration layer; `compute_tst_rates.py` computes one elementary TST rate only after a free-energy barrier or validated `free_energy_profile.csv` is available; plotting scripts only visualize prepared tables. None of these scripts runs KMC or certifies production readiness.
 
-If a prompt asks to use defaults without questions, refuse to run commands and explain which confirmations are missing. Defaults shown by scripts are interface conveniences and smoke-test settings, not project-approved physical parameters.
+If a prompt asks to use defaults without questions, refuse to run commands and explain which confirmations are missing. Defaults shown by scripts are interface conveniences and smoke-test settings, not project-approved physical parameters. If the user mentions candidate values while still asking for defaults, such as `free_energy_converted`, `min`, `max`, or `kBT_over_h`, treat them as proposed settings to confirm, not as already approved physical choices.
 
 ### Extract One Mean-Force Row
 
@@ -152,7 +152,7 @@ Before running this script, remind the user that barrier extraction is a physica
 - which free-energy column and unit to use, especially `free_energy_au` versus `free_energy_converted`
 - temperature, elementary-step identity, prefactor model, prefactor units, and whether the rate is intended for KMC
 
-Default barrier extraction is `--reactant-mode first --ts-mode max`: the first filtered free-energy point is treated as the reactant/reference state and the highest free-energy point is treated as the transition state. Do not present this as automatic physical identification.
+Default barrier extraction is `--reactant-mode first --ts-mode max`: the first filtered free-energy point is treated as the reactant/reference state and the highest free-energy point is treated as the transition state. Do not present this as automatic physical identification. Likewise, user-proposed `reactant_mode: min` and `ts_mode: max` are mathematical selections from the profile until the user confirms that they correspond to the physical reactant/reference state and transition state for the elementary step.
 
 Example using a profile, the first point as reactant, the maximum as transition state, and the original/simple `kBT_over_h` prefactor:
 
@@ -186,7 +186,7 @@ Example using a hydrogen adsorption prefactor `n v S`:
       --prefactor-units TODO_USER_APPROVAL_UNITS \
       --confirm-parameters
 
-Confirm before running: elementary-step identity, reactant/reference state, transition-state choice, free-energy unit, temperature, prefactor model, prefactor units, and whether the resulting rate is the correct input for KMC. Default barrier extraction treats the initial state as the first free-energy point and the transition state as the highest free-energy point. After computing or proposing a TST rate, report the selected reactant RC and transition-state RC to the user and ask whether they confirm or need to modify the state selection. If the user wants to modify the initial/final state selection, ask whether the free-energy integration direction and zero reference should be checked first.
+Confirm before running: elementary-step identity, reactant/reference state, transition-state choice, free-energy unit, temperature, prefactor model, prefactor units, and whether the resulting rate is the correct input for KMC. Default barrier extraction treats the initial state as the first free-energy point and the transition state as the highest free-energy point. `kBT_over_h` is an allowed original/simple TST prefactor model, not a universal default; require the user to confirm its applicability and units for the elementary step. After computing or proposing a TST rate, report the selected reactant RC and transition-state RC to the user and ask whether they confirm or need to modify the state selection. If the user wants to modify the initial/final state selection, ask whether the free-energy integration direction and zero reference should be checked first.
 ### Plot Mean Force And Free Energy
 
 Use `scripts/plot_mean_force.py` to plot `MeanForce` versus reaction coordinate from one or more `mean_force_table.csv` files. Use `scripts/plot_free_energy.py` to plot free energy versus reaction coordinate from one or more `free_energy_profile.csv` files.

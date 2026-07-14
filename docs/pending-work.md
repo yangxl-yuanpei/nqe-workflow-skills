@@ -17,6 +17,7 @@ This file tracks work that remains after the current repository consistency pass
 - A runner negative smoke fixture exists at `tests/runner_configs/postprocess_missing_defaults.yaml`; it is expected to fail and verifies implicit-default refusal.
 - A targeted runner preflight fresh-agent record exists at `tests/fresh_agent_records/2026-07-10_runner-preflight-targeted_opencode.md`; it passed the current implicit-default and bundled-config boundary prompts.
 - A targeted runner plot-only fresh-agent record exists at `tests/fresh_agent_records/2026-07-12_runner-plot-only-targeted_subagent.md`; it passed the current existing-CSV plotting boundary prompt.
+- A targeted runner/TI-TST boundary retest exists at `tests/fresh_agent_records/2026-07-14_runner-ti-tst-boundary-retest_opencode.md`; it passed candidate-path handling, optional `output_dir` omission, plot-only-to-default-TST refusal, and path-confirmation-versus-TI/TST-approval prompts.
 - A user-confirmed local dpdata mini example exists outside the repository at `../00` for labeled `abacus/scf -> deepmd/npy` inspection/comparison boundaries. It is documented in `dpdata-format-conversion/README.md` and is not a reusable production default.
 - A real 13-window CHMC/CPIHMC-style dataset exists outside the repository at `../demo`; summaries and diagnostics are recorded under `tests/real_case_records/2026-07-03_demo_multi_window*`.
 - A runner staged fixture for `../demo` exists at `tests/runner_configs/demo_multi_window_dry_run.yaml`; the record is `tests/real_case_records/2026-07-10_demo_runner_dry_run_record.md`. It has been dry-run and executed through convergence CSV summaries plus mean-force extraction, without TI/TST.
@@ -125,7 +126,7 @@ Implementation boundary:
 
 ## 7. Fresh-Agent Test Records
 
-Manual prompts are available, and the recommended procedure is documented in `docs/fresh-agent-testing.md`. Recorded baseline fresh-agent and script-smoke batches pass. Future records should focus on newly changed behavior, deeper failure-driven prompts, and real-data workflow checks.
+Manual prompts are available, and the recommended procedure is documented in `docs/fresh-agent-testing.md`. Recorded baseline fresh-agent, script-smoke, and targeted runner/TI-TST boundary batches pass. Future records should focus on newly changed behavior, deeper failure-driven prompts, and real-data workflow checks.
 
 Recommended record fields:
 
@@ -144,7 +145,7 @@ Use `tests/fresh_agent_record_template.md` as the copyable record template.
 
 Highest-priority fresh-agent sections:
 
-- `nqe-postprocess-runner` config/failure behavior beyond the current preflight and plot-only targeted passes
+- `nqe-postprocess-runner` config/failure behavior beyond the current preflight, plot-only, and 2026-07-14 boundary targeted passes
 - `chmc-cpihmc-sampling` only after further script/reference changes
 - `ti-tst-rate` deeper prompts beyond the no-defaults retest
 - `dpdata-format-conversion` only when adding new executable checks or changing the anti-guessing/reference behavior

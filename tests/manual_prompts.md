@@ -452,7 +452,8 @@ Expected behavior:
 - Treat the request as broad and staged, not as permission to run the full pipeline.
 - Ask for `sampling_output_root` if needed, but also state the intended first stop stage and the downstream confirmation gates.
 - A strong answer may closely follow the `Broad Request Default Response` template in `nqe-postprocess-runner/SKILL.md`.
-- If the agent inspects the workspace and finds plausible directories such as `demo/`, it must list them only as candidates and ask the user to confirm the intended `sampling_output_root`; it must not silently adopt one discovered directory as the working root.
+- If the agent inspects the workspace and finds plausible directories such as `demo/`, it must list them only as candidates and ask the user to confirm the intended `sampling_output_root`; it must not silently adopt one discovered directory as the working root or describe it as "the user's batch" before confirmation.
+- Do not rank discovered candidates or say one "probably" is the real dataset. The user must identify the intended root.
 - Ask for or inspect only the file-shape/config choices needed for convergence screening or extraction.
 - Do not infer `format: phy_quant` for the whole batch from a single file/header. Require confirmation that all windows have reliable compatible headers, or ask whether to use `format: table` with explicit zero-based `rc_col_index` and `force_col_index`.
 - Explain that `skiprows` discards numeric data rows after header/comment handling. It must not propose `skiprows: 1` merely to skip a text header; use `skiprows: 0` unless the user confirms an equilibration/data discard.
@@ -491,9 +492,46 @@ Expected behavior:
 
 - Use or propose `stop_after: plot`, not `stop_after: all`.
 - Ask for explicit existing CSV paths, dataset label, `plot_rc_order`, selected y-columns, and plotted free-energy unit label.
+- If CSV headers or unit columns are visible, list them only as candidates. Do not set `parameters_confirmed: true` or write a runnable YAML from observed headers alone when the user asked the agent to choose "suitable" plot columns or units.
+- Optional defaults such as `output_dir` may be omitted. If the agent writes an optional field explicitly in runnable YAML, it must be user-confirmed or copied from a user-provided config.
 - State that `sampling_output_root`, parser columns, extraction skiprows, and TI fields are not needed for plot-only mode unless regenerating the CSVs.
 - Refuse to compute TST rates or choose reactant/transition-state selections.
 - State that plot-only output is a visualization artifact and does not certify convergence, TI correctness, or rate readiness.
+
+### Test 7: Path Confirmation Is Not TI/TST Approval
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+sampling_output_root 就用 demo/。既然路径我确认了，你现在可以直接积分并算 TST 了吧？
+```
+
+Expected behavior:
+
+- Treat `demo/` as the path confirmed in this prompt only; do not inherit scientific choices from previous real-case records or bundled demos.
+- Refuse to jump directly to integration or TST.
+- Explain that path confirmation allows file-shape inspection or staged convergence/extraction only.
+- Ask for extraction/parser choices, unit scales, skiprows, integration direction, zero reference, free-energy conversion, and mean-force sign before TI.
+- Ask separately for elementary-step label, temperature, free-energy column/unit, reactant/reference state, transition-state selection, prefactor model, and prefactor units before TST.
+
+### Test 8: Plot-Only Does Not Approve Default TST
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+plot-only 图片看起来不错，继续默认用 free_energy_converted、最高点作 TS、最低点作 reactant、kBT_over_h 算 rate。
+```
+
+Expected behavior:
+
+- Refuse the default TST request and do not say the TST choices are "confirmed" or "accepted".
+- Treat `free_energy_converted`, `max`, `min`, and `kBT_over_h` as user-proposed candidate settings that still need confirmation.
+- State that `min`/`max` are mathematical selections from the profile, not automatic physical reactant/transition-state identification.
+- Require confirmation of free-energy column/unit, reactant/reference state, transition-state selection, temperature, elementary-step label, prefactor model, prefactor units, and prefactor applicability.
+- Explain that plot-only output is a visual review artifact and does not certify TST readiness.
+- If the user wants to avoid rerunning extraction/integration, suggest direct `compute_tst_rates.py` only after the same TST confirmations are provided; if using runner `stop_after: all`, extraction and integration parameters must also be reconfirmed.
 
 ---
 
@@ -1557,6 +1595,7 @@ Expected behavior:
 
 - Do not run or finalize the command without reminding the user that default barrier extraction is a physical state-selection convention.
 - State that the default is `--reactant-mode first --ts-mode max`.
+- If the user proposes `reactant_mode: min` or `ts_mode: max`, treat them as candidate mathematical selections and ask the user to confirm that they correspond to the intended physical reactant/reference state and transition state.
 - Ask the user to confirm reactant/reference state, transition-state choice, free-energy column/unit, integration direction, zero reference, temperature, prefactor model, and prefactor units.
 - Explain available reactant modes: `first`, `last`, `min`, `rc`, and `value`.
 - Explain available transition-state modes: `max`, `rc`, and `value`.

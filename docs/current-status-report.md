@@ -49,6 +49,7 @@ initial DFT-labeled dataset
 - Script-level checks on 2026-07-10 passed for Python syntax across all 14 helper scripts, runner positive dry-run, runner implicit-default refusal, and `check_chmc_window.py --print-defaults`.
 - The targeted runner preflight fresh-agent record is `tests/fresh_agent_records/2026-07-10_runner-preflight-targeted_opencode.md`. It passed for implicit-default refusal, `format: auto` refusal, TST default refusal, missing convergence columns, and bundled-config boundary behavior.
 - The targeted runner plot-only fresh-agent record is `tests/fresh_agent_records/2026-07-12_runner-plot-only-targeted_subagent.md`. It passed for using `stop_after: plot`, asking for explicit existing CSV paths and plotting choices, and refusing extraction, integration, and TST.
+- The targeted runner/TI-TST boundary retest is `tests/fresh_agent_records/2026-07-14_runner-ti-tst-boundary-retest_opencode.md`. It passed for candidate-path handling, optional `output_dir` omission, plot-only-to-default-TST refusal, and the rule that path confirmation is not TI/TST approval.
 - The real-data runner staged execution record is `tests/real_case_records/2026-07-10_demo_runner_dry_run_record.md`. It validates dry-run plus real execution through convergence CSV summaries and mean-force extraction on the 13-window `../demo` dataset with explicit table columns and no TI/TST commands.
 - The real-data runner output review is `tests/real_case_records/2026-07-11_demo_runner_output_review.md`. It records plot-axis correction, output completeness, TI-handoff risks, and discard sensitivity for windows `0.0` and `1.8`.
 - A candidate per-window discard dry-run fixture exists at `tests/runner_configs/demo_multi_window_candidate_skiprows.yaml`, with its CSV override in `tests/runner_configs/demo_multi_window_candidate_skiprows.csv`. This is for command review and sensitivity testing only, not a production discard policy.
@@ -63,9 +64,9 @@ initial DFT-labeled dataset
 ## Current Gaps
 
 - `1/9` failure-case reference file is still a placeholder: `kmc-h2-efficiency/references/kmc-failure-cases.md`. `abacus-dft-labeling/references/abacus-failure-cases.md`, `chmc-cpihmc-sampling/references/chmc-cpihmc-failure-cases.md`, `ti-tst-rate/references/ti-tst-failure-cases.md`, `dpdata-format-conversion/references/dpdata-failure-cases.md`, `nqe-postprocess-runner/references/postprocess-runner-failure-cases.md`, `deepmd-training/references/deepmd-failure-cases.md`, `dpgen-active-learning/references/dpgen-failure-cases.md`, and `lammps-exploration/references/lammps-failure-cases.md` currently contain populated cases.
-- Recorded fresh-agent batches pass, but deeper failure-driven and real-data validation remains incomplete. Do not claim production readiness or exhaustive test coverage.
+- Recorded fresh-agent batches pass, including the latest targeted runner/TI-TST boundary retest, but deeper failure-driven and real-data validation remains incomplete. Do not claim production readiness or exhaustive test coverage.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped `param.json`, `machine.json`, and README files. It is not a real DP-GEN production example.
-- `nqe-postprocess-runner` is still experimental because it needs deeper fresh-agent behavior tests for config/failure cases and a user-approved guarded TI-only review after convergence/extraction, not because basic staged execution is missing.
+- `nqe-postprocess-runner` is still experimental because it needs deeper fresh-agent behavior tests for missing windows, bad columns, child-command failures, unexpected dry-run commands, and per-window discard mistakes, not because basic staged execution or the latest path/plot/TST boundary checks are missing.
 - `kmc-h2-efficiency` is still teaching-ready because it lacks an executable schema checker for event networks and rate tables.
 - The repository still lacks target-system-specific production inputs, validated physical parameters, convergence evidence, and provenance records.
 
@@ -93,7 +94,7 @@ Script output remains diagnostic or post-processing output. It is not proof of p
 ## Highest-Priority Next Work
 
 1. Review the guarded TI-only free-energy profile before any TST handoff, especially the zero convention, reactant/transition-state definition, free-energy column/unit, temperature, and prefactor model.
-2. Continue deeper fresh-agent tests for runner config/failure behavior beyond the targeted preflight and plot-only passes, especially missing windows, bad columns, unexpected dry-run commands, child-script failures, `stop_after`, `convergence_plot`, `stop_after: plot`, and `per_window_skiprows_file`.
+2. Continue deeper fresh-agent tests for runner config/failure behavior beyond the targeted preflight, plot-only, and 2026-07-14 boundary passes, especially missing windows, bad columns, unexpected dry-run commands, child-script failures, `stop_after`, `convergence_plot`, and `per_window_skiprows_file`.
 3. Keep dpdata repeatable checks deferred until an environment with dpdata is available; the skill, README example, and populated failure reference already cover the teaching/checking boundary.
 4. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
 5. Keep README, quickstart, testing guide, status report, and pending-work documents synchronized after every script or skill change.
