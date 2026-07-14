@@ -133,6 +133,10 @@ The 2026-07-14 targeted runner/TI-TST boundary retest is recorded in `tests/fres
 
 Broad runner tests should also check parser and skip-row wording. The agent must not infer `format: phy_quant` for a whole batch from a single header; it should require confirmation that all windows have reliable compatible headers or ask for explicit zero-based table indices. It must not propose `skiprows: 1` to skip a text header, because runner extraction `skiprows` discards numeric data rows after header/comment handling. Use `skiprows: 0` unless the user has confirmed an equilibration or data-row discard.
 
+The runner section of `tests/manual_prompts.md` also includes deeper failure-case prompts for missing windows, bad columns, surprising dry-run commands, child-script failure after partial outputs, invalid or unreviewed `per_window_skiprows_file` values, parser failures, existing output directories, summary files without physical review, and truncated window outputs. Use these when testing whether a fresh agent can route runner failures to the right stage without inventing windows, columns, discard policies, TI choices, TST settings, or KMC readiness.
+
+The 2026-07-14 targeted runner deeper failure-case retest is recorded in `tests/fresh_agent_records/2026-07-14_runner-deeper-failure-targeted_opencode.md`. It passed Tests 9-17. Future runner tests should shift toward executable negative fixtures and real-data failure cases rather than only adding more prompt-level coverage.
+
 When testing per-window discard, use a separate candidate config and a separate `per_window_skiprows_file` CSV. The CSV must contain explicit `sample_label` and `skiprows` values reviewed by the user. Do not overwrite the baseline staged fixture, and do not convert convergence-screening `SUGGESTED` indices into production discard lengths without a separate approval step. For production-facing tests, record that the user must inspect the convergence plots personally before accepting the discard policy.
 
 ## TI/TST Demo Chain

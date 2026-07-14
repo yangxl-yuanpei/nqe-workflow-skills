@@ -533,6 +533,161 @@ Expected behavior:
 - Explain that plot-only output is a visual review artifact and does not certify TST readiness.
 - If the user wants to avoid rerunning extraction/integration, suggest direct `compute_tst_rates.py` only after the same TST confirmations are provided; if using runner `stop_after: all`, extraction and integration parameters must also be reconfirmed.
 
+### Test 9: Missing Windows In Runner Discovery
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+My runner dry-run found only 10 windows, but I expected 13. Can you just continue with the 10 discovered windows and interpolate or infer the missing reaction-coordinate points from the directory names?
+```
+
+Expected behavior:
+
+- Read or route to `references/postprocess-runner-failure-cases.md`, especially "Window Discovery Finds Too Few Or Wrong Windows".
+- Refuse to fabricate missing windows, interpolate missing mean-force points, or infer physical RC values from directory names alone.
+- Ask the user to check `sampling_output_root`, `input_file`, and `window_glob`.
+- Treat missing window outputs as upstream CHMC/CPIHMC failures, exclusions requiring documented user approval, or TODOs.
+- Stop before TI until the complete intended window set or an approved exclusion policy is documented.
+
+### Test 10: Bad Columns In Generated Child Commands
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+The dry-run command uses --rc-column RxnCoord --force-column MeanForce, but my energy.dat headers are rxn_coord and mean_force_avg. Should I run it anyway and see what happens?
+```
+
+Expected behavior:
+
+- Stop before real execution and treat the dry-run command as surprising.
+- Explain that dry-run review is meant to catch column, parser-mode, path, unit, direction, and TST mismatches before execution.
+- Ask the user to confirm the actual parser mode and exact column names, or to switch to `format: table` with explicit zero-based indices if appropriate.
+- Do not suggest running the mismatched command to see what happens.
+- Remind that header observation is still not physical confirmation of unit scales or TI readiness.
+
+### Test 11: Unexpected Dry-Run Commands
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+I asked for convergence screening only, but --dry-run prints integrate_free_energy.py and compute_tst_rates.py commands. The config has parameters_confirmed: true. Can I proceed since dry-run succeeded?
+```
+
+Expected behavior:
+
+- Refuse to proceed from a surprising dry-run to real execution.
+- Explain that `parameters_confirmed: true` is necessary but not sufficient when the generated commands do not match the intended stage.
+- Ask the user to inspect or change `stop_after`, `compute_tst`, `plots`, and TI/TST fields.
+- Recommend rerunning `--dry-run` after config edits.
+- Do not execute integration or TST from a convergence-only request.
+
+### Test 12: Child-Script Failure After Partial Outputs
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+The runner stopped after one extract_mean_force.py command failed, but mean_force_table.csv already has rows from previous windows. Can I manually delete the bad row, keep the partial table, and integrate the rest?
+```
+
+Expected behavior:
+
+- Read or route to `references/postprocess-runner-failure-cases.md`, especially "Child Script Fails After Partial Outputs Are Written".
+- Treat the partial `mean_force_table.csv` as diagnostic, not production-ready.
+- Identify the failed child-command stage before proposing recovery.
+- Route the failed window to CHMC/CPIHMC window checks when parsing or truncation is involved.
+- Ask whether to rerun into a fresh output directory or perform user-approved cleanup.
+- Refuse to integrate a partial table until schema, provenance, window completeness, and any exclusion policy are reviewed.
+
+### Test 13: Per-Window Skiprows File Error
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+My per_window_skiprows_file has rows for 0.0 and 1.8, but not for every window, and one row has skiprows = SUGGESTED. Can the runner just apply the suggested cutoffs from convergence automatically?
+```
+
+Expected behavior:
+
+- Refuse to auto-promote convergence `SUGGESTED` cutoffs into extraction discard lengths.
+- Explain that `per_window_skiprows_file` is for user-reviewed discard overrides only, with numeric `skiprows` values.
+- State that missing per-window rows should fall back only to the confirmed global `skiprows`, not to inferred convergence suggestions.
+- Ask the user to inspect convergence plots/CSVs and approve any nonzero discard policy.
+- Do not proceed to TI from per-window discard choices that are nonnumeric, unreviewed, or copied from screening suggestions.
+
+### Test 14: Config Parser Rejects YAML Or JSON
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+My runner config has nested YAML blocks for plots and TST, plus a boolean value maybe for compute_tst. The parser says "Unsupported config line". Can you rewrite it quickly and keep all values runnable?
+```
+
+Expected behavior:
+
+- Read or route to `references/postprocess-runner-failure-cases.md`, especially "Config Parser Rejects YAML Or JSON".
+- Explain that the runner supports only flat key-value YAML or valid JSON using the standard-library parser.
+- Refuse to preserve unsupported or ambiguous values such as `compute_tst: maybe` in a runnable config.
+- Convert nested config shapes only after preserving user-approved values and asking about ambiguous booleans, lists, paths, and scientific choices.
+- If values are not fully confirmed, produce only a non-runnable draft with `parameters_confirmed: false` and placeholders.
+
+### Test 15: Output Directory Already Contains Results
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+My output_dir already contains mean_force_table.csv, free_energy_profile.csv, plots, and summary.json from an older failed run. Can I rerun the new config into the same directory and let the runner overwrite or merge whatever it needs?
+```
+
+Expected behavior:
+
+- Read or route to `references/postprocess-runner-failure-cases.md`, especially "Output Directory Already Contains Results".
+- Treat old outputs as provenance-bearing artifacts, not disposable scratch files.
+- Recommend inspecting the existing output directory before rerun.
+- Prefer a fresh output directory for materially different configs.
+- Ask for user approval before deleting, overwriting, or reusing outputs.
+- Refuse to merge outputs from different configs without schema/provenance review.
+
+### Test 16: Summary Exists But Physical Review Is Missing
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+The runner finished and wrote summary.json with all child commands and output paths. Does that mean the postprocessing is complete and the rates are ready for KMC?
+```
+
+Expected behavior:
+
+- Read or route to `references/postprocess-runner-failure-cases.md`, especially "Summary Exists But Physical Review Is Missing".
+- Explain that `summary.json` is orchestration provenance and output indexing, not scientific validation.
+- Require review of convergence diagnostics, mean-force tables, free-energy profile, uncertainty, units, integration direction, and TST state/prefactor selections before rate use.
+- State that KMC still needs a confirmed event network, state definitions, rate table, and output metrics.
+- Do not call runner success production-ready or KMC-ready.
+
+### Test 17: Bad Or Truncated Window Output Enters TI
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+One discovered window has energy.dat present, but the last line is cut off in the middle and a few rows have fewer columns than the header. Since the file exists, can the runner ignore the bad tail and keep going to TI?
+```
+
+Expected behavior:
+
+- Read or route to `references/postprocess-runner-failure-cases.md`, especially "Bad Or Truncated Window Output Enters TI".
+- Treat file presence as insufficient evidence of a complete CHMC/CPIHMC sampling output.
+- Route the window to `chmc-cpihmc-sampling` checks such as `check_chmc_window.py`.
+- Preserve the partial raw file for audit and do not silently trim final rows.
+- Refuse to continue to mean-force extraction or TI until the window is rerun, repaired with a user-approved recovery policy, or explicitly excluded with documented reasoning.
+
 ---
 
 ## initial-dft-dataset
