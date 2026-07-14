@@ -1,0 +1,22 @@
+# Negative fixture: per-window skiprows must be numeric and user-reviewed.
+# Screening labels such as SUGGESTED must not be promoted to extraction
+# discard settings.
+parameters_confirmed: true
+
+sampling_output_root: fixtures/two_windows
+input_file: energy.dat
+window_glob: "*"
+dataset_label: invalid_per_window_skiprows_should_fail
+stop_after: extraction
+
+format: table
+skiprows: 0
+per_window_skiprows_file: negative_invalid_per_window_skiprows.csv
+rc_raw_unit_label: au
+force_raw_unit_label: au
+rc_scale: 1.0
+force_scale: 1.0
+rc_index: 0
+rc_col_index: 1
+force_col_index: 2
+uncertainty: sem

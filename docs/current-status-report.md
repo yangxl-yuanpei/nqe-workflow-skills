@@ -1,6 +1,6 @@
 # NQE Workflow Skills Current Status Report
 
-Last updated: 2026-07-11
+Last updated: 2026-07-14
 
 ## Overall Status
 
@@ -51,6 +51,7 @@ initial DFT-labeled dataset
 - The targeted runner plot-only fresh-agent record is `tests/fresh_agent_records/2026-07-12_runner-plot-only-targeted_subagent.md`. It passed for using `stop_after: plot`, asking for explicit existing CSV paths and plotting choices, and refusing extraction, integration, and TST.
 - The targeted runner/TI-TST boundary retest is `tests/fresh_agent_records/2026-07-14_runner-ti-tst-boundary-retest_opencode.md`. It passed for candidate-path handling, optional `output_dir` omission, plot-only-to-default-TST refusal, and the rule that path confirmation is not TI/TST approval.
 - The targeted runner deeper failure-case retest is `tests/fresh_agent_records/2026-07-14_runner-deeper-failure-targeted_opencode.md`. It passed Tests 9-17 for missing windows, bad columns, unexpected dry-run commands, partial outputs, per-window skiprows errors, parser failures, existing output directories, summary-without-review, and truncated window outputs.
+- The first executable runner negative fixtures are now available under `tests/runner_configs/negative_*.yaml`. They are expected to fail and currently cover nested YAML rejection, invalid boolean rejection, missing-window discovery failure, and invalid `per_window_skiprows_file` values. The record is `tests/real_case_records/2026-07-14_runner_negative_fixtures_record.md`.
 - The real-data runner staged execution record is `tests/real_case_records/2026-07-10_demo_runner_dry_run_record.md`. It validates dry-run plus real execution through convergence CSV summaries and mean-force extraction on the 13-window `../demo` dataset with explicit table columns and no TI/TST commands.
 - The real-data runner output review is `tests/real_case_records/2026-07-11_demo_runner_output_review.md`. It records plot-axis correction, output completeness, TI-handoff risks, and discard sensitivity for windows `0.0` and `1.8`.
 - A candidate per-window discard dry-run fixture exists at `tests/runner_configs/demo_multi_window_candidate_skiprows.yaml`, with its CSV override in `tests/runner_configs/demo_multi_window_candidate_skiprows.csv`. This is for command review and sensitivity testing only, not a production discard policy.
@@ -67,7 +68,7 @@ initial DFT-labeled dataset
 - `1/9` failure-case reference file is still a placeholder: `kmc-h2-efficiency/references/kmc-failure-cases.md`. `abacus-dft-labeling/references/abacus-failure-cases.md`, `chmc-cpihmc-sampling/references/chmc-cpihmc-failure-cases.md`, `ti-tst-rate/references/ti-tst-failure-cases.md`, `dpdata-format-conversion/references/dpdata-failure-cases.md`, `nqe-postprocess-runner/references/postprocess-runner-failure-cases.md`, `deepmd-training/references/deepmd-failure-cases.md`, `dpgen-active-learning/references/dpgen-failure-cases.md`, and `lammps-exploration/references/lammps-failure-cases.md` currently contain populated cases.
 - Recorded fresh-agent batches pass, including the latest targeted runner/TI-TST boundary retest, but deeper failure-driven and real-data validation remains incomplete. Do not claim production readiness or exhaustive test coverage.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped `param.json`, `machine.json`, and README files. It is not a real DP-GEN production example.
-- `nqe-postprocess-runner` is still experimental because it needs executable negative fixtures and more real-data failure validation, not because basic staged execution, targeted fresh-agent failure routing, or the latest path/plot/TST boundary checks are missing.
+- `nqe-postprocess-runner` is still experimental because it needs deeper child-script and real-data failure validation, not because basic staged execution, targeted fresh-agent failure routing, executable parser/discovery/skiprows negative fixtures, or the latest path/plot/TST boundary checks are missing.
 - `kmc-h2-efficiency` is still teaching-ready because it lacks an executable schema checker for event networks and rate tables.
 - The repository still lacks target-system-specific production inputs, validated physical parameters, convergence evidence, and provenance records.
 
@@ -95,7 +96,7 @@ Script output remains diagnostic or post-processing output. It is not proof of p
 ## Highest-Priority Next Work
 
 1. Review the guarded TI-only free-energy profile before any TST handoff, especially the zero convention, reactant/transition-state definition, free-energy column/unit, temperature, and prefactor model.
-2. Add executable runner negative fixtures for missing windows, bad columns, unexpected dry-run commands, child-script failures, parser failures, output-directory reuse, and `per_window_skiprows_file` errors. Prompt coverage for these cases now exists and has a targeted fresh-agent pass record.
+2. Extend runner negative validation beyond the first executable fixtures, especially child-script failures, bad/truncated window outputs, output-directory reuse, and real-data failure recovery. Prompt coverage for these cases now exists and has a targeted fresh-agent pass record.
 3. Keep dpdata repeatable checks deferred until an environment with dpdata is available; the skill, README example, and populated failure reference already cover the teaching/checking boundary.
 4. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
 5. Keep README, quickstart, testing guide, status report, and pending-work documents synchronized after every script or skill change.

@@ -1,0 +1,13 @@
+# Negative fixture: the runner only supports flat key: value YAML or JSON.
+# This indented/nested block should be rejected by the config parser before
+# scientific preflight or command generation.
+parameters_confirmed: true
+stop_after: plot
+dataset_label: nested_yaml_should_fail
+plot_mean_force: true
+plot_free_energy: false
+plot_rc_order: ascending
+mean_force_table: dummy.csv
+mean_force_y_column: mean_force_au
+plot_style:
+  title: nested_yaml_is_not_supported

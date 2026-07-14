@@ -1,0 +1,21 @@
+# Negative fixture: discovery must find at least two windows containing the
+# confirmed input_file. A single present window is not enough for TI-style
+# post-processing.
+parameters_confirmed: true
+
+sampling_output_root: fixtures/one_window
+input_file: energy.dat
+window_glob: "*"
+dataset_label: missing_windows_should_fail
+stop_after: extraction
+
+format: table
+skiprows: 0
+rc_raw_unit_label: au
+force_raw_unit_label: au
+rc_scale: 1.0
+force_scale: 1.0
+rc_index: 0
+rc_col_index: 1
+force_col_index: 2
+uncertainty: sem

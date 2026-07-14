@@ -37,6 +37,11 @@ def parse_scalar(value: str) -> Any:
 def load_simple_yaml(path: Path) -> dict[str, Any]:
     config: dict[str, Any] = {}
     for line_number, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        if raw[:1].isspace() and raw.strip() and not raw.lstrip().startswith("#"):
+            raise ValueError(
+                f"Unsupported indented or nested config line {line_number}: {raw!r}. "
+                "Use flat key: value YAML or JSON only."
+            )
         line = raw.strip()
         if not line or line.startswith("#"):
             continue

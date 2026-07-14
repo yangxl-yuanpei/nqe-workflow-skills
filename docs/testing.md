@@ -84,6 +84,10 @@ python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py nqe-postprocess-
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py nqe-postprocess-runner/assets/config.convergence-screening.example.yaml --dry-run
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/demo_multi_window_plot_only.yaml --dry-run
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/postprocess_missing_defaults.yaml --dry-run
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_parser_nested.yaml --dry-run
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_invalid_bool.yaml --dry-run
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_missing_windows.yaml --dry-run
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_invalid_per_window_skiprows.yaml --dry-run
 ```
 
 These checks only confirm that minimal static checkers and script interfaces load and expose expected options. They do not validate convergence, parameter quality, or physical correctness. The CHMC/CPIHMC convergence helper reports screening diagnostics only; plot review and user-approved equilibration choices are still required.
@@ -94,6 +98,7 @@ The postprocess runner smoke test uses `--dry-run` so it checks config parsing, 
 The convergence-screening example extends this check by verifying that per-window `analyze_phy_quant_convergence.py` commands are generated before mean-force extraction, without treating suggested cutoffs as automatic TI discard lengths.
 The plot-only fixture verifies that `stop_after: plot` can generate plot commands from existing reviewed CSV files without rediscovering windows, re-extracting mean forces, reintegrating free energy, or running TST.
 The `postprocess_missing_defaults.yaml` check is expected to fail with a preflight error. It verifies that `parameters_confirmed: true` is not enough when parser mode, columns, units, TI zero reference, or TST/plot choices are still implicit.
+The `negative_*.yaml` runner fixtures are also expected to fail. They verify executable rejection of nested YAML, invalid boolean values, too few discovered windows, and non-numeric per-window skiprows such as `SUGGESTED`.
 
 ## Real-Data Diagnostic Records
 
@@ -109,6 +114,7 @@ Current records include:
 - `2026-07-11_candidate_skiprows_dry_run_record.md`: dry-run record for the candidate `per_window_skiprows_file` fixture. It verifies command generation only and does not approve a production discard policy.
 - `2026-07-11_reviewed_skiprows_execution_record.md`: executed reviewed demo extraction with user-accepted `10000`-row discard for windows `0.0` and `1.8`; not reusable as a production default.
 - `2026-07-11_reviewed_ti_only_record.md`: guarded TI-only execution using user-confirmed ascending integration, most-negative-RC endpoint zero, eV conversion, and `dF/dRC` mean-force sign. It does not approve TST.
+- `2026-07-14_runner_negative_fixtures_record.md`: executable negative-runner fixture record covering nested YAML rejection, invalid boolean rejection, missing-window discovery failure, and invalid per-window skiprows failure.
 
 Use these records to understand script behavior on real file shapes. Do not treat them as production convergence evidence or reusable physical defaults.
 

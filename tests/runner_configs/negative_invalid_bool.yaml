@@ -1,0 +1,28 @@
+# Negative fixture: boolean fields must be explicit true/false values.
+# compute_tst: maybe should be rejected instead of guessed.
+parameters_confirmed: true
+
+sampling_output_root: fixtures/two_windows
+input_file: energy.dat
+window_glob: "*"
+dataset_label: invalid_bool_should_fail
+stop_after: all
+
+format: table
+skiprows: 0
+rc_raw_unit_label: au
+force_raw_unit_label: au
+rc_scale: 1.0
+force_scale: 1.0
+rc_index: 0
+rc_col_index: 1
+force_col_index: 2
+uncertainty: sem
+
+integration_direction: ascending
+zero: first
+free_energy_scale: 1.0
+free_energy_unit_label: au
+
+plots: false
+compute_tst: maybe
