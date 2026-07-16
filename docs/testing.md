@@ -100,6 +100,19 @@ The plot-only fixture verifies that `stop_after: plot` can generate plot command
 The `postprocess_missing_defaults.yaml` check is expected to fail with a preflight error. It verifies that `parameters_confirmed: true` is not enough when parser mode, columns, units, TI zero reference, or TST/plot choices are still implicit.
 The `negative_*.yaml` runner fixtures are also expected to fail. They verify executable rejection of nested YAML, invalid boolean values, too few discovered windows, and non-numeric per-window skiprows such as `SUGGESTED`.
 
+### Runner Child-Script Negative Fixtures
+
+Some runner failures cannot be proven by `--dry-run`, because dry-run only checks command generation. The following fixtures intentionally run child scripts and are expected to exit nonzero:
+
+```bash
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_bad_columns.yaml --dry-run
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_bad_columns.yaml
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_truncated_window.yaml --dry-run
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_truncated_window.yaml
+```
+
+`negative_bad_columns.yaml` should dry-run successfully but fail during extraction because the confirmed `rc_column` and `force_column` do not exist. `negative_truncated_window.yaml` should dry-run successfully but fail during extraction because one discovered window has a short data row. These runs write only to ignored `tmp/runner-negative-*` directories. Treat any partial CSV there as diagnostic evidence of child-script failure, not as input to TI.
+
 ## Real-Data Diagnostic Records
 
 Small summaries from real or representative data are stored under `tests/real_case_records/`. The raw large data are intentionally kept outside the repository.
@@ -115,6 +128,7 @@ Current records include:
 - `2026-07-11_reviewed_skiprows_execution_record.md`: executed reviewed demo extraction with user-accepted `10000`-row discard for windows `0.0` and `1.8`; not reusable as a production default.
 - `2026-07-11_reviewed_ti_only_record.md`: guarded TI-only execution using user-confirmed ascending integration, most-negative-RC endpoint zero, eV conversion, and `dF/dRC` mean-force sign. It does not approve TST.
 - `2026-07-14_runner_negative_fixtures_record.md`: executable negative-runner fixture record covering nested YAML rejection, invalid boolean rejection, missing-window discovery failure, and invalid per-window skiprows failure.
+- `2026-07-14_runner_child_failure_fixtures_record.md`: child-script negative-runner fixture record covering bad extraction columns and truncated window output.
 
 Use these records to understand script behavior on real file shapes. Do not treat them as production convergence evidence or reusable physical defaults.
 

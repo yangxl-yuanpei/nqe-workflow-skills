@@ -1,0 +1,21 @@
+# Negative fixture: dry-run can generate commands, but real extraction should
+# fail because the confirmed header column names do not exist in the input.
+parameters_confirmed: true
+
+sampling_output_root: fixtures/two_windows
+input_file: energy.dat
+window_glob: "*"
+dataset_label: bad_columns_should_fail
+output_dir: ../../tmp/runner-negative-bad-columns-output
+stop_after: extraction
+
+format: phy_quant
+skiprows: 0
+rc_raw_unit_label: au
+force_raw_unit_label: au
+rc_scale: 1.0
+force_scale: 1.0
+rc_index: 0
+rc_column: MissingRxnCoord
+force_column: MissingMeanForce
+uncertainty: sem

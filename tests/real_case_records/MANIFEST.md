@@ -12,6 +12,7 @@ This directory stores compact evidence from real or semi-real script checks. It 
 - `2026-07-11_reviewed_ti_only_record.md`: guarded TI-only record after user-confirmed integration direction, zero reference, unit conversion, and mean-force sign convention.
 - `2026-07-12_plot_only_execution_record.md`: plot-only runner execution record for already reviewed mean-force and free-energy CSV outputs.
 - `2026-07-14_runner_negative_fixtures_record.md`: executable negative-runner fixture record for parser, boolean, window-discovery, and per-window-skiprows failures.
+- `2026-07-14_runner_child_failure_fixtures_record.md`: executable child-script failure record for bad extraction columns and truncated window rows.
 
 ## Retained Attachments
 

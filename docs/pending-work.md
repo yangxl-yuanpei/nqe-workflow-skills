@@ -15,11 +15,13 @@ This file tracks work that remains after the current repository consistency pass
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped files, but it is not a real DP-GEN example.
 - Manual prompts exist. Recorded fresh-agent and script-smoke batches currently pass; remaining testing work is deeper failure-driven behavior and real-data validation, not a missing baseline pass.
 - Runner negative smoke fixtures exist at `tests/runner_configs/postprocess_missing_defaults.yaml` and `tests/runner_configs/negative_*.yaml`; they are expected to fail and verify implicit-default refusal, nested YAML rejection, invalid boolean rejection, missing-window discovery failure, and invalid per-window skiprows rejection.
+- Runner child-script negative fixtures also exist for bad header columns and truncated table rows. They dry-run successfully but fail during real extraction, demonstrating that dry-run command generation is not a guarantee of child-script success.
 - A targeted runner preflight fresh-agent record exists at `tests/fresh_agent_records/2026-07-10_runner-preflight-targeted_opencode.md`; it passed the current implicit-default and bundled-config boundary prompts.
 - A targeted runner plot-only fresh-agent record exists at `tests/fresh_agent_records/2026-07-12_runner-plot-only-targeted_subagent.md`; it passed the current existing-CSV plotting boundary prompt.
 - A targeted runner/TI-TST boundary retest exists at `tests/fresh_agent_records/2026-07-14_runner-ti-tst-boundary-retest_opencode.md`; it passed candidate-path handling, optional `output_dir` omission, plot-only-to-default-TST refusal, and path-confirmation-versus-TI/TST-approval prompts.
 - A targeted runner deeper failure-case retest exists at `tests/fresh_agent_records/2026-07-14_runner-deeper-failure-targeted_opencode.md`; it passed Tests 9-17 for missing windows, bad columns, unexpected dry-run commands, partial outputs, per-window skiprows errors, parser failures, existing output directories, summary-without-review, and truncated window outputs.
 - An executable runner negative-fixture record exists at `tests/real_case_records/2026-07-14_runner_negative_fixtures_record.md`; it confirms expected failures for nested YAML, invalid boolean values, too few discovered windows, and invalid `per_window_skiprows_file` values.
+- A runner child-script failure fixture record exists at `tests/real_case_records/2026-07-14_runner_child_failure_fixtures_record.md`; it confirms expected failures for bad extraction columns and truncated window rows.
 - A user-confirmed local dpdata mini example exists outside the repository at `../00` for labeled `abacus/scf -> deepmd/npy` inspection/comparison boundaries. It is documented in `dpdata-format-conversion/README.md` and is not a reusable production default.
 - A real 13-window CHMC/CPIHMC-style dataset exists outside the repository at `../demo`; summaries and diagnostics are recorded under `tests/real_case_records/2026-07-03_demo_multi_window*`.
 - A runner staged fixture for `../demo` exists at `tests/runner_configs/demo_multi_window_dry_run.yaml`; the record is `tests/real_case_records/2026-07-10_demo_runner_dry_run_record.md`. It has been dry-run and executed through convergence CSV summaries plus mean-force extraction, without TI/TST.
@@ -75,7 +77,7 @@ Current state:
 Remaining work:
 
 - Prompt-level runner failure routing has a targeted fresh-agent pass for missing windows, bad columns, unexpected dry-run commands, child-script failures, per-window discard errors, config parser failures, existing output directories, summary-without-physical-review, and truncated window outputs.
-- Extend executable runner negative validation to the remaining practical failure families, especially child-script failures, bad/truncated window outputs, and output-directory reuse. The first parser, missing-window, invalid-boolean, and invalid-per-window-skiprows fixtures already exist.
+- Extend executable runner negative validation to the remaining practical failure families, especially output-directory reuse, stale partial-output handling, and real-data recovery. Parser, missing-window, invalid-boolean, invalid-per-window-skiprows, bad-column, and truncated-window fixtures already exist.
 - Review the guarded TI-only free-energy profile before any TST handoff. TST still requires explicit reactant/transition-state selection, free-energy column/unit, temperature, prefactor model, and prefactor units.
 - Consider adding a `--generate-config` or draft-config mode only if it can preserve `parameters_confirmed: false` for unapproved values.
 
@@ -147,7 +149,7 @@ Use `tests/fresh_agent_record_template.md` as the copyable record template.
 
 Highest-priority fresh-agent sections:
 
-- `nqe-postprocess-runner` executable negative fixtures beyond the current parser/discovery/skiprows fixtures, especially child-script and real-data failure recovery
+- `nqe-postprocess-runner` executable negative fixtures beyond the current parser/discovery/skiprows/bad-column/truncation fixtures, especially stale-output and real-data failure recovery
 - `chmc-cpihmc-sampling` only after further script/reference changes
 - `ti-tst-rate` deeper prompts beyond the no-defaults retest
 - `dpdata-format-conversion` only when adding new executable checks or changing the anti-guessing/reference behavior
@@ -170,7 +172,7 @@ Do not state that production readiness or exhaustive coverage has been achieved.
 ## Suggested Priority Order
 
 1. Review the guarded TI-only profile and decide whether to stop at TI or prepare a separate TST-confirmation checklist.
-2. Extend runner negative fixtures toward child-script and real-data failure families now covered by prompt-level tests.
+2. Extend runner negative fixtures toward stale-output and real-data failure families now covered by prompt-level tests.
 3. Keep dpdata repeatable checks deferred until a dpdata-enabled test environment is available.
 4. Choose at most one optional static checker to implement next if it directly supports current validation needs; otherwise keep this section as a backlog.
 5. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.

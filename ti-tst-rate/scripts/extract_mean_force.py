@@ -138,9 +138,14 @@ def read_phy_quant(path: Path, rc_column: str, force_column: str, skiprows: int)
         ) from exc
     rc_vals: list[float] = []
     force_vals: list[float] = []
-    for row in rows[skiprows:]:
+    for row_number, row in enumerate(rows[skiprows:], start=skiprows + 2):
         if max(rc_pos, force_pos) >= len(row):
-            continue
+            raise ValueError(
+                f"Row {row_number} in {path} has {len(row)} column(s), "
+                f"but requested rc_column={rc_column!r} at index {rc_pos} "
+                f"and force_column={force_column!r} at index {force_pos}. "
+                "This may indicate a truncated or corrupt sampling output."
+            )
         rc_vals.append(float(row[rc_pos]))
         force_vals.append(float(row[force_pos]))
     return rc_vals, force_vals
@@ -153,24 +158,36 @@ def read_table(path: Path, rc_col_index: int | None, force_col_index: int | None
         raise ValueError("Provide --rc-col-index or --window-rc for --format table")
     rows: list[list[float]] = []
     with path.open("r", encoding="utf-8") as handle:
-        for line in handle:
+        for line_number, line in enumerate(handle, start=1):
             stripped = line.strip()
             if not stripped or stripped.startswith("#"):
                 continue
             vals = numeric_tokens(stripped)
             if vals is not None:
-                rows.append(vals)
+                rows.append([float(line_number), *vals])
     rows = rows[skiprows:]
     force_vals: list[float] = []
     rc_vals: list[float] = []
     for row in rows:
-        if force_col_index >= len(row):
-            continue
-        force_vals.append(row[force_col_index])
+        line_number = int(row[0])
+        values = row[1:]
+        if force_col_index >= len(values):
+            raise ValueError(
+                f"Row {line_number} in {path} has {len(values)} numeric column(s), "
+                f"but requested force_col_index={force_col_index}. "
+                "This may indicate a truncated or corrupt sampling output."
+            )
+        force_vals.append(values[force_col_index])
         if window_rc is not None:
             rc_vals.append(window_rc)
-        elif rc_col_index is not None and rc_col_index < len(row):
-            rc_vals.append(row[rc_col_index])
+        elif rc_col_index is not None and rc_col_index < len(values):
+            rc_vals.append(values[rc_col_index])
+        else:
+            raise ValueError(
+                f"Row {line_number} in {path} has {len(values)} numeric column(s), "
+                f"but requested rc_col_index={rc_col_index}. "
+                "This may indicate a truncated or corrupt sampling output."
+            )
     return rc_vals, force_vals
 
 
