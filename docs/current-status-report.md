@@ -1,6 +1,6 @@
 # NQE Workflow Skills Current Status Report
 
-Last updated: 2026-07-14
+Last updated: 2026-07-16
 
 ## Overall Status
 
@@ -29,7 +29,7 @@ initial DFT-labeled dataset
 | Skill maturity | Most skills are ready for teaching/checking; `nqe-postprocess-runner` remains experimental; `kmc-h2-efficiency` remains teaching-ready |
 | Scripts | 14 Python helper scripts |
 | Templates | 19 `.template` files |
-| Failure references | 9 `*failure-cases.md` files; 8 populated, 1 still placeholder |
+| Failure references | 9 `*failure-cases.md` files; all 9 populated |
 | Manual prompts | Broad prompt coverage exists in `tests/manual_prompts.md`; recorded fresh-agent batches pass, while deeper failure-driven and real-data validation remains open |
 | Open DFT backend | ABACUS is the documented open backend; do not reintroduce VASP as the default |
 | Production status | Not production-ready without target-system parameters, convergence evidence, and user-approved physical choices |
@@ -66,7 +66,7 @@ initial DFT-labeled dataset
 
 ## Current Gaps
 
-- `1/9` failure-case reference file is still a placeholder: `kmc-h2-efficiency/references/kmc-failure-cases.md`. `abacus-dft-labeling/references/abacus-failure-cases.md`, `chmc-cpihmc-sampling/references/chmc-cpihmc-failure-cases.md`, `ti-tst-rate/references/ti-tst-failure-cases.md`, `dpdata-format-conversion/references/dpdata-failure-cases.md`, `nqe-postprocess-runner/references/postprocess-runner-failure-cases.md`, `deepmd-training/references/deepmd-failure-cases.md`, `dpgen-active-learning/references/dpgen-failure-cases.md`, and `lammps-exploration/references/lammps-failure-cases.md` currently contain populated cases.
+- All 9 failure-case reference files are now populated. KMC failure cases are boundary-oriented and cover event-network, rate-table, implementation, output-interpretation, and provenance failures without introducing production defaults.
 - Recorded fresh-agent batches pass, including the latest targeted runner/TI-TST boundary retest, but deeper failure-driven and real-data validation remains incomplete. Do not claim production readiness or exhaustive test coverage.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped `param.json`, `machine.json`, and README files. It is not a real DP-GEN production example.
 - `nqe-postprocess-runner` is still experimental because it needs broader real-data failure recovery validation, not because basic staged execution, targeted fresh-agent failure routing, executable parser/discovery/skiprows negative fixtures, child-script bad-column/truncation fixtures, or the latest path/plot/TST boundary checks are missing.
@@ -99,7 +99,7 @@ Script output remains diagnostic or post-processing output. It is not proof of p
 1. Review the guarded TI-only free-energy profile before any TST handoff, especially the zero convention, reactant/transition-state definition, free-energy column/unit, temperature, and prefactor model.
 2. Extend runner negative validation beyond the current executable fixtures, especially output-directory reuse, stale partial-output handling, and more real-data failure recovery. Prompt coverage for these cases now exists and has a targeted fresh-agent pass record.
 3. Keep dpdata repeatable checks deferred until an environment with dpdata is available; the skill, README example, and populated failure reference already cover the teaching/checking boundary.
-4. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
+4. Defer any KMC checker until the final specialized postprocessing pass; KMC failure cases are now populated as boundary references.
 5. Keep README, quickstart, testing guide, status report, and pending-work documents synchronized after every script or skill change.
 
 ## Scientific Guardrails

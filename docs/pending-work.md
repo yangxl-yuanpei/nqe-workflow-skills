@@ -1,6 +1,6 @@
 # Pending Work
 
-Last updated: 2026-07-14
+Last updated: 2026-07-16
 
 This file tracks work that remains after the current repository consistency pass. It intentionally separates documented repository state from production readiness.
 
@@ -9,7 +9,7 @@ This file tracks work that remains after the current repository consistency pass
 - 12 skills exist.
 - 14 Python helper scripts exist.
 - 19 `.template` files exist.
-- 9 failure-case references exist; 1 is still a placeholder.
+- 9 failure-case references exist; all 9 are populated.
 - `nqe-postprocess-runner` has a basic config example, a convergence-screening config example, staged `stop_after` control for convergence/extraction/integration/plot/all, and a user-reviewed `per_window_skiprows_file` mechanism for per-window extraction discard overrides.
 - `check_chmc_window.py` exists; it is no longer a future script placeholder.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped files, but it is not a real DP-GEN example.
@@ -33,11 +33,19 @@ This file tracks work that remains after the current repository consistency pass
 
 ## 1. Failure-Case References
 
-High priority. The following files still need real observed failures, causes, checks, and conservative responses:
+All failure-case reference files are now populated:
 
+- `abacus-dft-labeling/references/abacus-failure-cases.md`
+- `chmc-cpihmc-sampling/references/chmc-cpihmc-failure-cases.md`
+- `ti-tst-rate/references/ti-tst-failure-cases.md`
+- `dpdata-format-conversion/references/dpdata-failure-cases.md`
+- `nqe-postprocess-runner/references/postprocess-runner-failure-cases.md`
+- `deepmd-training/references/deepmd-failure-cases.md`
+- `dpgen-active-learning/references/dpgen-failure-cases.md`
+- `lammps-exploration/references/lammps-failure-cases.md`
 - `kmc-h2-efficiency/references/kmc-failure-cases.md`
 
-`abacus-dft-labeling/references/abacus-failure-cases.md`, `chmc-cpihmc-sampling/references/chmc-cpihmc-failure-cases.md`, `ti-tst-rate/references/ti-tst-failure-cases.md`, `dpdata-format-conversion/references/dpdata-failure-cases.md`, `nqe-postprocess-runner/references/postprocess-runner-failure-cases.md`, `deepmd-training/references/deepmd-failure-cases.md`, `dpgen-active-learning/references/dpgen-failure-cases.md`, and `lammps-exploration/references/lammps-failure-cases.md` already have populated cases and can be used as style references.
+Future work should refine these with additional real observed failures as they appear, not convert reference examples into production defaults.
 
 ## 2. CHMC/CPIHMC Window Checking
 
@@ -91,7 +99,7 @@ Remaining work:
 
 - Define a minimal KMC event-network schema.
 - Add a checker such as `check_kmc_network.py` or `check_kmc_events.py`.
-- Add failure cases for missing states, invalid transitions, negative rates, duplicate events, missing reverse events when required, and mismatched output metrics.
+- Refine KMC failure cases with future real observed failures when available.
 - Keep H2 formation efficiency as one possible observable, not a hard-coded output.
 
 ## 5. dpdata Conversion Examples
@@ -175,5 +183,5 @@ Do not state that production readiness or exhaustive coverage has been achieved.
 2. Extend runner negative fixtures toward stale-output and real-data failure families now covered by prompt-level tests.
 3. Keep dpdata repeatable checks deferred until a dpdata-enabled test environment is available.
 4. Choose at most one optional static checker to implement next if it directly supports current validation needs; otherwise keep this section as a backlog.
-5. Defer KMC failure cases and any KMC checker until the final specialized postprocessing pass.
+5. Defer any KMC checker until the final specialized postprocessing pass.
 6. Polish release-facing README and tutorial material after the evidence above is in place.

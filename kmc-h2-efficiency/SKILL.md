@@ -71,7 +71,7 @@ Use this skill for kinetic Monte Carlo as a general event-based simulation stage
 
 ## References
 
-- Read `references/kmc-failure-cases.md` when KMC setup, event networks, or output interpretation fails. This placeholder should be expanded with real observed failures before relying on it for diagnosis.
+- Read `references/kmc-failure-cases.md` when KMC setup, event networks, rate tables, code-specific notes, or output interpretation fails.
 
 - Read `references/kmc-general-logic.md` when explaining KMC principles, generic event selection, custom observables, and non-H2 use cases.
 - Read `references/kmc-checklist.md` for local workflow-specific checks.
