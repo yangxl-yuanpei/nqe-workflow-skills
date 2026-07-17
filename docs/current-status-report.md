@@ -38,6 +38,7 @@ initial DFT-labeled dataset
 
 - The 12 skills cover the full teaching workflow from initial DFT data through KMC reasoning.
 - The README, quickstart, testing guide, and major skills now agree on the repository boundary: useful for teaching, guarded checking, and deterministic post-processing helpers, not automatic production.
+- `docs/upstream-community-skills.md` records confirmed DeepModeling community skills for dpdata, DeePMD-kit, DP-GEN simplify, and LAMMPS/DeePMD. These are treated as software-operation references, not replacements for this repository's scientific guardrails.
 - The TI/TST script chain exists and is split into extraction, integration, plotting, and TST-rate computation.
 - `nqe-postprocess-runner` can dry-run or execute a confirmed config in guarded stages. It now includes a preflight guard that rejects runnable configs relying on implicit parser, column, unit, integration, state-selection, temperature, prefactor, or convergence-plot defaults.
 - `nqe-postprocess-runner` now has `stop_after` stage control, optional convergence-screening mode, plot-only mode for existing CSV outputs, and an explicit `per_window_skiprows_file` mechanism for user-reviewed per-window extraction discard overrides. `convergence_plot: false` enables CSV summary-only mode when plotting dependencies are unavailable.

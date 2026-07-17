@@ -67,6 +67,12 @@ Use this skill for LAMMPS-based exploration in DP-GEN and related MLFF sampling 
 - Check PLUMED output files such as CV traces or restraint diagnostics are present and synchronized with LAMMPS output when PLUMED is used.
 - Flag broken trajectories or chemically unreasonable structures for human review before ABACUS labeling.
 
+## Upstream Community Skills
+
+- DeepModeling provides an upstream `lammps-deepmd` skill for LAMMPS with DeePMD-kit potentials. See `../docs/upstream-community-skills.md`.
+- Use upstream LAMMPS/DeePMD guidance or official LAMMPS/DeePMD-kit documentation for command syntax and pair-style usage when needed.
+- This repository's boundary still applies: do not convert upstream example ensembles, masses, timesteps, thermostats, pressures, run lengths, model names, PLUMED CVs, or execution commands into a target-system default without user confirmation.
+
 ## Templates
 
 - Use `templates/input.lammps.template` as a teaching scaffold for DP-GEN/LAMMPS exploration scripts.

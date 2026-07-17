@@ -60,6 +60,12 @@ When the user asks the agent to guess an unknown format:
 - Confirm atom names/type map, atom count, frame count, cell/PBC, coordinates, energies, forces, virials, and units after conversion.
 - Treat all script warnings as prompts for human review.
 
+## Upstream Community Skills
+
+- DeepModeling provides upstream dpdata skills for CLI usage, driver/minimizer APIs, and plugin development. See `../docs/upstream-community-skills.md`.
+- Use upstream dpdata skills or official dpdata documentation for command/API syntax when needed.
+- This repository's boundary still applies: do not rely on `auto` format detection, plausible format strings, optional flags, or conversion success as scientific confirmation unless the user has explicitly approved the source, target format, label policy, units, atom ordering, and downstream use.
+
 ## Scripts
 
 - Use `scripts/inspect_dpdata_system.py` to summarize a dpdata-readable file or directory.

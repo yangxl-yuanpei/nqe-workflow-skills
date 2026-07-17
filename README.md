@@ -10,6 +10,7 @@ Quick entry points:
 - [Manual Skill Tests](tests/manual_prompts.md)
 - [Testing Guide](docs/testing.md)
 - [Fresh-Agent Testing](docs/fresh-agent-testing.md)
+- [Upstream DeepModeling Community Skills](docs/upstream-community-skills.md)
 
 ## Workflow Scope
 
@@ -54,7 +55,8 @@ Current repository state:
 - 19 `.template` files provide input or handoff scaffolds with explicit `TODO_USER_APPROVAL` placeholders.
 - `nqe-postprocess-runner` now has both a basic demo config and an optional convergence-screening config, staged `stop_after` control, plot-only mode for existing CSV outputs, explicit user-reviewed per-window discard overrides, and a preflight guard that rejects runnable configs relying on implicit parser, column, unit, TI, TST, convergence-plot, or plot defaults.
 - `check_chmc_window.py` and `analyze_phy_quant_convergence.py` support the current CHMC/CPIHMC pre-TI checking path.
-- 9 failure-case reference files exist; 1 is still a placeholder and should not be treated as a reliable diagnosis guide yet.
+- 9 failure-case reference files exist and are populated.
+- DeepModeling upstream community skills for dpdata, DeePMD-kit, DP-GEN simplify, and LAMMPS/DeePMD are linked as software-operation references. This repository keeps the cross-stage scientific boundary layer.
 - Manual prompt coverage exists. Recorded baseline fresh-agent and script-smoke batches pass, while deeper failure-driven and real-data validation remains open.
 
 The most up-to-date status and pending-work summaries live in [docs/current-status-report.md](docs/current-status-report.md) and [docs/pending-work.md](docs/pending-work.md).

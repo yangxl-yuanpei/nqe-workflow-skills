@@ -65,6 +65,12 @@ Use this skill for DeePMD-kit training and model validation within the NQE H2 fo
 - Check the frozen model path and format are documented before downstream use.
 - Report unresolved TODOs rather than declaring production readiness.
 
+## Upstream Community Skills
+
+- DeepModeling provides upstream DeePMD-kit skills for training, DPA3 fine-tuning, Python inference, `dp test`, and LAMMPS/DeePMD usage. See `../docs/upstream-community-skills.md`.
+- Use upstream DeePMD-kit skills or official DeePMD-kit documentation for version-specific command/API syntax when needed.
+- This repository's boundary still applies: do not convert upstream example hyperparameters, model recommendations, pretrained-model names, fine-tuning settings, or inference examples into production choices for the user's system without explicit approval and downstream validation criteria.
+
 ## Templates
 
 - Use `templates/input.json.template` as a teaching scaffold for DeePMD-kit training input.

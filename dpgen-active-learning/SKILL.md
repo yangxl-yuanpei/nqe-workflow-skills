@@ -75,6 +75,12 @@ Treat model-deviation selection as an internal filtering mechanism within or imm
 - Check ABACUS labeling tasks converged and produced complete energy, force, and virial labels.
 - Report unresolved TODOs instead of filling them silently.
 
+## Upstream Community Skills
+
+- DeepModeling provides an upstream `dpgen-simplify` skill for the DP-GEN simplify workflow. See `../docs/upstream-community-skills.md`.
+- Use upstream DP-GEN skills or official DP-GEN documentation for simplify-specific `param.json`, `machine.json`, environment, and command syntax when the user is doing simplify.
+- This repository's boundary still applies for active learning: do not infer trust levels, exploration temperatures, sampling lengths, candidate-selection rules, DeePMD training settings, ABACUS labeling settings, or scheduler resources from upstream examples.
+
 ## Templates
 
 - Use `templates/param.json.template` and `templates/machine.json.template` as teaching scaffolds for DP-GEN planning.

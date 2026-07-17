@@ -170,6 +170,7 @@ After future changes, keep these files aligned:
 - `README.md`
 - `docs/quickstart.md`
 - `docs/testing.md`
+- `docs/upstream-community-skills.md`
 - `docs/current-status-report.md`
 - `docs/pending-work.md`
 - affected `SKILL.md` files
