@@ -162,6 +162,8 @@ The runner section of `tests/manual_prompts.md` also includes deeper failure-cas
 
 The 2026-07-14 targeted runner deeper failure-case retest is recorded in `tests/fresh_agent_records/2026-07-14_runner-deeper-failure-targeted_opencode.md`. It passed Tests 9-17. Future runner tests should shift toward executable negative fixtures and real-data failure cases rather than only adding more prompt-level coverage.
 
+The 2026-07-17 targeted runner output-directory boundary retest is recorded in `tests/fresh_agent_records/2026-07-17_runner-output-dir-boundary-retest_opencode.md`. It passed the retest for non-empty `output_dir` refusal, refusing to add `allow_existing_output_dir: true` as a convenience fix, and refusing to treat runner success as clean overwrite or convergence proof.
+
 When testing per-window discard, use a separate candidate config and a separate `per_window_skiprows_file` CSV. The CSV must contain explicit `sample_label` and `skiprows` values reviewed by the user. Do not overwrite the baseline staged fixture, and do not convert convergence-screening `SUGGESTED` indices into production discard lengths without a separate approval step. For production-facing tests, record that the user must inspect the convergence plots personally before accepting the discard policy.
 
 ## TI/TST Demo Chain

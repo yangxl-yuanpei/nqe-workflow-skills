@@ -286,6 +286,9 @@ Agent response:
 4. Record which run produced which outputs.
 5. Do not merge outputs from different configs without provenance.
 6. Use `allow_existing_output_dir: true` only as a user-approved operational override; it is not a scientific approval or provenance merge.
+7. If the user has not provided a config path yet, still answer the overwrite/reuse safety question first. State that direct overwrite is not OK by default and list the recovery options before asking for the YAML/JSON path.
+8. If the user asks to add `allow_existing_output_dir: true`, do not treat that as approval by itself. Ask whether they have inspected the existing outputs and explicitly approve reuse or cleanup. Prefer a fresh `output_dir`, and do not describe reuse as a clean overwrite because old plots or convergence summaries may remain.
+9. Do not report "all windows converged" or "old files were cleanly overwritten" from runner completion alone. Require review of convergence evidence, output-directory contents, summary provenance, and the intended downstream stage before making acceptance claims.
 
 ## Summary Exists But Physical Review Is Missing
 
