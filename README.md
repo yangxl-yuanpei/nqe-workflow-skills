@@ -4,6 +4,13 @@ This repository contains agent-readable skills for teaching, inspecting, and par
 
 The current repository is a teaching and guidance skills library. It is not yet a one-click production automation pipeline.
 
+Recommended public framing: this is an agent-readable skills library for
+teaching, checking, and guarded post-processing across an atomistic NQE
+workflow. It is not a benchmark dataset, a complete target-system simulation
+campaign, or a validated H2 formation-efficiency production pipeline. See
+[Release Readiness Checklist](docs/release-readiness.md) for public-release and
+manuscript-readiness boundaries.
+
 Quick entry points:
 
 - [Quick Start](docs/quickstart.md)

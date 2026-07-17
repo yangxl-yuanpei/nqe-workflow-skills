@@ -1,65 +1,65 @@
 {
-  "config": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\runner_configs\\demo_multi_window_candidate_skiprows.yaml",
+  "config": "<REPO>\\tests\\runner_configs\\demo_multi_window_candidate_skiprows.yaml",
   "dataset_label": "demo_multi_window_candidate_skiprows",
   "stop_after": "extraction",
   "window_count": 13,
   "windows": [
     {
       "sample_label": "_1.6",
-      "input": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\_1.6\\energy.dat"
+      "input": "../demo\\_1.6\\energy.dat"
     },
     {
       "sample_label": "_1.2",
-      "input": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\_1.2\\energy.dat"
+      "input": "../demo\\_1.2\\energy.dat"
     },
     {
       "sample_label": "_0.8",
-      "input": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\_0.8\\energy.dat"
+      "input": "../demo\\_0.8\\energy.dat"
     },
     {
       "sample_label": "_0.4",
-      "input": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\_0.4\\energy.dat"
+      "input": "../demo\\_0.4\\energy.dat"
     },
     {
       "sample_label": "0.0",
-      "input": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\0.0\\energy.dat"
+      "input": "../demo\\0.0\\energy.dat"
     },
     {
       "sample_label": "0.4",
-      "input": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\0.4\\energy.dat"
+      "input": "../demo\\0.4\\energy.dat"
     },
     {
       "sample_label": "0.8",
-      "input": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\0.8\\energy.dat"
+      "input": "../demo\\0.8\\energy.dat"
     },
     {
       "sample_label": "1.2",
-      "input": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\1.2\\energy.dat"
+      "input": "../demo\\1.2\\energy.dat"
     },
     {
       "sample_label": "1.4",
-      "input": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\1.4\\energy.dat"
+      "input": "../demo\\1.4\\energy.dat"
     },
     {
       "sample_label": "1.8",
-      "input": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\1.8\\energy.dat"
+      "input": "../demo\\1.8\\energy.dat"
     },
     {
       "sample_label": "2.2",
-      "input": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\2.2\\energy.dat"
+      "input": "../demo\\2.2\\energy.dat"
     },
     {
       "sample_label": "2.6",
-      "input": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\2.6\\energy.dat"
+      "input": "../demo\\2.6\\energy.dat"
     },
     {
       "sample_label": "3.0",
-      "input": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\3.0\\energy.dat"
+      "input": "../demo\\3.0\\energy.dat"
     }
   ],
   "outputs": {
-    "convergence_dir": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence",
-    "mean_force_table": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
+    "convergence_dir": "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence",
+    "mean_force_table": "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
     "free_energy_profile": null,
     "tst_rates": null,
     "mean_force_plot": null,
@@ -77,14 +77,14 @@
   },
   "commands": [
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
+      "<PYTHON>",
+      "<REPO>\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\_1.6\\energy.dat",
+      "../demo\\_1.6\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_1.6.png",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_1.6.png",
       "--summary",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_1.6.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_1.6.csv",
       "--skiprows",
       "0",
       "--confirm-parameters",
@@ -102,14 +102,14 @@
       "--no-plot"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
+      "<PYTHON>",
+      "<REPO>\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\_1.2\\energy.dat",
+      "../demo\\_1.2\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_1.2.png",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_1.2.png",
       "--summary",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_1.2.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_1.2.csv",
       "--skiprows",
       "0",
       "--confirm-parameters",
@@ -127,14 +127,14 @@
       "--no-plot"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
+      "<PYTHON>",
+      "<REPO>\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\_0.8\\energy.dat",
+      "../demo\\_0.8\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_0.8.png",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_0.8.png",
       "--summary",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_0.8.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_0.8.csv",
       "--skiprows",
       "0",
       "--confirm-parameters",
@@ -152,14 +152,14 @@
       "--no-plot"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
+      "<PYTHON>",
+      "<REPO>\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\_0.4\\energy.dat",
+      "../demo\\_0.4\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_0.4.png",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_0.4.png",
       "--summary",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_0.4.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\_0.4.csv",
       "--skiprows",
       "0",
       "--confirm-parameters",
@@ -177,14 +177,14 @@
       "--no-plot"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
+      "<PYTHON>",
+      "<REPO>\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\0.0\\energy.dat",
+      "../demo\\0.0\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\0.0.png",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\0.0.png",
       "--summary",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\0.0.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\0.0.csv",
       "--skiprows",
       "0",
       "--confirm-parameters",
@@ -202,14 +202,14 @@
       "--no-plot"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
+      "<PYTHON>",
+      "<REPO>\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\0.4\\energy.dat",
+      "../demo\\0.4\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\0.4.png",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\0.4.png",
       "--summary",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\0.4.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\0.4.csv",
       "--skiprows",
       "0",
       "--confirm-parameters",
@@ -227,14 +227,14 @@
       "--no-plot"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
+      "<PYTHON>",
+      "<REPO>\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\0.8\\energy.dat",
+      "../demo\\0.8\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\0.8.png",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\0.8.png",
       "--summary",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\0.8.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\0.8.csv",
       "--skiprows",
       "0",
       "--confirm-parameters",
@@ -252,14 +252,14 @@
       "--no-plot"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
+      "<PYTHON>",
+      "<REPO>\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\1.2\\energy.dat",
+      "../demo\\1.2\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\1.2.png",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\1.2.png",
       "--summary",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\1.2.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\1.2.csv",
       "--skiprows",
       "0",
       "--confirm-parameters",
@@ -277,14 +277,14 @@
       "--no-plot"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
+      "<PYTHON>",
+      "<REPO>\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\1.4\\energy.dat",
+      "../demo\\1.4\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\1.4.png",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\1.4.png",
       "--summary",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\1.4.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\1.4.csv",
       "--skiprows",
       "0",
       "--confirm-parameters",
@@ -302,14 +302,14 @@
       "--no-plot"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
+      "<PYTHON>",
+      "<REPO>\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\1.8\\energy.dat",
+      "../demo\\1.8\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\1.8.png",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\1.8.png",
       "--summary",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\1.8.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\1.8.csv",
       "--skiprows",
       "0",
       "--confirm-parameters",
@@ -327,14 +327,14 @@
       "--no-plot"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
+      "<PYTHON>",
+      "<REPO>\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\2.2\\energy.dat",
+      "../demo\\2.2\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\2.2.png",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\2.2.png",
       "--summary",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\2.2.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\2.2.csv",
       "--skiprows",
       "0",
       "--confirm-parameters",
@@ -352,14 +352,14 @@
       "--no-plot"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
+      "<PYTHON>",
+      "<REPO>\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\2.6\\energy.dat",
+      "../demo\\2.6\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\2.6.png",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\2.6.png",
       "--summary",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\2.6.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\2.6.csv",
       "--skiprows",
       "0",
       "--confirm-parameters",
@@ -377,14 +377,14 @@
       "--no-plot"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
+      "<PYTHON>",
+      "<REPO>\\chmc-cpihmc-sampling\\scripts\\analyze_phy_quant_convergence.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\3.0\\energy.dat",
+      "../demo\\3.0\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\3.0.png",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\3.0.png",
       "--summary",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\3.0.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\convergence\\3.0.csv",
       "--skiprows",
       "0",
       "--confirm-parameters",
@@ -402,12 +402,12 @@
       "--no-plot"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\extract_mean_force.py",
+      "<PYTHON>",
+      "<REPO>\\ti-tst-rate\\scripts\\extract_mean_force.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\_1.6\\energy.dat",
+      "../demo\\_1.6\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
       "--dataset-label",
       "demo_multi_window_candidate_skiprows",
       "--sample-label",
@@ -437,12 +437,12 @@
       "reviewed demo per-window discard fixture; production use still requires user visual convergence-plot review; no TI/TST approval"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\extract_mean_force.py",
+      "<PYTHON>",
+      "<REPO>\\ti-tst-rate\\scripts\\extract_mean_force.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\_1.2\\energy.dat",
+      "../demo\\_1.2\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
       "--dataset-label",
       "demo_multi_window_candidate_skiprows",
       "--sample-label",
@@ -472,12 +472,12 @@
       "reviewed demo per-window discard fixture; production use still requires user visual convergence-plot review; no TI/TST approval"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\extract_mean_force.py",
+      "<PYTHON>",
+      "<REPO>\\ti-tst-rate\\scripts\\extract_mean_force.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\_0.8\\energy.dat",
+      "../demo\\_0.8\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
       "--dataset-label",
       "demo_multi_window_candidate_skiprows",
       "--sample-label",
@@ -507,12 +507,12 @@
       "reviewed demo per-window discard fixture; production use still requires user visual convergence-plot review; no TI/TST approval"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\extract_mean_force.py",
+      "<PYTHON>",
+      "<REPO>\\ti-tst-rate\\scripts\\extract_mean_force.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\_0.4\\energy.dat",
+      "../demo\\_0.4\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
       "--dataset-label",
       "demo_multi_window_candidate_skiprows",
       "--sample-label",
@@ -542,12 +542,12 @@
       "reviewed demo per-window discard fixture; production use still requires user visual convergence-plot review; no TI/TST approval"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\extract_mean_force.py",
+      "<PYTHON>",
+      "<REPO>\\ti-tst-rate\\scripts\\extract_mean_force.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\0.0\\energy.dat",
+      "../demo\\0.0\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
       "--dataset-label",
       "demo_multi_window_candidate_skiprows",
       "--sample-label",
@@ -577,12 +577,12 @@
       "reviewed demo per-window discard fixture; production use still requires user visual convergence-plot review; no TI/TST approval; per-window skiprows=10000; reason=User accepted 10000-row discard for this demo review after sensitivity screening; production use requires visual convergence-plot review"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\extract_mean_force.py",
+      "<PYTHON>",
+      "<REPO>\\ti-tst-rate\\scripts\\extract_mean_force.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\0.4\\energy.dat",
+      "../demo\\0.4\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
       "--dataset-label",
       "demo_multi_window_candidate_skiprows",
       "--sample-label",
@@ -612,12 +612,12 @@
       "reviewed demo per-window discard fixture; production use still requires user visual convergence-plot review; no TI/TST approval"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\extract_mean_force.py",
+      "<PYTHON>",
+      "<REPO>\\ti-tst-rate\\scripts\\extract_mean_force.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\0.8\\energy.dat",
+      "../demo\\0.8\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
       "--dataset-label",
       "demo_multi_window_candidate_skiprows",
       "--sample-label",
@@ -647,12 +647,12 @@
       "reviewed demo per-window discard fixture; production use still requires user visual convergence-plot review; no TI/TST approval"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\extract_mean_force.py",
+      "<PYTHON>",
+      "<REPO>\\ti-tst-rate\\scripts\\extract_mean_force.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\1.2\\energy.dat",
+      "../demo\\1.2\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
       "--dataset-label",
       "demo_multi_window_candidate_skiprows",
       "--sample-label",
@@ -682,12 +682,12 @@
       "reviewed demo per-window discard fixture; production use still requires user visual convergence-plot review; no TI/TST approval"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\extract_mean_force.py",
+      "<PYTHON>",
+      "<REPO>\\ti-tst-rate\\scripts\\extract_mean_force.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\1.4\\energy.dat",
+      "../demo\\1.4\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
       "--dataset-label",
       "demo_multi_window_candidate_skiprows",
       "--sample-label",
@@ -717,12 +717,12 @@
       "reviewed demo per-window discard fixture; production use still requires user visual convergence-plot review; no TI/TST approval"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\extract_mean_force.py",
+      "<PYTHON>",
+      "<REPO>\\ti-tst-rate\\scripts\\extract_mean_force.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\1.8\\energy.dat",
+      "../demo\\1.8\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
       "--dataset-label",
       "demo_multi_window_candidate_skiprows",
       "--sample-label",
@@ -752,12 +752,12 @@
       "reviewed demo per-window discard fixture; production use still requires user visual convergence-plot review; no TI/TST approval; per-window skiprows=10000; reason=User accepted 10000-row discard for this demo review after RC-adjustment and sensitivity screening; production use requires visual convergence-plot review"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\extract_mean_force.py",
+      "<PYTHON>",
+      "<REPO>\\ti-tst-rate\\scripts\\extract_mean_force.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\2.2\\energy.dat",
+      "../demo\\2.2\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
       "--dataset-label",
       "demo_multi_window_candidate_skiprows",
       "--sample-label",
@@ -787,12 +787,12 @@
       "reviewed demo per-window discard fixture; production use still requires user visual convergence-plot review; no TI/TST approval"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\extract_mean_force.py",
+      "<PYTHON>",
+      "<REPO>\\ti-tst-rate\\scripts\\extract_mean_force.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\2.6\\energy.dat",
+      "../demo\\2.6\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
       "--dataset-label",
       "demo_multi_window_candidate_skiprows",
       "--sample-label",
@@ -822,12 +822,12 @@
       "reviewed demo per-window discard fixture; production use still requires user visual convergence-plot review; no TI/TST approval"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\extract_mean_force.py",
+      "<PYTHON>",
+      "<REPO>\\ti-tst-rate\\scripts\\extract_mean_force.py",
       "--input",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\demo\\3.0\\energy.dat",
+      "../demo\\3.0\\energy.dat",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_candidate_skiprows\\output\\mean_force_table.csv",
       "--dataset-label",
       "demo_multi_window_candidate_skiprows",
       "--sample-label",

@@ -1,26 +1,26 @@
 {
-  "config": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\runner_configs\\demo_multi_window_plot_only.yaml",
+  "config": "<REPO>\\tests\\runner_configs\\demo_multi_window_plot_only.yaml",
   "dataset_label": "demo_multi_window_reviewed_ti_only",
   "stop_after": "plot",
   "window_count": 0,
   "windows": [],
   "outputs": {
     "convergence_dir": null,
-    "mean_force_table": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\mean_force_table.csv",
-    "free_energy_profile": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\free_energy_profile.csv",
+    "mean_force_table": "<REPO>\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\mean_force_table.csv",
+    "free_energy_profile": "<REPO>\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\free_energy_profile.csv",
     "tst_rates": null,
-    "mean_force_plot": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\mean_force_plot_only.png",
-    "free_energy_plot": "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\free_energy_plot_only.png"
+    "mean_force_plot": "<REPO>\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\mean_force_plot_only.png",
+    "free_energy_plot": "<REPO>\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\free_energy_plot_only.png"
   },
   "per_window_skiprows": {},
   "commands": [
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\plot_mean_force.py",
+      "<PYTHON>",
+      "<REPO>\\ti-tst-rate\\scripts\\plot_mean_force.py",
       "--curve",
-      "file=C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\mean_force_table.csv,dataset=demo_multi_window_reviewed_ti_only,label=MeanForce,marker=o",
+      "file=<REPO>\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\mean_force_table.csv,dataset=demo_multi_window_reviewed_ti_only,label=MeanForce,marker=o",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\mean_force_plot_only.png",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\mean_force_plot_only.png",
       "--rc-order",
       "ascending",
       "--confirm-parameters",
@@ -31,12 +31,12 @@
       "--grid"
     ],
     [
-      "C:\\Users\\94474\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\ti-tst-rate\\scripts\\plot_free_energy.py",
+      "<PYTHON>",
+      "<REPO>\\ti-tst-rate\\scripts\\plot_free_energy.py",
       "--curve",
-      "file=C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\free_energy_profile.csv,dataset=demo_multi_window_reviewed_ti_only,label=FreeEnergy,marker=o",
+      "file=<REPO>\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\free_energy_profile.csv,dataset=demo_multi_window_reviewed_ti_only,label=FreeEnergy,marker=o",
       "--output",
-      "C:\\Users\\94474\\Documents\\Codex\\2026-06-26\\w\\nqe-workflow-skills-release\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\free_energy_plot_only.png",
+      "<REPO>\\tests\\real_case_records\\2026-07-11_reviewed_ti_only\\output\\free_energy_plot_only.png",
       "--rc-order",
       "ascending",
       "--free-energy-unit-label",

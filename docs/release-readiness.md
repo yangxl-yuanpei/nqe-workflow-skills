@@ -9,6 +9,31 @@ The repository is release-facing as a teaching, checking, and semi-automated
 post-processing skills library. It is not release-ready as a one-click
 computational production pipeline.
 
+## Recommended Release Profile
+
+Recommended public framing:
+
+```text
+An agent-readable skills library for teaching, checking, and guarded
+post-processing across an atomistic NQE workflow.
+```
+
+This is a good release profile because it matches the repository's strongest
+evidence: broad workflow coverage, populated guardrails, conservative scripts,
+manual prompts, fresh-agent records, and selected real-case diagnostic records.
+
+Avoid framing the release as:
+
+```text
+A complete automated NQE production workflow.
+A validated H2 formation-efficiency pipeline.
+A benchmark dataset or reproducibility package for a specific physical system.
+```
+
+Those stronger profiles would require bundled target-system inputs, confirmed
+physical parameters, reproducible raw data, end-to-end provenance, convergence
+evidence, uncertainty propagation, and complete KMC event-network validation.
+
 ## Public Repository Contents
 
 The following content is suitable for a public skills-library release:
@@ -58,6 +83,11 @@ presented as bundled public data:
 - Local absolute paths. Retained records should use sanitized placeholders such
   as `<REPO>`, `<USER_SITE_PACKAGES>`, and `../demo`.
 
+The public repository may mention `../00` and `../demo` as sanitized external
+path labels. Those labels should be read as maintainer-local evidence pointers,
+not as files guaranteed to exist in a fresh clone. Do not move large raw data
+into the repository just to make those paths resolvable.
+
 ## Evidence That Can Be Claimed
 
 The current repository can reasonably claim:
@@ -71,6 +101,8 @@ The current repository can reasonably claim:
 - Script-level syntax and interface checks for the current helper scripts.
 - Real or representative diagnostic records for selected CHMC/CPIHMC, runner,
   TI-only, and plot-only paths.
+- A clear separation between public teaching/checking artifacts and
+  maintainer-local raw validation data.
 
 Use careful wording:
 
@@ -115,6 +147,9 @@ release:
   to exist in a fresh clone.
 - New script changes have at least syntax/interface checks and relevant
   failure-boundary notes.
+- The release announcement or repository description uses the recommended
+  teaching/checking/post-processing profile rather than production-pipeline
+  wording.
 
 Useful checks:
 
@@ -143,3 +178,21 @@ These are useful but not required for a teaching/checking release:
   physical parameters.
 - Prepare separate manuscript or project-description materials outside the
   repository if targeting a journal submission.
+
+## Manuscript Readiness Boundary
+
+The repository is mature enough to support an initial methods/software-style
+manuscript draft if the paper describes:
+
+- the skill-library design,
+- cross-stage scientific guardrails,
+- failure-mode references,
+- staged post-processing scripts,
+- fresh-agent behavior tests, and
+- selected diagnostic records as case studies.
+
+The repository alone is not enough for a results paper that claims new
+production-quality NQE rates, validated H2 formation efficiencies, or a
+complete target-system simulation campaign. Those claims need separate
+scientific datasets, parameter justifications, convergence analysis,
+uncertainty estimates, and system-specific validation.
