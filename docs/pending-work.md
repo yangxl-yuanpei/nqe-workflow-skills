@@ -1,6 +1,6 @@
 # Pending Work
 
-Last updated: 2026-07-16
+Last updated: 2026-07-17
 
 This file tracks work that remains after the current repository consistency pass. It intentionally separates documented repository state from production readiness.
 
@@ -20,6 +20,8 @@ This file tracks work that remains after the current repository consistency pass
 - A targeted runner plot-only fresh-agent record exists at `tests/fresh_agent_records/2026-07-12_runner-plot-only-targeted_subagent.md`; it passed the current existing-CSV plotting boundary prompt.
 - A targeted runner/TI-TST boundary retest exists at `tests/fresh_agent_records/2026-07-14_runner-ti-tst-boundary-retest_opencode.md`; it passed candidate-path handling, optional `output_dir` omission, plot-only-to-default-TST refusal, and path-confirmation-versus-TI/TST-approval prompts.
 - A targeted runner deeper failure-case retest exists at `tests/fresh_agent_records/2026-07-14_runner-deeper-failure-targeted_opencode.md`; it passed Tests 9-17 for missing windows, bad columns, unexpected dry-run commands, partial outputs, per-window skiprows errors, parser failures, existing output directories, summary-without-review, and truncated window outputs.
+- A targeted upstream DeepModeling boundary retest exists at `tests/fresh_agent_records/2026-07-17_upstream-deepmodeling-boundary_opencode.md`; it passed dpdata, DeePMD, DP-GEN, and LAMMPS/PLUMED prompts that check upstream skills are software-operation references rather than target-system default sources.
+- KMC boundary prompts now cover default convergence-threshold refusal, historical KMC note threshold refusal, and association-only networks with confirmed initial coverage. The latest reported fresh-agent answers passed these checks, but a dedicated KMC fresh-agent record file has not yet been added.
 - An executable runner negative-fixture record exists at `tests/real_case_records/2026-07-14_runner_negative_fixtures_record.md`; it confirms expected failures for nested YAML, invalid boolean values, too few discovered windows, and invalid `per_window_skiprows_file` values.
 - A runner child-script failure fixture record exists at `tests/real_case_records/2026-07-14_runner_child_failure_fixtures_record.md`; it confirms expected failures for bad extraction columns and truncated window rows.
 - A user-confirmed local dpdata mini example exists outside the repository at `../00` for labeled `abacus/scf -> deepmd/npy` inspection/comparison boundaries. It is documented in `dpdata-format-conversion/README.md` and is not a reusable production default.
@@ -94,6 +96,8 @@ Remaining work:
 Current state:
 
 - KMC concepts, state/event/rate-table boundaries, and generic examples exist.
+- KMC failure cases are populated and cover single-rate misuse, missing state models, incomplete event networks, rate-table mismatch, invalid/degenerate rates, event-selection logic, incomplete new species/event types, output-count misinterpretation, missing statistical convergence, stale/mixed outputs, and code-specific notes treated as defaults.
+- KMC prompts now explicitly forbid default convergence thresholds, historical code-note threshold migration, and automatic dismissal of association-only networks when user-defined initial coverage or reservoir assumptions may exist.
 
 Remaining work:
 
@@ -161,7 +165,7 @@ Highest-priority fresh-agent sections:
 - `chmc-cpihmc-sampling` only after further script/reference changes
 - `ti-tst-rate` deeper prompts beyond the no-defaults retest
 - `dpdata-format-conversion` only when adding new executable checks or changing the anti-guessing/reference behavior
-- `kmc-h2-efficiency`
+- `kmc-h2-efficiency` only when adding the KMC checker or changing KMC boundary behavior again
 
 ## 8. Documentation Synchronization
 
@@ -180,9 +184,9 @@ Do not state that production readiness or exhaustive coverage has been achieved.
 
 ## Suggested Priority Order
 
-1. Review the guarded TI-only profile and decide whether to stop at TI or prepare a separate TST-confirmation checklist.
+1. Implement the minimal KMC schema/static checker if the next pass continues KMC work.
 2. Extend runner negative fixtures toward stale-output and real-data failure families now covered by prompt-level tests.
-3. Keep dpdata repeatable checks deferred until a dpdata-enabled test environment is available.
-4. Choose at most one optional static checker to implement next if it directly supports current validation needs; otherwise keep this section as a backlog.
-5. Defer any KMC checker until the final specialized postprocessing pass.
+3. Review the guarded TI-only profile only if preparing a separate TST-confirmation checklist.
+4. Keep dpdata repeatable checks deferred until a dpdata-enabled test environment is available.
+5. Choose at most one optional static checker for DP-GEN, DeePMD, LAMMPS/PLUMED, ABACUS, or dpdata conversion only if it directly supports current validation needs.
 6. Polish release-facing README and tutorial material after the evidence above is in place.

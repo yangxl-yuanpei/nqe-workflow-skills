@@ -1,6 +1,6 @@
 # NQE Workflow Skills Current Status Report
 
-Last updated: 2026-07-16
+Last updated: 2026-07-17
 
 ## Overall Status
 
@@ -30,7 +30,7 @@ initial DFT-labeled dataset
 | Scripts | 14 Python helper scripts |
 | Templates | 19 `.template` files |
 | Failure references | 9 `*failure-cases.md` files; all 9 populated |
-| Manual prompts | Broad prompt coverage exists in `tests/manual_prompts.md`; recorded fresh-agent batches pass, while deeper failure-driven and real-data validation remains open |
+| Manual prompts | Broad prompt coverage exists in `tests/manual_prompts.md`; recorded fresh-agent batches pass, including targeted runner, KMC-boundary, and upstream DeepModeling boundary behavior. Deeper executable and real-data validation remains open |
 | Open DFT backend | ABACUS is the documented open backend; do not reintroduce VASP as the default |
 | Production status | Not production-ready without target-system parameters, convergence evidence, and user-approved physical choices |
 
@@ -47,11 +47,14 @@ initial DFT-labeled dataset
 - `dpdata-format-conversion` provides inspect, convert, and compare helpers for dpdata-readable systems.
 - `dpdata-format-conversion/README.md` documents a user-confirmed local mini example, `../00`, for labeled `abacus/scf -> deepmd/npy` inspection/comparison boundaries. This example is for local file-shape testing only and is not a reusable production default.
 - Recorded fresh-agent and smoke batches currently pass: Batch A/B minimal smoke and failure prompts, Batch C changed-skill deep tests, Batch D script-interface smoke, and the targeted dpdata/TI/TST/runner retest.
+- `tests/manual_prompts.md` now includes upstream DeepModeling boundary tests for dpdata, DeePMD, DP-GEN, and LAMMPS/PLUMED. These prompts check that upstream skills are treated as software-operation references rather than permission to invent target-system parameters.
 - Script-level checks on 2026-07-10 passed for Python syntax across all 14 helper scripts, runner positive dry-run, runner implicit-default refusal, and `check_chmc_window.py --print-defaults`.
 - The targeted runner preflight fresh-agent record is `tests/fresh_agent_records/2026-07-10_runner-preflight-targeted_opencode.md`. It passed for implicit-default refusal, `format: auto` refusal, TST default refusal, missing convergence columns, and bundled-config boundary behavior.
 - The targeted runner plot-only fresh-agent record is `tests/fresh_agent_records/2026-07-12_runner-plot-only-targeted_subagent.md`. It passed for using `stop_after: plot`, asking for explicit existing CSV paths and plotting choices, and refusing extraction, integration, and TST.
 - The targeted runner/TI-TST boundary retest is `tests/fresh_agent_records/2026-07-14_runner-ti-tst-boundary-retest_opencode.md`. It passed for candidate-path handling, optional `output_dir` omission, plot-only-to-default-TST refusal, and the rule that path confirmation is not TI/TST approval.
 - The targeted runner deeper failure-case retest is `tests/fresh_agent_records/2026-07-14_runner-deeper-failure-targeted_opencode.md`. It passed Tests 9-17 for missing windows, bad columns, unexpected dry-run commands, partial outputs, per-window skiprows errors, parser failures, existing output directories, summary-without-review, and truncated window outputs.
+- The targeted upstream DeepModeling boundary retest is `tests/fresh_agent_records/2026-07-17_upstream-deepmodeling-boundary_opencode.md`. It passed for dpdata format-guessing refusal, DeePMD hyperparameter-default refusal, DP-GEN trust/exploration-default refusal, and LAMMPS/PLUMED default refusal.
+- KMC manual boundary prompts now cover convergence-threshold refusal, historical code-note threshold refusal, and association-only networks with user-defined initial coverage. The latest reported fresh-agent responses passed these targeted checks, although no separate KMC fresh-agent record file has been added yet.
 - The first executable runner negative fixtures are now available under `tests/runner_configs/negative_*.yaml`. They are expected to fail and currently cover nested YAML rejection, invalid boolean rejection, missing-window discovery failure, and invalid `per_window_skiprows_file` values. The record is `tests/real_case_records/2026-07-14_runner_negative_fixtures_record.md`.
 - Runner child-script negative fixtures now cover bad header columns and truncated table rows. Dry-run succeeds for these cases, while real execution fails at `extract_mean_force.py`; the record is `tests/real_case_records/2026-07-14_runner_child_failure_fixtures_record.md`.
 - The real-data runner staged execution record is `tests/real_case_records/2026-07-10_demo_runner_dry_run_record.md`. It validates dry-run plus real execution through convergence CSV summaries and mean-force extraction on the 13-window `../demo` dataset with explicit table columns and no TI/TST commands.
@@ -68,10 +71,10 @@ initial DFT-labeled dataset
 ## Current Gaps
 
 - All 9 failure-case reference files are now populated. KMC failure cases are boundary-oriented and cover event-network, rate-table, implementation, output-interpretation, and provenance failures without introducing production defaults.
-- Recorded fresh-agent batches pass, including the latest targeted runner/TI-TST boundary retest, but deeper failure-driven and real-data validation remains incomplete. Do not claim production readiness or exhaustive test coverage.
+- Recorded fresh-agent batches pass, including the latest targeted runner/TI-TST and upstream DeepModeling boundary retests, but deeper executable and real-data validation remains incomplete. Do not claim production readiness or exhaustive test coverage.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped `param.json`, `machine.json`, and README files. It is not a real DP-GEN production example.
 - `nqe-postprocess-runner` is still experimental because it needs broader real-data failure recovery validation, not because basic staged execution, targeted fresh-agent failure routing, executable parser/discovery/skiprows negative fixtures, child-script bad-column/truncation fixtures, or the latest path/plot/TST boundary checks are missing.
-- `kmc-h2-efficiency` is still teaching-ready because it lacks an executable schema checker for event networks and rate tables.
+- `kmc-h2-efficiency` is still teaching-ready. Its boundary references and prompts are stronger, but it lacks an executable schema checker for event networks and rate tables.
 - The repository still lacks target-system-specific production inputs, validated physical parameters, convergence evidence, and provenance records.
 
 ## Script Inventory
@@ -97,10 +100,10 @@ Script output remains diagnostic or post-processing output. It is not proof of p
 
 ## Highest-Priority Next Work
 
-1. Review the guarded TI-only free-energy profile before any TST handoff, especially the zero convention, reactant/transition-state definition, free-energy column/unit, temperature, and prefactor model.
+1. Add a minimal KMC schema/static checker if continuing KMC work next. It should check file shape, event/rate labels, required metadata, placeholders, and obvious invalid rates without judging the physical event network.
 2. Extend runner negative validation beyond the current executable fixtures, especially output-directory reuse, stale partial-output handling, and more real-data failure recovery. Prompt coverage for these cases now exists and has a targeted fresh-agent pass record.
-3. Keep dpdata repeatable checks deferred until an environment with dpdata is available; the skill, README example, and populated failure reference already cover the teaching/checking boundary.
-4. Defer any KMC checker until the final specialized postprocessing pass; KMC failure cases are now populated as boundary references.
+3. Review the guarded TI-only free-energy profile only if preparing a separate TST-confirmation checklist. TST still requires explicit state selection, free-energy column/unit, temperature, prefactor model, and prefactor units.
+4. Keep dpdata repeatable checks deferred until an environment with dpdata is available; the skill, README example, and populated failure reference already cover the teaching/checking boundary.
 5. Keep README, quickstart, testing guide, status report, and pending-work documents synchronized after every script or skill change.
 
 ## Scientific Guardrails
