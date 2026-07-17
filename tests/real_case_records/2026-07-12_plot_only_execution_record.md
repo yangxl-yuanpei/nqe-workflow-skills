@@ -38,7 +38,7 @@ The first execution attempt exposed a useful plot-only provenance issue: the ori
 The bundled Python environment did not include `matplotlib`. The successful execution used a temporary `PYTHONPATH` pointing to the user-site packages directory where `matplotlib` was already installed:
 
 ```text
-PYTHONPATH=C:\Users\94474\AppData\Roaming\Python\Python312\site-packages
+PYTHONPATH=<USER_SITE_PACKAGES>
 ```
 
 No new package was installed during this run.

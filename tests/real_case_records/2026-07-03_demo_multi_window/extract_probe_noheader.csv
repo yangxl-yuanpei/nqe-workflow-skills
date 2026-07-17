@@ -1,2 +1,2 @@
 dataset_label,sample_label,rc_index,reaction_coordinate_raw,reaction_coordinate_raw_unit,mean_force_raw,mean_force_raw_unit,uncertainty_raw,reaction_coordinate_au,mean_force_au,uncertainty_au,n_samples,equilibration_discard,source_file,rc_column,force_column,rc_scale,force_scale,parameters_confirmed,notes
-demo_300K,1.2,0,1.2,au,-0.01549067884,au,2.34833697722e-05,1.2,-0.01549067884,2.34833697722e-05,100000,0 rows,C:\Users\94474\Documents\Codex\2026-06-26\w\demo\1.2\energy.dat,col_6,col_7,1,1,true,
+demo_300K,1.2,0,1.2,au,-0.01549067884,au,2.34833697722e-05,1.2,-0.01549067884,2.34833697722e-05,100000,0 rows,../demo\1.2\energy.dat,col_6,col_7,1,1,true,

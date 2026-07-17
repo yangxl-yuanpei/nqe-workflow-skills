@@ -2,6 +2,8 @@
 
 This directory stores compact evidence from real or semi-real script checks. It is not a production dataset archive.
 
+Retained paths in CSV, JSON, and text artifacts may be sanitized for public release. For example, repository-local paths may appear as `<REPO>`, user-site Python paths as `<USER_SITE_PACKAGES>`, and external raw-data paths as `../demo`. These placeholders preserve provenance shape without exposing a maintainer's local filesystem.
+
 ## Canonical Records
 
 - `2026-07-02_real_phy_quant_test_record.md`: single large `PHY_QUANT` diagnostic record. The full raw `PHY_QUANT` file is intentionally not stored in the repository; only file metadata, head/tail excerpts, and checksums are kept under `inputs/`.

@@ -28,7 +28,7 @@ Before conversion, confirm:
 
 ## Confirmed Local Mini Example
 
-The user-provided `../00` directory is a small local example for this workspace. It has ABACUS SCF-style input/output files and a converted DeePMD NPY directory:
+The user-provided `../00` directory is a small maintainer-local example for this workspace. It may not exist in a fresh public clone. It has ABACUS SCF-style input/output files and a converted DeePMD NPY directory:
 
 - source path from the repository root: `..\00`
 - source format, confirmed for this example only: `abacus/scf`
@@ -37,7 +37,7 @@ The user-provided `../00` directory is a small local example for this workspace.
 - label mode, confirmed for this example only: labeled data, so use `--labeled`
 - observed DeePMD files: `type.raw`, `type_map.raw`, `set.000\box.npy`, `coord.npy`, `energy.npy`, and `force.npy`
 
-Use this example to test script interfaces and file-shape checks when dpdata is installed. Do not use its element list, ABACUS settings, labels, units, frame count, or output layout as defaults for another system.
+Use this example to test script interfaces and file-shape checks when dpdata is installed. Do not treat it as a public reproducibility fixture, and do not use its element list, ABACUS settings, labels, units, frame count, or output layout as defaults for another system.
 
 From the repository root, inspect the ABACUS source:
 

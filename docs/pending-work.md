@@ -22,12 +22,12 @@ This file tracks work that remains after the current repository consistency pass
 - A targeted runner deeper failure-case retest exists at `tests/fresh_agent_records/2026-07-14_runner-deeper-failure-targeted_opencode.md`; it passed Tests 9-17 for missing windows, bad columns, unexpected dry-run commands, partial outputs, per-window skiprows errors, parser failures, existing output directories, summary-without-review, and truncated window outputs.
 - A targeted runner output-directory boundary retest exists at `tests/fresh_agent_records/2026-07-17_runner-output-dir-boundary-retest_opencode.md`; it passed non-empty `output_dir` refusal, `allow_existing_output_dir` convenience-fix refusal, and runner-success-is-not-convergence prompts.
 - A targeted upstream DeepModeling boundary retest exists at `tests/fresh_agent_records/2026-07-17_upstream-deepmodeling-boundary_opencode.md`; it passed dpdata, DeePMD, DP-GEN, and LAMMPS/PLUMED prompts that check upstream skills are software-operation references rather than target-system default sources.
-- KMC boundary prompts now cover default convergence-threshold refusal, historical KMC note threshold refusal, and association-only networks with confirmed initial coverage. The latest reported fresh-agent answers passed these checks, but a dedicated KMC fresh-agent record file has not yet been added.
+- KMC boundary prompts now cover default convergence-threshold refusal, historical KMC note threshold refusal, and association-only networks with confirmed initial coverage. The latest reported fresh-agent answers passed these checks, but they remain reported results rather than a dedicated KMC fresh-agent record file.
 - An executable runner negative-fixture record exists at `tests/real_case_records/2026-07-14_runner_negative_fixtures_record.md`; it confirms expected failures for nested YAML, invalid boolean values, too few discovered windows, and invalid `per_window_skiprows_file` values.
 - A runner child-script failure fixture record exists at `tests/real_case_records/2026-07-14_runner_child_failure_fixtures_record.md`; it confirms expected failures for bad extraction columns and truncated window rows.
 - A runner stale-output fixture record exists at `tests/real_case_records/2026-07-17_runner_stale_output_fixture_record.md`; it confirms dry-run command review remains available while real execution refuses non-empty `output_dir` reuse unless `allow_existing_output_dir: true` is explicitly approved.
-- A user-confirmed local dpdata mini example exists outside the repository at `../00` for labeled `abacus/scf -> deepmd/npy` inspection/comparison boundaries. It is documented in `dpdata-format-conversion/README.md` and is not a reusable production default.
-- A real 13-window CHMC/CPIHMC-style dataset exists outside the repository at `../demo`; summaries and diagnostics are recorded under `tests/real_case_records/2026-07-03_demo_multi_window*`.
+- A user-confirmed maintainer-local dpdata mini example exists outside the repository at `../00` for labeled `abacus/scf -> deepmd/npy` inspection/comparison boundaries. It is documented in `dpdata-format-conversion/README.md`, may not exist in a fresh clone, and is not a reusable production default.
+- A real 13-window CHMC/CPIHMC-style dataset exists outside the repository at `../demo`; summaries and diagnostics are recorded under `tests/real_case_records/2026-07-03_demo_multi_window*` with sanitized retained paths for public release.
 - A runner staged fixture for `../demo` exists at `tests/runner_configs/demo_multi_window_dry_run.yaml`; the record is `tests/real_case_records/2026-07-10_demo_runner_dry_run_record.md`. It has been dry-run and executed through convergence CSV summaries plus mean-force extraction, without TI/TST.
 - The staged runner outputs have been reviewed in `tests/real_case_records/2026-07-11_demo_runner_output_review.md`, including corrected convergence plots and discard sensitivity for `0.0` and `1.8`.
 - A separate per-window discard fixture exists at `tests/runner_configs/demo_multi_window_candidate_skiprows.yaml` with `tests/runner_configs/demo_multi_window_candidate_skiprows.csv`. The user accepted `10000` discarded rows for `0.0` and `1.8` in this demo review only; production use still requires direct convergence plot/CSV review.
@@ -113,13 +113,13 @@ Remaining work:
 Current state:
 
 - `inspect_dpdata_system.py`, `convert_with_dpdata.py`, and `compare_converted_system.py` exist.
-- `dpdata-format-conversion/README.md` documents the user-confirmed local `../00` example as labeled `abacus/scf -> deepmd/npy`.
+- `dpdata-format-conversion/README.md` documents the user-confirmed maintainer-local `../00` example as labeled `abacus/scf -> deepmd/npy`.
 - A targeted fresh-agent test record confirms the skill now refuses unknown-format guessing and handles the confirmed `../00` example conservatively.
 - `dpdata-format-conversion/references/dpdata-failure-cases.md` is populated with failure patterns and upstream issue references.
 
 Remaining work:
 
-- Convert the local `../00` example into repeatable documented checks only when a test environment with dpdata is available.
+- Convert the maintainer-local `../00` example into repeatable documented checks only when a test environment with dpdata is available, or replace it with a tiny in-repository fixture if public reproducibility becomes more important than preserving the original local file shape.
 - Optionally use the populated dpdata failure reference to design small executable or documented checks for wrong format strings, missing labels, element-order mismatch, cell-shape mismatch, and frame-count mismatch.
 - Add a short recipe reference for ABACUS -> DeePMD raw/npy and LAMMPS dump inspection when format names are confirmed.
 

@@ -14,7 +14,7 @@ First data row: 1; columns: 8.
 [WARN] Header Inference
   Header was not read directly from this physical-output file; review inferred column mapping.
   Details:
-Current file starts with numeric data, so no header was read from this file. Inferred header from sibling file C:\Users\94474\Documents\Codex\2026-06-26\w\demo\0.0\energy.dat: Steps KinEng PotEng TotEng dE_dN ElecNum RxnCoord MeanForce
+Current file starts with numeric data, so no header was read from this file. Inferred header from sibling file ../demo\0.0\energy.dat: Steps KinEng PotEng TotEng dE_dN ElecNum RxnCoord MeanForce
 
 [PASS] Initial RC Adjustment
   All 1 matched RC value(s) started within tolerance of the target.
@@ -29,7 +29,7 @@ Current file starts with numeric data, so no header was read from this file. Inf
 [WARN] Convergence
   Mean force shows 5.10% drift.
   Details:
-Current file starts with numeric data, so no header was read from this file. Inferred header from sibling file C:\Users\94474\Documents\Codex\2026-06-26\w\demo\0.0\energy.dat: Steps KinEng PotEng TotEng dE_dN ElecNum RxnCoord MeanForce
+Current file starts with numeric data, so no header was read from this file. Inferred header from sibling file ../demo\0.0\energy.dat: Steps KinEng PotEng TotEng dE_dN ElecNum RxnCoord MeanForce
 Consider longer production run for mean force convergence.
 
 [SKIP] INPUT/ALL_INPUT Agreement
