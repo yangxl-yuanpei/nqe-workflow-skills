@@ -183,6 +183,12 @@ def preflight_config(config: dict[str, Any]) -> None:
         require_explicit(config, "convergence_skiprows", problems, "convergence skip-row handling must be explicit")
         require_explicit(config, "convergence_auto_equilibration", problems, "auto-equilibration screening choice must be explicit")
         require_explicit(config, "convergence_plot", problems, "convergence plot/summary-only choice must be explicit")
+        if has_value(config, "convergence_use_row_index_as_step"):
+            row_index_axis = as_bool(config, "convergence_use_row_index_as_step", False)
+            if row_index_axis and (has_value(config, "convergence_step_column") or has_value(config, "convergence_step_col_index")):
+                problems.append(
+                    "convergence_use_row_index_as_step: do not combine row-index x-axis with convergence_step_column or convergence_step_col_index"
+                )
 
     if reaches_stage(stop_after, "extraction"):
         extraction_required = {
@@ -452,6 +458,7 @@ def build_convergence_cmd(
             cmd.extend(["--col-index", str(index)])
     add_opt(cmd, "--step-column", config, "convergence_step_column")
     add_opt(cmd, "--step-col-index", config, "convergence_step_col_index")
+    add_flag(cmd, "--use-row-index-as-step", as_bool(config, "convergence_use_row_index_as_step", False))
     add_opt(cmd, "--running-window", config, "convergence_running_window")
     add_opt(cmd, "--x-scale", config, "convergence_x_scale")
     add_opt(cmd, "--y-scale", config, "convergence_y_scale")

@@ -48,6 +48,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--col-index", action="append", type=int, default=[], help="Zero-based numeric column index to analyze. Repeat for multiple columns.")
     parser.add_argument("--step-column", default="Steps", help="Column name for x-axis steps.")
     parser.add_argument("--step-col-index", type=int, help="Zero-based step column index if no step-column header is available.")
+    parser.add_argument(
+        "--use-row-index-as-step",
+        action="store_true",
+        help=(
+            "Use zero-based data-row/sample index as the diagnostic x-axis when the "
+            "sampling output has no real step/iteration column. The reported "
+            "equilibration_step is then a row index, not a simulation step."
+        ),
+    )
     parser.add_argument("--skiprows", type=int, default=0, help="Number of numeric data rows to skip after the header.")
     parser.add_argument("--delimiter", default=None, help="Optional delimiter. Default: arbitrary whitespace.")
     parser.add_argument("--equilibration-index", type=int, help="Zero-based data-row index where production sampling starts after skiprows.")
@@ -86,6 +95,7 @@ def print_defaults() -> None:
     print("  default analyzed columns: PotEng plus the first available mean-force column among MeanForce or MeanForce_0")
     print("  column indices: zero-based")
     print("  step column: Steps")
+    print("  row-index x-axis: disabled unless --use-row-index-as-step is passed")
     print("  skiprows: 0 numeric data rows after header")
     print("  y-scale: 1.0, x-scale: 1.0")
     print("  auto-equilibration: disabled unless --auto-equilibration is passed")
@@ -393,9 +403,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if not args.summary and args.no_plot:
         parser.error("--summary is required when --no-plot is used")
     header, rows = read_table(args.input, args.delimiter, args.skiprows)
-    step_index = resolve_index(header, args.step_column, args.step_col_index, "step")
+    if args.use_row_index_as_step and (args.step_col_index is not None or args.step_column != "Steps"):
+        parser.error("Use --use-row-index-as-step without --step-column or --step-col-index")
     value_indices = select_value_columns(header, args.column, args.col_index)
-    raw_steps = [row[step_index] * args.x_scale for row in rows]
+    if args.use_row_index_as_step:
+        raw_steps = [float(index) * args.x_scale for index in range(len(rows))]
+        if args.xlabel == "Step":
+            args.xlabel = "Row index after skiprows"
+    else:
+        step_index = resolve_index(header, args.step_column, args.step_col_index, "step")
+        raw_steps = [row[step_index] * args.x_scale for row in rows]
     user_eq_index: Optional[int] = None
     if args.equilibration_index is not None and args.equilibration_step is not None:
         parser.error("Use only one of --equilibration-index or --equilibration-step")
@@ -415,6 +432,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         write_summary(args.summary, diagnostics)
     if not args.no_plot:
         make_plot(args.output, args.title, raw_steps, plot_series, args.running_window, args.xlabel, args.ylabel, args.width, args.height_per_panel, args.dpi)
+    if args.use_row_index_as_step:
+        print("Using row index as diagnostic x-axis; eq_step reports row index, not simulation step.")
     for item in diagnostics:
         print(f"{item.column}: status={item.auto_status}, eq_index={item.equilibration_index}, eq_step={item.equilibration_step}, mean={item.mean:.10g}, sem={item.sem:.4g}, used={item.used_samples}/{item.total_samples}")
         print(f"  note: {item.auto_reason}")

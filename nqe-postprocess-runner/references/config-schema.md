@@ -32,7 +32,7 @@ Window discovery:
 - `sampling_output_root`: directory containing reaction-coordinate window subdirectories.
 - `input_file`: confirmed file name inside each window directory. Required in runnable configs; do not rely on `energy.dat` as an implicit default.
 - `window_glob`: confirmed direct-child glob for window directories. Required in runnable configs; do not rely on `*` as an implicit default.
-- `dataset_label`: label written to output CSVs.
+- `dataset_label`: provenance label written to output CSVs and summaries. It does not by itself choose `output_dir` or file-name prefixes unless a specific config field or script option uses it.
 - `output_dir`: output directory. Default: `nqe-postprocess-output`.
 - `allow_existing_output_dir`: optional safety override, `true` or `false`. Default: `false`. Real execution refuses to write into a non-empty `output_dir` unless this is explicitly set to `true` after inspecting old outputs and approving reuse or cleanup. Do not add this field as the first remedy or as a convenience fix. Dry-run does not write outputs and does not require this field.
 - `stop_after`: optional stage boundary, one of `convergence`, `extraction`, `integration`, `plot`, or `all`. Default: `all`.
@@ -48,6 +48,7 @@ Stage boundary:
 - For broad user requests such as "postprocess this batch", do not infer a full pipeline. Default to `stop_after: convergence` or `stop_after: extraction` until the user separately confirms integration direction, zero reference, unit conversion, and mean-force sign convention.
 - When asking for `sampling_output_root`, state the intended first stop stage and the downstream confirmation gates. Do not ask for the path as if it were enough to authorize TI or TST.
 - If candidate directories are found before the user confirms `sampling_output_root`, list them as candidates and ask which one is intended. Discovery is not confirmation; a bundled `demo/` or previous real-case record is not the user's new batch just because it exists in the repository.
+- Read-only inventory is allowed before a runnable config exists. Counting windows, checking row counts, detecting short rows, and comparing `INPUT`/`ALL_INPUT` files are inspection tasks, not runner execution; they do not require `parameters_confirmed: true` and do not authorize child scripts or downstream TI/TST.
 
 Optional convergence screening before TI:
 
@@ -56,6 +57,7 @@ Optional convergence screening before TI:
 - `convergence_output_dir`: optional directory for per-window diagnostic plots and CSV summaries. Default: `output_dir/convergence`.
 - `convergence_skiprows`: numeric rows to discard before the diagnostic script. Required when convergence screening is enabled.
 - `convergence_step_column`, `convergence_step_col_index`: optional step-axis settings for the diagnostic script.
+- `convergence_use_row_index_as_step`: optional `true` or `false`. Use `true` only when the sampling output has no real step/iteration column and the user has approved row/sample index as the diagnostic x-axis. Do not combine it with `convergence_step_column` or `convergence_step_col_index`.
 - `convergence_running_window`: optional rolling-average window for convergence plots. Default: `0`.
 - `convergence_x_scale`, `convergence_y_scale`: optional axis scaling for the diagnostic script.
 - `convergence_xlabel`, `convergence_ylabel`: optional axis labels for the diagnostic script.
@@ -66,7 +68,10 @@ Convergence-screening boundary:
 
 - These diagnostics call `chmc-cpihmc-sampling/scripts/analyze_phy_quant_convergence.py` once per window before mean-force extraction.
 - The generated plot/CSV outputs are screening aids only. They do not automatically rewrite `skiprows`, do not prove equilibration, and still require user review before TI handoff.
+- Convergence screening and mean-force extraction are separate stages. Screening plots/CSVs diagnose time-series behavior; extraction produces `mean_force_table.csv` for TI only after parser, column, unit, and discard choices are confirmed.
 - If `convergence_plot: false`, the runner generates only per-window CSV summaries via `--no-plot`; this avoids adding plotting dependencies but removes the visual inspection artifact.
+- If the sampling output has no step/iteration column, do not use a physical observable such as kinetic energy as a fake x-axis. Ask the user to confirm `convergence_use_row_index_as_step: true`; then any reported `equilibration_step` is a row index after `convergence_skiprows`, not a simulation step.
+- Do not set `convergence_auto_equilibration: true` in a runnable config unless the user has explicitly confirmed that suggested equilibration indices are screening hints only. For drafts, prefer `TODO_USER_APPROVAL` or `false` until the user decides.
 
 Mean-force extraction:
 

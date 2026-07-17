@@ -88,6 +88,7 @@ python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_con
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_invalid_bool.yaml --dry-run
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_missing_windows.yaml --dry-run
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_invalid_per_window_skiprows.yaml --dry-run
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/no_step_convergence_row_index.yaml --dry-run
 ```
 
 These checks only confirm that minimal static checkers and script interfaces load and expose expected options. They do not validate convergence, parameter quality, or physical correctness. The CHMC/CPIHMC convergence helper reports screening diagnostics only; plot review and user-approved equilibration choices are still required.
@@ -96,6 +97,7 @@ For ABACUS, the static checker also checks INPUT-declared STRU/KPT paths and pse
 
 The postprocess runner smoke test uses `--dry-run` so it checks config parsing, window discovery, and generated child commands without executing the TI/TST scripts or requiring plotting dependencies.
 The convergence-screening example extends this check by verifying that per-window `analyze_phy_quant_convergence.py` commands are generated before mean-force extraction, without treating suggested cutoffs as automatic TI discard lengths.
+The `no_step_convergence_row_index.yaml` fixture checks headerless CPIHMC-style data with no step column. It should generate convergence commands with `--use-row-index-as-step`; this is a diagnostic x-axis only, and reported `eq_step` values mean row indices rather than physical simulation steps.
 The plot-only fixture verifies that `stop_after: plot` can generate plot commands from existing reviewed CSV files without rediscovering windows, re-extracting mean forces, reintegrating free energy, or running TST.
 The `postprocess_missing_defaults.yaml` check is expected to fail with a preflight error. It verifies that `parameters_confirmed: true` is not enough when parser mode, columns, units, TI zero reference, or TST/plot choices are still implicit.
 The `negative_*.yaml` runner fixtures are also expected to fail. They verify executable rejection of nested YAML, invalid boolean values, too few discovered windows, and non-numeric per-window skiprows such as `SUGGESTED`.
@@ -154,9 +156,15 @@ For plot-only runner tests, use `stop_after: plot` with existing CSV inputs. The
 
 For broad prompts such as "postprocess this batch", the expected fresh-agent behavior is to stage the workflow and stop before TI unless integration direction, zero reference, unit conversion, and mean-force sign convention have been explicitly confirmed. If the agent asks for `sampling_output_root`, it should also state the intended first stop stage and the downstream confirmation gates. If it discovers plausible directories such as `demo/`, it should present them as candidates only and ask the user to confirm the intended root. A generic postprocessing request should not trigger `stop_after: integration`, plots, TST, or rate calculation by default.
 
+Broad runner tests should distinguish read-only inventory from runner execution. A fresh agent may count windows, compare `INPUT`/`ALL_INPUT`, check row counts, and detect short rows before `parameters_confirmed: true`; it should not call that inventory a runner dry-run, and it should not claim that inventory authorizes extraction, TI, or TST.
+
 The 2026-07-14 targeted runner/TI-TST boundary retest is recorded in `tests/fresh_agent_records/2026-07-14_runner-ti-tst-boundary-retest_opencode.md`. It confirms that fresh-agent behavior now treats discovered paths, observed CSV headers, optional defaults, and default TST phrases as candidates rather than user confirmation.
 
 Broad runner tests should also check parser and skip-row wording. The agent must not infer `format: phy_quant` for a whole batch from a single header; it should require confirmation that all windows have reliable compatible headers or ask for explicit zero-based table indices. It must not propose `skiprows: 1` to skip a text header, because runner extraction `skiprows` discards numeric data rows after header/comment handling. Use `skiprows: 0` unless the user has confirmed an equilibration or data-row discard.
+
+If convergence screening data have no real step or iteration column, the agent must not use a physical observable column as a fake step axis. It should either ask for a real step column or require explicit approval for row/sample index mode through `convergence_use_row_index_as_step: true`.
+
+Fresh-agent wording should keep convergence diagnostics separate from extraction. `stop_after: convergence` generates screening plots/CSVs only; `stop_after: extraction` may run those diagnostics and then write a mean-force table. If `convergence_auto_equilibration` appears in a draft before user confirmation, it should be `TODO_USER_APPROVAL` or `false`; if set to `true`, the answer must say it is only a screening aid. `dataset_label` should be described as provenance/output-table metadata, not as an automatic output-directory or file-prefix control.
 
 The runner section of `tests/manual_prompts.md` also includes deeper failure-case prompts for missing windows, bad columns, surprising dry-run commands, child-script failure after partial outputs, invalid or unreviewed `per_window_skiprows_file` values, parser failures, existing output directories, summary files without physical review, and truncated window outputs. Use these when testing whether a fresh agent can route runner failures to the right stage without inventing windows, columns, discard policies, TI choices, TST settings, or KMC readiness.
 

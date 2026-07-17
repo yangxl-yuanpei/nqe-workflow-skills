@@ -15,6 +15,13 @@ Typical columns are:
 
 Column indices in the scripts are zero-based. Prefer column names when the header is available.
 
+Some CPIHMC `energy.dat` files contain only physical observables, for example
+`ke pe etotal rc mfl mfr`, and have no step or iteration column. In that case,
+do not use a physical observable such as kinetic energy as a fake step axis.
+Use `--use-row-index-as-step` only after the user confirms that row/sample index
+is acceptable as a diagnostic x-axis. Then `equilibration_step` in the CSV and
+printed output means row index after `--skiprows`, not a simulation step.
+
 ## Diagnostic Script
 
 Use scripts/analyze_phy_quant_convergence.py to plot one or more columns from a PHY_QUANT or energy.dat style file.
@@ -39,6 +46,7 @@ Before running the script, ask the user to confirm:
 
 - input file path
 - columns to inspect
+- the step-axis source: a real step column/index, or row/sample index via `--use-row-index-as-step` when no step column exists
 - whether any initial rows should be skipped
 - whether --equilibration-index, --equilibration-step, or --auto-equilibration should be used
 - whether any unit scaling is needed through --x-scale or --y-scale

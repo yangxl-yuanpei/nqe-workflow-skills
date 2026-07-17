@@ -27,9 +27,10 @@ Use this skill as the thin automation layer above `ti-tst-rate`. It discovers sa
 4. Inspect the config before running anything. Confirm that paths exist, `parameters_confirmed: true` is present, and all required scientific choices for the configured `stop_after` stage are explicit. Expect the runner to refuse configs that still rely on `format: auto`, missing extraction columns, missing unit/scale fields, missing TI zero references, or missing TST free-energy/prefactor fields.
 5. If any required value is missing or ambiguous, ask the user before editing or running the config. Do not infer it from file order, directory names, or examples.
 6. If the config enables convergence screening, confirm the selected `PHY_QUANT`/`energy.dat` diagnostic columns, skip policy, whether plots should be generated, and whether `--auto-equilibration` is only being used as a screening aid.
-7. Run `--dry-run` first and show the generated child commands to the user unless the user explicitly says they already dry-ran the same config.
-8. Only run without `--dry-run` after the user confirms the dry-run commands or explicitly asks for execution of an already confirmed config.
-9. Report generated files and repeat the reactant/transition-state selection from `tst_rates.csv` for user confirmation.
+7. Read-only inventory of sampling folders, row counts, column counts, and `INPUT`/`ALL_INPUT` consistency is allowed before a runnable config exists. Inventory is not runner execution, does not require `parameters_confirmed: true`, and does not authorize TI/TST.
+8. Run `--dry-run` first and show the generated child commands to the user unless the user explicitly says they already dry-ran the same config.
+9. Only run without `--dry-run` after the user confirms the dry-run commands or explicitly asks for execution of an already confirmed config.
+10. Report generated files and repeat the reactant/transition-state selection from `tst_rates.csv` for user confirmation.
 
 Use this command for the first check:
 
@@ -64,8 +65,10 @@ When the user asks an agent to run this postprocessing workflow:
 - When asking the user for `sampling_output_root` or a sampling-output directory after a broad request, also state the intended first stop stage and downstream gates: first inspect/diagnose file shapes and convergence/extraction only; do not integrate until TI direction, zero reference, unit conversion, and mean-force sign are confirmed; do not run TST/rates until state selection, temperature, and prefactor are confirmed.
 - If workspace inspection reveals likely directories such as `demo/`, `results/`, or reaction-coordinate window folders, describe them as candidate paths only. Do not silently adopt a discovered directory as `sampling_output_root`, and do not phrase a candidate as "the user's windows" or "the batch" until the user confirms it. Ask the user to confirm the intended root before writing a runnable config or running commands.
 - If the user only gives a sampling-output directory, inspect available file shapes if useful, then ask for the missing config parameters; do not run the runner directly and do not write a runnable config from directory names alone.
+- Treat read-only inventory separately from runner execution. Listing windows, checking row counts, finding short rows, and comparing `INPUT`/`ALL_INPUT` files may be done before `parameters_confirmed: true`; do not describe this inventory as a runner dry-run or as approval to execute child scripts.
 - Do not infer a whole-batch parser mode from one file. Use `format: phy_quant` only after confirming all included windows have reliable compatible headers with the named columns. If headers are absent, inconsistent, or only partially checked, ask whether to use `format: table` with explicit zero-based `rc_col_index` and `force_col_index` instead.
 - Treat `skiprows` as a data-row discard applied after header/comment handling. Never set `skiprows: 1` merely to skip a header; headers are handled by the parser. Use `skiprows: 0` unless the user confirms an equilibration/data discard length.
+- Treat `dataset_label` as a provenance/output-table label. Do not say it controls output directory names or file prefixes unless the current config or script path actually uses it that way.
 - If the user gives a config with `parameters_confirmed: false` or no `parameters_confirmed` field, review the missing choices and stop before execution.
 - If the user gives a config with `parameters_confirmed: true`, still run `--dry-run` first and check that the generated child commands match the intended inputs, outputs, units, integration direction, state selection, temperature, and prefactor.
 - Before real execution, inspect whether the configured `output_dir` is non-empty. Prefer a fresh output directory for materially different configs or reruns after failure. Set `allow_existing_output_dir: true` only when the user has explicitly approved reusing or cleaning old outputs; this is an operational override, not a scientific approval.
@@ -73,6 +76,7 @@ When the user asks an agent to run this postprocessing workflow:
 - If the user asks to add `allow_existing_output_dir: true`, do not immediately ask which config to edit or add the field as a convenience fix. First ask whether they have inspected the existing `output_dir` and explicitly approve reuse or cleanup. Prefer suggesting a fresh `output_dir`, and never describe reuse as a clean overwrite because old plots, convergence summaries, or provenance-bearing files may remain.
 - Do not claim that enabling `allow_existing_output_dir` makes a rerun clean, complete, or converged. Runner success means child commands completed; it does not prove sampling convergence, remove arbitrary stale artifacts, merge provenance, or approve downstream TI/TST/KMC readiness.
 - If the user gives a config with `run_convergence_diagnostics: true`, check that the generated child commands inspect the intended convergence columns, honor the confirmed plot or summary-only choice, and do not silently turn suggested equilibration cutoffs into TI-ready discard lengths.
+- If drafting convergence screening before the user has decided about automatic equilibration suggestions, leave `convergence_auto_equilibration` as `TODO_USER_APPROVAL` or set it to `false`. Set it to `true` only after the user confirms it is a screening aid, not a production discard policy.
 - If the user wants per-window extraction discard, require a user-reviewed `per_window_skiprows_file`; do not auto-convert convergence `SUGGESTED` cutoffs into production `skiprows`. For production use, explicitly remind the user to inspect the convergence plots/CSVs themselves and approve whether the proposed discard is scientifically reasonable.
 - If the user wants convergence or extraction only, use a confirmed `stop_after` value rather than filling fake TI/TST fields.
 - If the user later confirms TI choices, create a separate `stop_after: integration` config or clearly update the existing config, then dry-run again before execution. Do not proceed from a generic postprocessing request directly to integration or TST.
@@ -94,7 +98,7 @@ When the user asks an agent to run this postprocessing workflow:
 - optionally call `compute_tst_rates.py`
 - write `summary.json`, or `plot_summary.json` for `stop_after: plot`
 
-The `stop_after` config field can intentionally stop at `convergence`, `extraction`, or `integration` so the runner does not require or generate later-stage commands before those physical choices are confirmed. `stop_after: plot` is a separate plot-only mode for already generated CSV files.
+The `stop_after` config field can intentionally stop at `convergence`, `extraction`, or `integration` so the runner does not require or generate later-stage commands before those physical choices are confirmed. `stop_after: convergence` is diagnostic screening only. `stop_after: extraction` may include convergence screening and then mean-force extraction. `stop_after: plot` is a separate plot-only mode for already generated CSV files.
 
 The script supports a small YAML subset and JSON using only the Python standard library.
 

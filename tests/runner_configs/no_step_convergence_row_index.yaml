@@ -1,0 +1,19 @@
+# Positive dry-run fixture for headerless convergence data with no step column.
+# The input columns are zero-based: ke pe etotal rc mfl mfr.
+# Row-index mode is explicit and diagnostic only; it must not be interpreted as
+# a physical simulation step.
+parameters_confirmed: true
+
+dataset_label: no_step_convergence_row_index_fixture
+sampling_output_root: fixtures/no_step_windows
+input_file: energy.dat
+window_glob: "*"
+output_dir: tmp/no-step-convergence-row-index
+
+stop_after: convergence
+run_convergence_diagnostics: true
+convergence_columns: 1,2,3,4,5
+convergence_skiprows: 0
+convergence_use_row_index_as_step: true
+convergence_auto_equilibration: false
+convergence_plot: false
