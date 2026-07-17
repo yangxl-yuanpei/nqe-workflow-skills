@@ -24,6 +24,7 @@ This file tracks work that remains after the current repository consistency pass
 - KMC boundary prompts now cover default convergence-threshold refusal, historical KMC note threshold refusal, and association-only networks with confirmed initial coverage. The latest reported fresh-agent answers passed these checks, but a dedicated KMC fresh-agent record file has not yet been added.
 - An executable runner negative-fixture record exists at `tests/real_case_records/2026-07-14_runner_negative_fixtures_record.md`; it confirms expected failures for nested YAML, invalid boolean values, too few discovered windows, and invalid `per_window_skiprows_file` values.
 - A runner child-script failure fixture record exists at `tests/real_case_records/2026-07-14_runner_child_failure_fixtures_record.md`; it confirms expected failures for bad extraction columns and truncated window rows.
+- A runner stale-output fixture record exists at `tests/real_case_records/2026-07-17_runner_stale_output_fixture_record.md`; it confirms dry-run command review remains available while real execution refuses non-empty `output_dir` reuse unless `allow_existing_output_dir: true` is explicitly approved.
 - A user-confirmed local dpdata mini example exists outside the repository at `../00` for labeled `abacus/scf -> deepmd/npy` inspection/comparison boundaries. It is documented in `dpdata-format-conversion/README.md` and is not a reusable production default.
 - A real 13-window CHMC/CPIHMC-style dataset exists outside the repository at `../demo`; summaries and diagnostics are recorded under `tests/real_case_records/2026-07-03_demo_multi_window*`.
 - A runner staged fixture for `../demo` exists at `tests/runner_configs/demo_multi_window_dry_run.yaml`; the record is `tests/real_case_records/2026-07-10_demo_runner_dry_run_record.md`. It has been dry-run and executed through convergence CSV summaries plus mean-force extraction, without TI/TST.
@@ -87,7 +88,7 @@ Current state:
 Remaining work:
 
 - Prompt-level runner failure routing has a targeted fresh-agent pass for missing windows, bad columns, unexpected dry-run commands, child-script failures, per-window discard errors, config parser failures, existing output directories, summary-without-physical-review, and truncated window outputs.
-- Extend executable runner negative validation to the remaining practical failure families, especially output-directory reuse, stale partial-output handling, and real-data recovery. Parser, missing-window, invalid-boolean, invalid-per-window-skiprows, bad-column, and truncated-window fixtures already exist.
+- Extend executable runner negative validation to the remaining practical failure families, especially stale partial-output handling and real-data recovery. Parser, missing-window, invalid-boolean, invalid-per-window-skiprows, bad-column, truncated-window, and stale-output-dir fixtures already exist.
 - Review the guarded TI-only free-energy profile before any TST handoff. TST still requires explicit reactant/transition-state selection, free-energy column/unit, temperature, prefactor model, and prefactor units.
 - Consider adding a `--generate-config` or draft-config mode only if it can preserve `parameters_confirmed: false` for unapproved values.
 
@@ -161,7 +162,7 @@ Use `tests/fresh_agent_record_template.md` as the copyable record template.
 
 Highest-priority fresh-agent sections:
 
-- `nqe-postprocess-runner` executable negative fixtures beyond the current parser/discovery/skiprows/bad-column/truncation fixtures, especially stale-output and real-data failure recovery
+- `nqe-postprocess-runner` executable negative fixtures beyond the current parser/discovery/skiprows/bad-column/truncation/stale-output fixtures, especially stale partial-output and real-data failure recovery
 - `chmc-cpihmc-sampling` only after further script/reference changes
 - `ti-tst-rate` deeper prompts beyond the no-defaults retest
 - `dpdata-format-conversion` only when adding new executable checks or changing the anti-guessing/reference behavior
@@ -185,7 +186,7 @@ Do not state that production readiness or exhaustive coverage has been achieved.
 ## Suggested Priority Order
 
 1. Implement the minimal KMC schema/static checker if the next pass continues KMC work.
-2. Extend runner negative fixtures toward stale-output and real-data failure families now covered by prompt-level tests.
+2. Extend runner negative fixtures toward stale partial-output and real-data failure families now covered by prompt-level tests.
 3. Review the guarded TI-only profile only if preparing a separate TST-confirmation checklist.
 4. Keep dpdata repeatable checks deferred until a dpdata-enabled test environment is available.
 5. Choose at most one optional static checker for DP-GEN, DeePMD, LAMMPS/PLUMED, ABACUS, or dpdata conversion only if it directly supports current validation needs.

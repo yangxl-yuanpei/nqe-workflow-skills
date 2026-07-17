@@ -34,6 +34,7 @@ Window discovery:
 - `window_glob`: confirmed direct-child glob for window directories. Required in runnable configs; do not rely on `*` as an implicit default.
 - `dataset_label`: label written to output CSVs.
 - `output_dir`: output directory. Default: `nqe-postprocess-output`.
+- `allow_existing_output_dir`: optional safety override, `true` or `false`. Default: `false`. Real execution refuses to write into a non-empty `output_dir` unless this is explicitly set to `true` after inspecting or approving reuse of old outputs. Dry-run does not write outputs and does not require this field.
 - `stop_after`: optional stage boundary, one of `convergence`, `extraction`, `integration`, `plot`, or `all`. Default: `all`.
 - Directories discovered during workspace inspection are candidates only. Do not silently promote a discovered directory such as `demo/` or `results/` to `sampling_output_root`; ask the user to confirm the intended root before writing a runnable config or running commands. Do not describe a discovered candidate as the user's dataset until the user confirms it.
 
@@ -142,6 +143,13 @@ Optional:
 - `ti_tst_scripts_dir`: override path to `ti-tst-rate/scripts`.
 - `notes`: text added to generated CSV rows.
 - CLI `--dry-run`: print generated child commands without executing them. Use this first for smoke testing and config review.
+
+Output-directory reuse boundary:
+
+- By default, a real runner execution refuses a non-empty `output_dir` before deleting or overwriting known outputs.
+- Prefer a fresh `output_dir` for materially different configs or reruns after child-script failure.
+- Set `allow_existing_output_dir: true` only after the user has inspected old outputs or approved reuse/cleanup. This flag is an operational override; it does not merge provenance or certify stale outputs.
+- Dry-run may be used to review commands even when the output directory contains old files, because it does not execute child scripts or write outputs.
 
 Agent execution rule:
 

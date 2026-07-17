@@ -68,6 +68,7 @@ When the user asks an agent to run this postprocessing workflow:
 - Treat `skiprows` as a data-row discard applied after header/comment handling. Never set `skiprows: 1` merely to skip a header; headers are handled by the parser. Use `skiprows: 0` unless the user confirms an equilibration/data discard length.
 - If the user gives a config with `parameters_confirmed: false` or no `parameters_confirmed` field, review the missing choices and stop before execution.
 - If the user gives a config with `parameters_confirmed: true`, still run `--dry-run` first and check that the generated child commands match the intended inputs, outputs, units, integration direction, state selection, temperature, and prefactor.
+- Before real execution, inspect whether the configured `output_dir` is non-empty. Prefer a fresh output directory for materially different configs or reruns after failure. Set `allow_existing_output_dir: true` only when the user has explicitly approved reusing or cleaning old outputs; this is an operational override, not a scientific approval.
 - If the user gives a config with `run_convergence_diagnostics: true`, check that the generated child commands inspect the intended convergence columns, honor the confirmed plot or summary-only choice, and do not silently turn suggested equilibration cutoffs into TI-ready discard lengths.
 - If the user wants per-window extraction discard, require a user-reviewed `per_window_skiprows_file`; do not auto-convert convergence `SUGGESTED` cutoffs into production `skiprows`. For production use, explicitly remind the user to inspect the convergence plots/CSVs themselves and approve whether the proposed discard is scientifically reasonable.
 - If the user wants convergence or extraction only, use a confirmed `stop_after` value rather than filling fake TI/TST fields.
@@ -95,6 +96,8 @@ The `stop_after` config field can intentionally stop at `convergence`, `extracti
 The script supports a small YAML subset and JSON using only the Python standard library.
 
 Before generating child commands, the script rejects runnable configs that still rely on implicit column choices or physical defaults.
+
+Before real execution, the script refuses a non-empty `output_dir` unless `allow_existing_output_dir: true` is explicitly set. Dry-run remains available for command review because it writes no files.
 
 The optional convergence step is still a pre-TI screening layer, not automatic convergence proof and not automatic equilibration trimming.
 

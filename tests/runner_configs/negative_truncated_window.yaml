@@ -7,6 +7,7 @@ input_file: energy.dat
 window_glob: "*"
 dataset_label: truncated_window_should_fail
 output_dir: ../../tmp/runner-negative-truncated-window-output
+allow_existing_output_dir: true
 stop_after: extraction
 
 format: table

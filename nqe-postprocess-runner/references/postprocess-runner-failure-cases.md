@@ -268,7 +268,8 @@ Agent response:
 Typical symptoms:
 
 - A previous `mean_force_table.csv`, `free_energy_profile.csv`, `tst_rates.csv`, or `summary.json` exists in `output_dir`.
-- The runner removes known output CSV/JSON files before a real run.
+- The runner refuses a real run because `output_dir` is non-empty.
+- Older runner versions removed known output CSV/JSON files before a real run.
 - Plot or convergence files from a previous run remain and may be confused with new outputs.
 
 Likely causes:
@@ -281,9 +282,10 @@ Agent response:
 
 1. Inspect `output_dir` before rerunning.
 2. Prefer a fresh output directory for materially different configs.
-3. Ask the user before deleting or overwriting outputs.
+3. Ask the user before deleting, overwriting, or explicitly allowing reuse of outputs.
 4. Record which run produced which outputs.
 5. Do not merge outputs from different configs without provenance.
+6. Use `allow_existing_output_dir: true` only as a user-approved operational override; it is not a scientific approval or provenance merge.
 
 ## Summary Exists But Physical Review Is Missing
 

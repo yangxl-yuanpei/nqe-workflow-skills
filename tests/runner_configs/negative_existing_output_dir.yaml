@@ -1,0 +1,22 @@
+# Negative fixture: real execution must refuse a non-empty output_dir unless
+# allow_existing_output_dir is explicitly confirmed. Dry-run may still print
+# commands because it writes nothing.
+parameters_confirmed: true
+
+sampling_output_root: fixtures/two_windows
+input_file: energy.dat
+window_glob: "*"
+dataset_label: existing_output_dir_should_fail
+output_dir: fixtures/stale_output_dir
+stop_after: extraction
+
+format: phy_quant
+skiprows: 0
+rc_raw_unit_label: au
+force_raw_unit_label: au
+rc_scale: 1.0
+force_scale: 1.0
+rc_index: 0
+rc_column: RxnCoord
+force_column: MeanForce
+uncertainty: sem

@@ -362,6 +362,23 @@ def unlink_outputs(paths: Sequence[Path], dry_run: bool) -> None:
             path.unlink()
 
 
+def guard_existing_output_dir(output_dir: Path, allow_existing: bool, dry_run: bool) -> None:
+    """Refuse to run into a non-empty output directory unless explicitly allowed."""
+    if dry_run or allow_existing or not output_dir.exists():
+        return
+    existing = sorted(output_dir.iterdir(), key=lambda item: item.name)
+    if not existing:
+        return
+    preview = ", ".join(item.name for item in existing[:5])
+    if len(existing) > 5:
+        preview += f", ... ({len(existing)} entries total)"
+    raise ValueError(
+        f"Refusing to write into non-empty output_dir: {output_dir}. "
+        f"Existing entries: {preview}. Use a fresh output_dir, inspect and clean the old outputs, "
+        "or set allow_existing_output_dir: true only after user-approved reuse/cleanup."
+    )
+
+
 def build_extract_cmd(
     python: str,
     scripts: Path,
@@ -594,6 +611,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 + ", ".join(unknown)
             )
 
+    allow_existing_output_dir = as_bool(config, "allow_existing_output_dir", False)
+    guard_existing_output_dir(out, allow_existing_output_dir, args.dry_run)
     if not args.dry_run:
         out.mkdir(parents=True, exist_ok=True)
     if run_convergence and not args.dry_run:

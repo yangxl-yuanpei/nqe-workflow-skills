@@ -1,0 +1,3 @@
+{
+  "note": "stale runner output fixture; real runs should refuse this non-empty output_dir unless explicitly allowed"
+}

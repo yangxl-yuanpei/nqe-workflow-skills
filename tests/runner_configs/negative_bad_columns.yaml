@@ -7,6 +7,7 @@ input_file: energy.dat
 window_glob: "*"
 dataset_label: bad_columns_should_fail
 output_dir: ../../tmp/runner-negative-bad-columns-output
+allow_existing_output_dir: true
 stop_after: extraction
 
 format: phy_quant

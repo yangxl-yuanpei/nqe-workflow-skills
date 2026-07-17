@@ -109,9 +109,13 @@ python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_con
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_bad_columns.yaml
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_truncated_window.yaml --dry-run
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_truncated_window.yaml
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_existing_output_dir.yaml --dry-run
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_existing_output_dir.yaml
 ```
 
-`negative_bad_columns.yaml` should dry-run successfully but fail during extraction because the confirmed `rc_column` and `force_column` do not exist. `negative_truncated_window.yaml` should dry-run successfully but fail during extraction because one discovered window has a short data row. These runs write only to ignored `tmp/runner-negative-*` directories. Treat any partial CSV there as diagnostic evidence of child-script failure, not as input to TI.
+`negative_bad_columns.yaml` should dry-run successfully but fail during extraction because the confirmed `rc_column` and `force_column` do not exist. `negative_truncated_window.yaml` should dry-run successfully but fail during extraction because one discovered window has a short data row. These runs write only to ignored `tmp/runner-negative-*` directories and explicitly set `allow_existing_output_dir: true` because they are repeatable diagnostic fixtures. Treat any partial CSV there as diagnostic evidence of child-script failure, not as input to TI.
+
+`negative_existing_output_dir.yaml` should dry-run successfully but fail before real execution because its `output_dir` intentionally contains a stale `summary.json` fixture. This checks that real runner execution refuses non-empty output directories unless reuse has been explicitly approved with `allow_existing_output_dir: true`.
 
 ## Real-Data Diagnostic Records
 
@@ -129,6 +133,7 @@ Current records include:
 - `2026-07-11_reviewed_ti_only_record.md`: guarded TI-only execution using user-confirmed ascending integration, most-negative-RC endpoint zero, eV conversion, and `dF/dRC` mean-force sign. It does not approve TST.
 - `2026-07-14_runner_negative_fixtures_record.md`: executable negative-runner fixture record covering nested YAML rejection, invalid boolean rejection, missing-window discovery failure, and invalid per-window skiprows failure.
 - `2026-07-14_runner_child_failure_fixtures_record.md`: child-script negative-runner fixture record covering bad extraction columns and truncated window output.
+- `2026-07-17_runner_stale_output_fixture_record.md`: executable negative-runner fixture record covering real-run refusal for non-empty `output_dir` unless `allow_existing_output_dir: true` is explicitly approved.
 
 Use these records to understand script behavior on real file shapes. Do not treat them as production convergence evidence or reusable physical defaults.
 
