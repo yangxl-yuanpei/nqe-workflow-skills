@@ -11,6 +11,7 @@ Quick entry points:
 - [Testing Guide](docs/testing.md)
 - [Fresh-Agent Testing](docs/fresh-agent-testing.md)
 - [Upstream DeepModeling Community Skills](docs/upstream-community-skills.md)
+- [Release Readiness Checklist](docs/release-readiness.md)
 
 ## Workflow Scope
 
