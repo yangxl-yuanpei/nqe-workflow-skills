@@ -41,6 +41,7 @@ Use this skill for kinetic Monte Carlo as a general event-based simulation stage
 - Do not claim a meta two-H association rate alone is enough for full KMC.
 - Do not claim KMC directly uses CPIHMC mean force or trajectories.
 - Do not claim KMC outputs are statistically converged without documented trajectory statistics and steady-state checks.
+- Do not provide default convergence thresholds, replicate counts, event-count cutoffs, isotope ratios, temperature grids, or tolerance percentages unless the user or project protocol has supplied them.
 - Do not decide physical assumptions such as thermalization, gas-dust decoupling, coverage independence, or adiabatic adsorption without user approval.
 
 - Use `../common/scripts/check_workflow_files.py --software kmc --path PATH_TO_KMC_INPUTS` for a minimal static check of KMC event and parameter JSON files. Treat warnings as prompts for human review, not as event-network validation.

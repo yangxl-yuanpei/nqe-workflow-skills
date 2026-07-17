@@ -84,6 +84,10 @@ Agent response:
 2. Mark missing or intentionally excluded channels explicitly.
 3. Check whether each event changes the state in a defined way.
 4. Do not invent missing transitions or reverse events.
+5. Do not declare an association-only network impossible without checking the
+   user-defined initial coverage, reservoir, or source assumptions. Missing
+   adsorption, desorption, or hopping channels should remain explicit TODOs or
+   documented exclusions.
 
 ## Rate Table Labels, Units, Or Conditions Do Not Match Events
 
@@ -185,6 +189,9 @@ Agent response:
    modified.
 3. Do not copy species ratios, temperatures, or barriers from old examples as
    defaults.
+4. Do not copy historical regression tolerances, isotope ratios, temperature
+   grids, or rare-event explanations into a new system. Ask the user to define
+   acceptance criteria and isotope/environment assumptions for the target run.
 
 ## Output Counts Are Misinterpreted As Formation Efficiency
 
@@ -232,6 +239,10 @@ Agent response:
    uncertainty estimates, and steady-state or transient interpretation.
 2. Report missing convergence evidence as TODO.
 3. Do not claim statistical convergence from script completion alone.
+4. Do not provide fixed default convergence thresholds such as a required
+   trajectory count, event-count cutoff, or percent uncertainty target unless
+   the user or project protocol has supplied them. Ask the user to define the
+   statistical precision and review criteria for the target observable.
 
 ## Stale Or Mixed Outputs Are Used
 
@@ -282,6 +293,10 @@ Agent response:
    event list, or observable before using it.
 3. Do not migrate material-specific rates, temperatures, isotope ratios,
    lattice models, or output definitions into a new target system.
+4. Do not promote historical testing thresholds, trajectory counts, event-count
+   expectations, or tolerance percentages into general recommendations. If they
+   appear in an old code note, label them as code-specific historical values
+   that require separate user approval before reuse.
 
 ## How To Recover
 

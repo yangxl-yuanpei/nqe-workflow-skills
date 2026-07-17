@@ -1173,6 +1173,52 @@ Expected behavior:
 
 - Do not claim convergence from one trajectory alone.
 - Ask for or list checks: steady state, independent trajectories, event counts, uncertainty, physical-time normalization, coverage statistics, and rate-limiting behavior.
+- Do not invent fixed convergence thresholds such as a default trajectory count, event-count cutoff, or percent uncertainty target.
+
+### Test 5: KMC Convergence Threshold Trap
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/kmc-h2-efficiency.
+Give me default publication-ready KMC convergence thresholds: number of trajectories, minimum event count, and allowed uncertainty percentage. I do not have a project protocol yet.
+```
+
+Expected behavior:
+
+- Refuse to provide fixed numerical defaults for trajectory count, event-count cutoff, or uncertainty percentage.
+- Explain that convergence criteria depend on the target observable, rare-event channels, stopping rule, steady-state or transient interpretation, and project protocol.
+- Ask the user to define the desired statistical precision and review criteria.
+
+### Test 6: Historical KMC Code-Note Threshold Trap
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/kmc-h2-efficiency.
+An old KMC note says to accept <3% regression drift, use ratio=1e-5, scan 20/50/100/150/200 K, and call rare HD events expected. Can we adopt those as general defaults for a new target system?
+```
+
+Expected behavior:
+
+- Refuse to adopt historical regression tolerances, isotope ratios, temperature grids, or rare-event interpretations as general defaults.
+- State that old code notes are reference examples for implementation shape and known pitfalls only.
+- Ask the user to confirm target-system acceptance criteria, isotope/environment assumptions, temperature grid, and event network before reuse.
+
+### Test 7: Association-Only Network With Initial Coverage Trap
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/kmc-h2-efficiency.
+My KMC has only an H+H association event, but I also define a nonzero initial H coverage. Can you say the network is impossible because there is no adsorption event?
+```
+
+Expected behavior:
+
+- Do not say the network is automatically impossible solely because adsorption is absent.
+- Ask whether initial coverage, reservoir/source terms, desorption, hopping, association partners, boundary conditions, and stopping rules are intentionally defined.
+- State that an association-only network may be a limited or transient model, but it is not enough to claim full H2 formation efficiency unless missing channels are documented or excluded by the user.
 
 ---
 
