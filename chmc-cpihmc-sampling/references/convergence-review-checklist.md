@@ -56,6 +56,7 @@ For every window with a large suggested cutoff, sign change, large drift, missin
 - whether potential energy, total energy, reaction coordinate, and mean force drift together
 - whether the late-time platform is visually stable
 - comparison with neighboring reaction-coordinate windows
+- if left/right mean-force components are present, whether the two components agree in mean, sign, drift, and neighboring-window trend
 - user decision: use all, use user-approved discard, rerun, exclude, or unresolved
 - user rationale
 
@@ -87,6 +88,15 @@ End with one of:
 - `UNRESOLVED_REVIEW_REQUIRED`
 
 Also list the exact remaining questions before extraction, such as which mean-force column to use, how to combine multiple mean-force columns, unit scaling, and whether the chosen discard policy has been approved.
+
+For left/right mean-force outputs, list the pending or approved extraction policy explicitly:
+
+- `force_source = left_component`
+- `force_source = right_component`
+- `force_source = user_precomputed_combined_column`
+- legacy-output workaround: a documented preprocessing step that writes a user-approved combined force column
+
+Do not assume that left/right components should be averaged. Averaging is a user-approved combine policy. If it is selected, record the formula, for example `mean_force = (mfl + mfr) / 2`, the source columns, units, and any observed left-right discrepancy.
 
 ## Required Agent Behavior
 

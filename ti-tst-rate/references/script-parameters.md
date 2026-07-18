@@ -9,6 +9,7 @@ Use this reference when a user asks how to call the TI/TST scripts, what a param
 - For one CHMC/CPIHMC reaction coordinate, the default headers are `RxnCoord` and `MeanForce`.
 - For multiple reaction coordinates, `RxnCoord_0` and `MeanForce_0` are the first reaction-coordinate/mean-force pair; `RxnCoord_1` and `MeanForce_1` are the second pair.
 - `--rc-col-index 0` and `--force-col-index 0` mean the first numeric table column.
+- Some legacy CHMC/CPIHMC tables may contain left/right mean-force components for the same reaction coordinate, such as `mfl` and `mfr`. Newer CHMC outputs may instead provide a header and a single already averaged mean-force column. For legacy left/right outputs, treat the two columns as candidate force components, not automatic defaults. The current `extract_mean_force.py` interface extracts one force column per call; averaging left/right components requires a user-approved preprocessing step that writes a documented combined force column.
 - Atomic units are assumed unless the user provides a conversion or the input file documents another unit.
 - `--confirm-parameters` is a required guardrail, not a nuisance flag. Use it only after the user confirms columns, units, scales, ordering, and physical interpretation.
 - Use `--print-defaults` or `--help` to inspect current defaults before production-like use.
@@ -48,6 +49,7 @@ Important notes:
 - If you prefer numeric columns for a file like `Steps KinEng PotEng TotEng dE_dN ElecNum RxnCoord MeanForce`, pass `--format table --rc-col-index 6 --force-col-index 7` to use 0-based numeric columns.
 - In `table` mode, text headers are ignored because only numeric rows are parsed; `--skiprows` then skips numeric data rows, not the header.
 - In `table` mode, either provide `--rc-col-index` or `--window-rc`; always provide `--force-col-index`.
+- If the sampling output contains legacy left/right force components, inspect both in convergence diagnostics before extraction. Do not pass only one column or average them unless the user confirms the extraction policy. If the user wants arithmetic averaging, create a documented, user-approved intermediate table with the combined force column and record the formula, for example `mean_force = (mfl + mfr) / 2`, in `--notes`.
 
 ## integrate_free_energy.py
 

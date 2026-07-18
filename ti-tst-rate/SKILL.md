@@ -45,6 +45,7 @@ Use this skill for the thermodynamic-integration and transition-state-theory sta
 
 - For one CHMC/CPIHMC reaction coordinate, map `MeanForce` to `RxnCoord`. For multiple reaction coordinates, map each `MeanForce_i` column to the corresponding `RxnCoord_i` column; `MeanForce_0` corresponds to the first reaction coordinate.
 - Treat multiple mean-force columns as multidimensional free-energy-surface data. Do not collapse them to one dimension unless the user provides a path, projection, or marginalization rule.
+- Treat left/right mean-force components for the same reaction coordinate, such as `mfl`/`mfr`, as candidate components rather than separate reaction-coordinate dimensions. Do not average them automatically. Use one component, a user-precomputed combined column, or an explicit user-approved combine policy such as arithmetic mean only after the user confirms the physical meaning and units.
 - Use atomic units for reaction coordinates and mean forces unless the user documents a conversion.
 - Support user-approved prefactor models by elementary step. Use `k_B T / h` only for the original/simple TST prefactor when requested or documented; allow custom prefactors such as hydrogen adsorption `n v S` when the user provides density, mean speed, site area, and units.
 - Treat postprocessing scripts as guarded helper tools. They can extract, integrate, compute TST rates, and plot when assumptions are confirmed, but they are not production orchestration or physical validation.
@@ -52,6 +53,7 @@ Use this skill for the thermodynamic-integration and transition-state-theory sta
 ## TI Readiness Checks
 
 - Confirm mean force is available for every required reaction-coordinate window.
+- Confirm the extraction policy for mean-force components: selected single column, user-precomputed combined column, or explicit combine rule. If left/right components are averaged, record the source columns and formula.
 - Confirm the RC grid and window ordering are documented.
 - Confirm units and sign conventions for mean force and reaction coordinate are documented.
 - Confirm uncertainty estimates, block statistics, or convergence diagnostics are available or explicitly TODO.

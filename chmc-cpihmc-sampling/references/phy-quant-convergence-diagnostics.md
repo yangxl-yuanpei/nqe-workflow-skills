@@ -12,8 +12,11 @@ Typical columns are:
 - MeanForce: mean force when only one reaction coordinate is defined
 - MeanForce_0, MeanForce_1, ...: mean force for multiple reaction coordinates
 - RxnCoord, RxnCoord_0, ...: sampled reaction-coordinate values
+- mfl, mfr, or similar names: left/right mean-force components in some CHMC/CPIHMC outputs
 
 Column indices in the scripts are zero-based. Prefer column names when the header is available.
+
+When left/right mean-force components are present, inspect them separately first. They may be theoretically equivalent for a particular constrained-coordinate implementation, but that equivalence is a user- and code-confirmed interpretation, not an automatic parser rule. Large differences, sign disagreements, or different drift behavior between the two components should be recorded as sampling or implementation diagnostics before any averaging is considered.
 
 Some CPIHMC `energy.dat` files contain only physical observables, for example
 `ke pe etotal rc mfl mfr`, and have no step or iteration column. In that case,
@@ -51,6 +54,7 @@ Before running the script, ask the user to confirm:
 - whether --equilibration-index, --equilibration-step, or --auto-equilibration should be used
 - whether any unit scaling is needed through --x-scale or --y-scale
 - whether the selected reaction-coordinate/mean-force pair is the one intended for TI
+- if multiple mean-force-like columns are present, whether the user wants one specific component or a documented combine policy such as an arithmetic mean of left/right components
 
 After running the script, do not declare convergence from the CSV alone. Ask the user to inspect the plot. If the automatic cutoff is used, report that it is a suggested cutoff, not proof of equilibration.
 

@@ -85,6 +85,7 @@ Mean-force extraction:
 - `rc_scale`, `force_scale`: confirmed raw-to-atomic-unit conversion factors.
 - `rc_raw_unit_label`, `force_raw_unit_label`: confirmed raw unit labels preserved in CSV.
 - `uncertainty`: confirmed policy, `sem`, `std`, or `none`.
+- If a legacy sampling output has left/right mean-force components, such as `mfl` and `mfr`, the current runner extraction config still selects one force column per run. Do not invent runnable combine fields. For these legacy outputs, require either a user-confirmed single component or a documented, user-approved preprocessing step that writes a combined force column before runner extraction.
 
 Parser and skip-row boundaries:
 

@@ -15,11 +15,12 @@ Inputs from sampling:
 
 ## Thermodynamic Integration
 
-TI integrates mean force along the reaction coordinate to obtain a free-energy profile. In this workflow, single-RC output maps `MeanForce` to `RxnCoord`; multi-RC output maps `MeanForce_i` to `RxnCoord_i`, with `MeanForce_0` the derivative of free energy with respect to the first reaction coordinate. Reaction coordinates and mean forces are atomic units unless the user documents otherwise.
+TI integrates mean force along the reaction coordinate to obtain a free-energy profile. In this workflow, single-RC output maps `MeanForce` to `RxnCoord`; multi-RC output maps `MeanForce_i` to `RxnCoord_i`, with `MeanForce_0` the derivative of free energy with respect to the first reaction coordinate. Left/right mean-force components for the same reaction coordinate, such as `mfl` and `mfr`, require a user-approved extraction policy before TI: select one component, use a user-precomputed combined column, or document an explicit arithmetic mean. Reaction coordinates and mean forces are atomic units unless the user documents otherwise.
 
 Before accepting F(xi):
 
 - check smoothness of neighboring windows
+- check that any left/right mean-force components are either individually selected or combined only by an approved formula with recorded source columns
 - check numerical integration method is documented
 - check error propagation or bootstrap/block statistics if available
 - check reference zero of free energy is documented

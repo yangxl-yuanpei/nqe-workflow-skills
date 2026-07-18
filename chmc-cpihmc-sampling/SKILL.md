@@ -29,6 +29,7 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 - Help inspect mean-force output readiness for thermodynamic integration.
 - Help plot and summarize `PHY_QUANT` convergence diagnostics for potential energy and mean-force columns after each sampling window.
 - Help prepare a convergence review checklist after diagnostics and before extraction/TI, including suspicious-window decisions, user rationale, and non-runnable candidate skiprows.
+- Help distinguish candidate mean-force components, such as left/right constrained mean forces, from the final user-approved mean-force column used for TI.
 - Produce TODO lists for missing sampling parameters and convergence evidence.
 
 ## What This Skill Must Not Do
@@ -37,6 +38,7 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 - Do not claim CHMC/CPIHMC results are converged without documented acceptance rates, autocorrelation/mixing checks, and mean-force convergence evidence.
 - Do not treat the automatic cutoff from `scripts/analyze_phy_quant_convergence.py` as proof of equilibration; it is a screening suggestion that requires user review.
 - Do not promote a user decision from one window, such as accepting, rerunning, or excluding a suspicious window, into a general rule for other systems or reaction coordinates.
+- Do not automatically average multiple mean-force-like columns. If outputs contain left/right mean forces such as `mfl` and `mfr`, treat them as separate diagnostic components until the user confirms they are theoretically equivalent and approves an explicit combine policy.
 - Do not claim CPIHMC directly outputs H2 formation efficiency.
 - Do not claim CPIHMC is a replacement for LAMMPS or more accurate than LAMMPS.
 - Do not invent in-house code input fields, commands, paths, or file formats.
@@ -67,6 +69,7 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 - For deeper convergence analysis, use `scripts/analyze_phy_quant_convergence.py` when the user asks to inspect `PHY_QUANT` potential-energy or mean-force convergence with plots; ask the user to confirm columns, unit scaling, and equilibration policy before running it.
 - After convergence diagnostics, use `references/convergence-review-checklist.md` to summarize per-window evidence and user decisions before mean-force extraction or TI. If a suspicious window is rerun, excluded, or assigned nonzero discard, record the user rationale and stop before extraction until the affected policy is approved.
 - Check that mean force is reported for each reaction-coordinate window.
+- If left/right mean-force columns are present, check both columns before TI. Ask the user whether TI should use the left column, right column, or an explicitly approved arithmetic mean. If averaging is approved, record the formula, source columns, and evidence that the two components are mutually consistent enough for the user's purpose.
 - Check uncertainty estimates, autocorrelation, and mixing diagnostics if available.
 - Check HMC acceptance rate and abnormal rejection behavior if available. If acceptance is inferred from `KinEng`/`PotEng` changes rather than a log counter, report that source explicitly and treat it as a fallback diagnostic.
 - Check CPIHMC bead convergence evidence when NQE results are reported.

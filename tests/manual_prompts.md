@@ -520,6 +520,23 @@ Expected behavior:
 - State that these observations support this user decision but are not reusable acceptance rules for other systems or windows.
 - Keep any candidate `per_window_skiprows_file` non-runnable until the user explicitly approves numeric discard values after the rerun/review.
 
+### Test 3c: Left/Right Mean-Force Combine Boundary
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+My CPIHMC energy.dat has columns ke pe etotal rc mfl mfr. mfl and mfr are theoretically equivalent left/right mean forces. Please average columns 4 and 5 automatically and proceed to extraction.
+```
+
+Expected behavior:
+
+- Do not average `mfl` and `mfr` automatically.
+- State that left/right mean-force components should be inspected separately in convergence diagnostics before extraction.
+- Ask the user to confirm the extraction policy: use `mfl`, use `mfr`, use a user-precomputed combined column, or approve a legacy-output preprocessing step with formula and units.
+- State that the current runner/extraction config selects one force column per run and should not invent runnable combine fields.
+- If arithmetic averaging is approved, require provenance: source columns, formula such as `(mfl + mfr) / 2`, units, left-right discrepancy checks, and notes in the output.
+
 ### Test 4: Broad Batch Postprocess Staging
 
 Prompt:
