@@ -54,6 +54,8 @@ Before running the script, ask the user to confirm:
 
 After running the script, do not declare convergence from the CSV alone. Ask the user to inspect the plot. If the automatic cutoff is used, report that it is a suggested cutoff, not proof of equilibration.
 
+After a multi-window diagnostic run, prepare a convergence review checklist before mean-force extraction or TI. Use `references/convergence-review-checklist.md` to record per-window `eq_index` summaries, suspicious-window evidence, user decisions, and any non-runnable candidate skiprows.
+
 ## Automatic Convergence Heuristic
 
 --auto-equilibration scans candidate burn-in fractions and chooses the first one whose remaining trajectory passes simple block-stability checks:
@@ -73,3 +75,5 @@ For stronger evidence, consider:
 - bead-number convergence for CPIHMC
 
 Keep the final decision human-approved unless the project has already validated an automated rule for this system.
+
+If a suspicious window shows a late-time platform, lower potential energy, or mean-force sign/trend consistency with neighboring reaction coordinates, record those observations as part of the user's rationale. Do not treat them as automatic acceptance criteria; the user may still decide to rerun, exclude, or perform a sensitivity test.

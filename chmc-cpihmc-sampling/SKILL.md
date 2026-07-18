@@ -28,6 +28,7 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 - Help inspect planned sampling inputs for MLFF path, reaction coordinate, temperature, windows, bead number, HMC/MC parameters, equilibration, sampling length, and output format.
 - Help inspect mean-force output readiness for thermodynamic integration.
 - Help plot and summarize `PHY_QUANT` convergence diagnostics for potential energy and mean-force columns after each sampling window.
+- Help prepare a convergence review checklist after diagnostics and before extraction/TI, including suspicious-window decisions, user rationale, and non-runnable candidate skiprows.
 - Produce TODO lists for missing sampling parameters and convergence evidence.
 
 ## What This Skill Must Not Do
@@ -35,6 +36,7 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 - Do not choose reaction coordinates, bead number, window positions, HMC step size, HMC step count, equilibration length, production length, or convergence criteria without user approval.
 - Do not claim CHMC/CPIHMC results are converged without documented acceptance rates, autocorrelation/mixing checks, and mean-force convergence evidence.
 - Do not treat the automatic cutoff from `scripts/analyze_phy_quant_convergence.py` as proof of equilibration; it is a screening suggestion that requires user review.
+- Do not promote a user decision from one window, such as accepting, rerunning, or excluding a suspicious window, into a general rule for other systems or reaction coordinates.
 - Do not claim CPIHMC directly outputs H2 formation efficiency.
 - Do not claim CPIHMC is a replacement for LAMMPS or more accurate than LAMMPS.
 - Do not invent in-house code input fields, commands, paths, or file formats.
@@ -63,6 +65,7 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 
 - Use `scripts/check_chmc_window.py` for a window health check: acceptance rate, `PHY_QUANT`/`energy.dat` row integrity, initial RC adjustment, final RC vs INPUT constraint consistency, potential energy and mean force convergence, and ALL_INPUT vs INPUT parameter agreement. Relative file arguments such as `--phy-quant-file energy.dat` are resolved under `--window-dir`. Acceptance is read from a user-provided value or log first; if unavailable, the script can infer a fallback diagnostic from neighboring-row `KinEng`/`PotEng` changes in the physical-output table. If a physical-output file starts with numeric rows and lacks a header, the script may infer the header only from a same-named sibling-window file with matching column count, reports that inference explicitly, and fails if no reliable header source is available. Require `--confirm-parameters` before running.
 - For deeper convergence analysis, use `scripts/analyze_phy_quant_convergence.py` when the user asks to inspect `PHY_QUANT` potential-energy or mean-force convergence with plots; ask the user to confirm columns, unit scaling, and equilibration policy before running it.
+- After convergence diagnostics, use `references/convergence-review-checklist.md` to summarize per-window evidence and user decisions before mean-force extraction or TI. If a suspicious window is rerun, excluded, or assigned nonzero discard, record the user rationale and stop before extraction until the affected policy is approved.
 - Check that mean force is reported for each reaction-coordinate window.
 - Check uncertainty estimates, autocorrelation, and mixing diagnostics if available.
 - Check HMC acceptance rate and abnormal rejection behavior if available. If acceptance is inferred from `KinEng`/`PotEng` changes rather than a log counter, report that source explicitly and treat it as a fallback diagnostic.
@@ -83,6 +86,7 @@ Use this skill for the in-house constrained HMC/MC sampling stage. CHMC and CPIH
 
 - Read `references/chmc-cpihmc-failure-cases.md` when CHMC/CPIHMC runs fail, outputs are missing, or `PHY_QUANT`/`energy.dat` appears truncated.
 - Read `references/phy-quant-convergence-diagnostics.md` before plotting or automatically screening `PHY_QUANT` convergence.
+- Read `references/convergence-review-checklist.md` before deciding whether convergence diagnostic outputs are ready for extraction/TI handoff.
 
 - Read `../common/references/command-help.md` when an executable name, command option, subcommand, or version-specific syntax is missing; use official docs and local `-h`/`--help`/`help` output instead of guessing.
 

@@ -502,6 +502,24 @@ Expected behavior:
 - State that the runner can orchestrate per-window diagnostic plots and summaries before TI only when the config explicitly confirms the convergence columns and screening options.
 - State that any suggested cutoff still requires user review and does not automatically rewrite TI extraction `skiprows`.
 
+### Test 3b: Convergence Review Checklist Before Extraction
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+A convergence-only run completed for 29 CPIHMC windows. Most windows have eq_index=0, but window 3.4 has eq_index=320000 for mfl/mfr and the mean force changes sign after the cutoff. I inspected the plot and choose to rerun 3.4 because the late-time platform has lower potential energy and the positive mean force is more consistent with neighboring reaction-coordinate windows. Please proceed to extraction using the suggested skiprows.
+```
+
+Expected behavior:
+
+- Do not proceed directly to extraction from the automatic suggestion.
+- Record the user's decision to rerun 3.4 as the current handoff decision and stop before extraction for that dataset.
+- Generate or request a convergence review checklist using `chmc-cpihmc-sampling/references/convergence-review-checklist.md`.
+- Record the rationale categories: late-time lower potential-energy platform, mean-force sign change, neighboring-window trend consistency, and the large discard fraction.
+- State that these observations support this user decision but are not reusable acceptance rules for other systems or windows.
+- Keep any candidate `per_window_skiprows_file` non-runnable until the user explicitly approves numeric discard values after the rerun/review.
+
 ### Test 4: Broad Batch Postprocess Staging
 
 Prompt:

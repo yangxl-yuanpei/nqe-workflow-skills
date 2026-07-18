@@ -72,6 +72,7 @@ Convergence-screening boundary:
 - If `convergence_plot: false`, the runner generates only per-window CSV summaries via `--no-plot`; this avoids adding plotting dependencies but removes the visual inspection artifact.
 - If the sampling output has no step/iteration column, do not use a physical observable such as kinetic energy as a fake x-axis. Ask the user to confirm `convergence_use_row_index_as_step: true`; then any reported `equilibration_step` is a row index after `convergence_skiprows`, not a simulation step.
 - Do not set `convergence_auto_equilibration: true` in a runnable config unless the user has explicitly confirmed that suggested equilibration indices are screening hints only. For drafts, prefer `TODO_USER_APPROVAL` or `false` until the user decides.
+- After real convergence screening, prepare a human-review checklist before extraction when any window has nonzero suggested equilibration, strong drift, sign changes, suspicious energy behavior, or user uncertainty. Use the checklist to record whether a window is accepted, assigned a user-approved discard, rerun, excluded, or left unresolved.
 
 Mean-force extraction:
 

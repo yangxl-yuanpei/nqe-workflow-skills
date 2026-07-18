@@ -87,6 +87,8 @@ After each reaction-coordinate window finishes, inspect the relevant `PHY_QUANT`
 
 The helper `scripts/analyze_phy_quant_convergence.py` can produce a plot and CSV summary. Its automatic cutoff is only a conservative screening heuristic based on block stability and drift; it still requires user approval.
 
+For multi-window runs, produce a convergence review checklist before extraction/TI handoff. The checklist should summarize every window, expand suspicious windows, record the user's decision and rationale, and keep any candidate per-window `skiprows` table non-runnable until explicitly approved. A decision to rerun a window should be recorded as a valid handoff outcome, especially when a large cutoff, sign change, or late-time platform makes the production mean sensitive to the discard policy.
+
 ## Handoff To TI
 
 Before thermodynamic integration:
