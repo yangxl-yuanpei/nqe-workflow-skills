@@ -116,11 +116,13 @@ Plot-only mode:
 - At least one of `plot_mean_force` or `plot_free_energy` must be `true`.
 - `mean_force_table`: existing `mean_force_table.csv` path. Required when `plot_mean_force: true`.
 - `free_energy_profile`: existing `free_energy_profile.csv` path. Required when `plot_free_energy: true`.
-- `plot_rc_order`: confirmed plotting order, `ascending`, `descending`, or `input`.
+- `plot_rc_order`: confirmed plotting order, `ascending`, `descending`, or `input`. For free-energy plots, this must be consistent with the user-confirmed integration direction or intended initial-to-final RC direction; do not infer it from CSV row order or use it as a visual styling default.
+- When `plot_rc_order: descending` is passed to the plotting scripts and no explicit x-axis limits are supplied, the scripts invert the x-axis so larger reaction coordinate values appear on the left. If explicit x-axis limits are supplied, their order controls the visual axis direction.
+- If a config contains both `integration_direction` and `plot_rc_order`, they must not conflict. Updating a plot direction means updating `plot_rc_order`; changing only `integration_direction` has no effect in plot-only mode when `plot_rc_order` is present.
 - `mean_force_y_column`: confirmed mean-force column to plot, for example `mean_force_au`. Required when `plot_mean_force: true`.
 - `free_energy_y_column`: confirmed free-energy column to plot, for example `free_energy_converted`. Required when `plot_free_energy: true`.
 - `free_energy_plot_unit_label`: confirmed plotted free-energy unit label. Required when `plot_free_energy: true`.
-- Observed CSV headers and unit-label columns are candidates only. They can help form a checklist, but they do not authorize setting `parameters_confirmed: true` unless the user explicitly confirms the selected y-columns, plotted unit label, and `plot_rc_order`, or those values are copied from a user-provided config.
+- Observed CSV headers, row ordering, and unit-label columns are candidates only. They can help form a checklist, but they do not authorize setting `parameters_confirmed: true` unless the user explicitly confirms the selected y-columns, plotted unit label, and `plot_rc_order`, or those values are copied from a user-provided config.
 - `mean_force_plot_output`, `free_energy_plot_output`: optional output image paths. If omitted, the runner writes `mean_force.png` and `free_energy.png` under `output_dir`.
 - Optional style fields use the prefixes `mean_force_plot_` or `free_energy_plot_`: `xlabel`, `ylabel`, `title`, `width`, `height`, `dpi`, `linewidth`, `markersize`, and `grid`.
 - The runner writes `plot_summary.json` in `output_dir` by default, so plot-only provenance does not overwrite an existing postprocessing `summary.json`.

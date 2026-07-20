@@ -131,7 +131,7 @@ Purpose: plot one or more mean-force curves from `mean_force_table.csv` files.
 |---|---:|---|
 | `--curve` | required, repeatable | Curve spec: `file=...,dataset=...,label=...,rc_index=0,color=...,linestyle=...,marker=...`. |
 | `--output` | required | Output image path. |
-| `--rc-order` | `ascending` | Plot order: `ascending`, `descending`, or `input`. Keep consistent with integration/TST convention. |
+| `--rc-order` | `ascending` | Plot order: `ascending`, `descending`, or `input`. For free-energy plots, this must match the user-confirmed integration or initial-to-final direction; do not choose it from file order alone. With `descending` and no explicit `--xlim`, the plotting script inverts the x-axis so larger RC appears on the left. |
 | `--xlabel` | `Reaction coordinate (au)` | X-axis label. |
 | `--ylabel` | empty | Y-axis label override. |
 | `--title` | empty | Plot title. |
@@ -143,7 +143,7 @@ Purpose: plot one or more mean-force curves from `mean_force_table.csv` files.
 | `--linewidth` | `2.0` | Default line width. |
 | `--markersize` | `5.0` | Default marker size. |
 | `--grid` | false | Show grid. |
-| `--confirm-parameters` | false | Required confirmation of direction, units, datasets, and styles. |
+| `--confirm-parameters` | false | Required confirmation of integration/plot direction, units, datasets, and styles. |
 | `--y-column` | `mean_force_au` | Column to plot on the y-axis. |
 
 Curve-spec notes:
@@ -160,7 +160,7 @@ Purpose: plot one or more free-energy curves from `free_energy_profile.csv` file
 |---|---:|---|
 | `--curve` | required, repeatable | Curve spec: `file=...,dataset=...,label=...,rc_index=0,color=...,linestyle=...,marker=...`. |
 | `--output` | required | Output image path. |
-| `--rc-order` | `ascending` | Plot order: `ascending`, `descending`, or `input`. Keep consistent with integration/TST convention. |
+| `--rc-order` | `ascending` | Plot order: `ascending`, `descending`, or `input`. Must match the user-confirmed integration or initial-to-final direction; do not choose it from CSV row order alone. With `descending` and no explicit `--xlim`, the plotting script inverts the x-axis so larger RC appears on the left. |
 | `--xlabel` | `Reaction coordinate (au)` | X-axis label. |
 | `--ylabel` | empty | Y-axis label override. |
 | `--title` | empty | Plot title. |
@@ -172,13 +172,13 @@ Purpose: plot one or more free-energy curves from `free_energy_profile.csv` file
 | `--linewidth` | `2.0` | Default line width. |
 | `--markersize` | `5.0` | Default marker size. |
 | `--grid` | false | Show grid. |
-| `--confirm-parameters` | false | Required confirmation of direction, units, datasets, and styles. |
+| `--confirm-parameters` | false | Required confirmation of integration/plot direction, units, datasets, and styles. |
 | `--y-column` | `free_energy_au` | Column to plot on the y-axis. |
 | `--free-energy-unit-label` | empty | Optional y-axis unit label, such as `eV` or `au`. |
 
 Important notes:
 
-- Plot from initial state to final state using the same convention confirmed during integration and TST.
+- Plot from initial state to final state using the same convention confirmed during integration and TST. If that convention is not confirmed in the current task or copied from a reviewed config/summary, ask the user before plotting. `--rc-order descending` changes both row ordering and, unless `--xlim` is supplied, the visual x-axis direction.
 - Do not reverse or reinterpret the x-axis silently.
 - When plotting converted free energies, make sure `--y-column` and `--free-energy-unit-label` describe the same data.
 

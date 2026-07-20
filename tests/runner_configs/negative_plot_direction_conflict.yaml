@@ -1,0 +1,19 @@
+# Negative fixture: plot_rc_order conflicts with integration_direction.
+# Expected: runner preflight refuses this config instead of plotting in the wrong direction.
+parameters_confirmed: true
+
+dataset_label: demo_multi_window_reviewed_ti_only
+output_dir: ../real_case_records/2026-07-11_reviewed_ti_only/output
+stop_after: plot
+
+plot_mean_force: true
+plot_free_energy: true
+mean_force_table: ../real_case_records/2026-07-11_reviewed_ti_only/output/mean_force_table.csv
+free_energy_profile: ../real_case_records/2026-07-11_reviewed_ti_only/output/free_energy_profile.csv
+
+integration_direction: descending
+plot_rc_order: ascending
+
+mean_force_y_column: mean_force_au
+free_energy_y_column: free_energy_converted
+free_energy_plot_unit_label: eV

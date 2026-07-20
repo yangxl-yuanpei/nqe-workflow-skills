@@ -88,6 +88,7 @@ python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_con
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_invalid_bool.yaml --dry-run
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_missing_windows.yaml --dry-run
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_invalid_per_window_skiprows.yaml --dry-run
+python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/negative_plot_direction_conflict.yaml --dry-run
 python nqe-postprocess-runner/scripts/nqe_postprocess_runner.py tests/runner_configs/no_step_convergence_row_index.yaml --dry-run
 ```
 
@@ -100,7 +101,7 @@ The convergence-screening example extends this check by verifying that per-windo
 The `no_step_convergence_row_index.yaml` fixture checks headerless CPIHMC-style data with no step column. It should generate convergence commands with `--use-row-index-as-step`; this is a diagnostic x-axis only, and reported `eq_step` values mean row indices rather than physical simulation steps.
 The plot-only fixture verifies that `stop_after: plot` can generate plot commands from existing reviewed CSV files without rediscovering windows, re-extracting mean forces, reintegrating free energy, or running TST.
 The `postprocess_missing_defaults.yaml` check is expected to fail with a preflight error. It verifies that `parameters_confirmed: true` is not enough when parser mode, columns, units, TI zero reference, or TST/plot choices are still implicit.
-The `negative_*.yaml` runner fixtures are also expected to fail. They verify executable rejection of nested YAML, invalid boolean values, too few discovered windows, and non-numeric per-window skiprows such as `SUGGESTED`.
+The `negative_*.yaml` runner fixtures are also expected to fail. They verify executable rejection of nested YAML, invalid boolean values, too few discovered windows, non-numeric per-window skiprows such as `SUGGESTED`, and conflicting `plot_rc_order` versus `integration_direction`.
 
 ### Runner Child-Script Negative Fixtures
 
@@ -152,7 +153,7 @@ If an `energy.dat` or `PHY_QUANT` file starts with numeric data and lacks a head
 
 For staged runner tests, use `stop_after` to avoid fake downstream physical approvals. For example, `stop_after: extraction` may run convergence screening and mean-force extraction without requiring TI direction, zero reference, plots, or TST fields. If convergence screening is enabled, `convergence_plot` must be explicit; set it to `false` for CSV summary-only mode in environments without plotting dependencies.
 
-For plot-only runner tests, use `stop_after: plot` with existing CSV inputs. The config must explicitly confirm dataset label, `plot_rc_order`, selected y-columns, plotted free-energy unit label, and which plots to generate. Plot-only mode is visualization only and must not be treated as approval to rerun TI or compute TST rates.
+For plot-only runner tests, use `stop_after: plot` with existing CSV inputs. The config must explicitly confirm dataset label, `plot_rc_order`, selected y-columns, plotted free-energy unit label, and which plots to generate. For free-energy plots, `plot_rc_order` must come from the user-confirmed integration or initial-to-final RC direction, not from CSV row order or a style default. Plot-only mode is visualization only and must not be treated as approval to rerun TI or compute TST rates.
 
 For broad prompts such as "postprocess this batch", the expected fresh-agent behavior is to stage the workflow and stop before TI unless integration direction, zero reference, unit conversion, and mean-force sign convention have been explicitly confirmed. If the agent asks for `sampling_output_root`, it should also state the intended first stop stage and the downstream confirmation gates. If it discovers plausible directories such as `demo/`, it should present them as candidates only and ask the user to confirm the intended root. A generic postprocessing request should not trigger `stop_after: integration`, plots, TST, or rate calculation by default.
 

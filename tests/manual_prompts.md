@@ -591,6 +591,8 @@ Expected behavior:
 
 - Use or propose `stop_after: plot`, not `stop_after: all`.
 - Ask for explicit existing CSV paths, dataset label, `plot_rc_order`, selected y-columns, and plotted free-energy unit label.
+- For free-energy plotting, ask for or confirm the integration/initial-to-final RC direction that determines `plot_rc_order`; do not choose plot direction from CSV row order or as a style default.
+- If the user asks to reverse plotting direction in a plot-only config, update `plot_rc_order` explicitly; changing only `integration_direction` is not enough when `plot_rc_order` is already present.
 - If CSV headers or unit columns are visible, list them only as candidates. Do not set `parameters_confirmed: true` or write a runnable YAML from observed headers alone when the user asked the agent to choose "suitable" plot columns or units.
 - Optional defaults such as `output_dir` may be omitted. If the agent writes an optional field explicitly in runnable YAML, it must be user-confirmed or copied from a user-provided config.
 - State that `sampling_output_root`, parser columns, extraction skiprows, and TI fields are not needed for plot-only mode unless regenerating the CSVs.

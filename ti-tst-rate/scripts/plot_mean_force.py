@@ -81,6 +81,8 @@ def plot_curves(args: argparse.Namespace, y_column: str, default_ylabel: str) ->
         ax.set_title(args.title)
     if args.xlim:
         ax.set_xlim(args.xlim[0], args.xlim[1])
+    elif args.rc_order == 'descending':
+        ax.invert_xaxis()
     if args.ylim:
         ax.set_ylim(args.ylim[0], args.ylim[1])
     if args.grid:
@@ -90,13 +92,14 @@ def plot_curves(args: argparse.Namespace, y_column: str, default_ylabel: str) ->
     fig.savefig(args.output)
     print(f"Saved plot to {args.output}")
     print(f"RC order used for every curve: {args.rc_order}. Keep this consistent with integration/TST state convention.")
+    print(f"X-axis direction: {'decreasing left-to-right' if ax.xaxis_inverted() else 'increasing left-to-right'}.")
     return 0
 
 
 def add_common_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument('--curve', action='append', required=True, help='Curve spec: file=...,dataset=...,label=...,rc_index=0,color=...,linestyle=...,marker=...')
     parser.add_argument('--output', required=True, help='Output image path, e.g. mean_force.png.')
-    parser.add_argument('--rc-order', choices=['ascending', 'descending', 'input'], default='ascending', help='Plot from initial to final. Default ascending small RC -> large RC; use descending when large RC is initial.')
+    parser.add_argument('--rc-order', choices=['ascending', 'descending', 'input'], default='ascending', help='Plot from initial to final using the user-confirmed integration direction. With descending and no --xlim, the x-axis is inverted so large RC appears on the left. Default ascending small RC -> large RC is a script convention, not a physical choice.')
     parser.add_argument('--xlabel', default='Reaction coordinate (au)', help='X-axis label.')
     parser.add_argument('--ylabel', default='', help='Y-axis label override.')
     parser.add_argument('--title', default='', help='Plot title.')
@@ -108,7 +111,7 @@ def add_common_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument('--linewidth', type=float, default=2.0, help='Default line width.')
     parser.add_argument('--markersize', type=float, default=5.0, help='Default marker size.')
     parser.add_argument('--grid', action='store_true', help='Show grid.')
-    parser.add_argument('--confirm-parameters', action='store_true', help='Required confirmation of initial/final direction, units, datasets, and styles.')
+    parser.add_argument('--confirm-parameters', action='store_true', help='Required confirmation of integration/initial-final direction, units, datasets, and styles.')
 
 
 def build_parser() -> argparse.ArgumentParser:

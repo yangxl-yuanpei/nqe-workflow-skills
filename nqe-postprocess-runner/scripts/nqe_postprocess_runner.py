@@ -132,6 +132,10 @@ def get_stop_after(config: dict[str, Any]) -> str:
     return stop_after
 
 
+def normalize_rc_order(value: Any) -> str:
+    return str(value).strip().lower()
+
+
 def reaches_stage(stop_after: str, stage: str) -> bool:
     if stop_after == "plot":
         return False
@@ -163,7 +167,7 @@ def preflight_config(config: dict[str, Any]) -> None:
         require_explicit(config, "plot_mean_force", problems, "plot-only mean-force plotting choice must be explicit")
         require_explicit(config, "plot_free_energy", problems, "plot-only free-energy plotting choice must be explicit")
         require_explicit(config, "plot_rc_order", problems, "plot-only RC order must be user-confirmed")
-        if has_value(config, "plot_rc_order") and str(config["plot_rc_order"]).strip().lower() not in {"ascending", "descending", "input"}:
+        if has_value(config, "plot_rc_order") and normalize_rc_order(config["plot_rc_order"]) not in {"ascending", "descending", "input"}:
             problems.append("plot_rc_order: use ascending, descending, or input")
         if not plot_mean_force and not plot_free_energy:
             problems.append("plot-only mode requires at least one of plot_mean_force or plot_free_energy to be true")
@@ -174,6 +178,15 @@ def preflight_config(config: dict[str, Any]) -> None:
             require_explicit(config, "free_energy_profile", problems, "plot_free_energy requires an existing free-energy CSV path")
             require_explicit(config, "free_energy_y_column", problems, "plot_free_energy requires an explicit y-column")
             require_explicit(config, "free_energy_plot_unit_label", problems, "plot_free_energy requires an explicit plotted free-energy unit label")
+
+    if has_value(config, "integration_direction") and has_value(config, "plot_rc_order"):
+        integration_direction = normalize_rc_order(config["integration_direction"])
+        plot_rc_order = normalize_rc_order(config["plot_rc_order"])
+        if integration_direction in {"ascending", "descending"} and plot_rc_order in {"ascending", "descending"} and plot_rc_order != integration_direction:
+            problems.append(
+                "plot_rc_order conflicts with integration_direction; update plot_rc_order to the confirmed plotting/integration direction "
+                "or use plot_rc_order: input only when the CSV row order is the reviewed intended direction"
+            )
 
     if stop_after == "convergence" and not as_bool(config, "run_convergence_diagnostics", False):
         problems.append("stop_after: convergence requires run_convergence_diagnostics: true")
@@ -505,7 +518,7 @@ def add_plot_style_options(cmd: list[str], config: dict[str, Any], prefix: str =
 
 def build_plot_cmds(python: str, scripts: Path, config: dict[str, Any], mean_force: Path, free_energy: Path, out: Path) -> list[list[str]]:
     dataset = str(require(config, "dataset_label"))
-    direction = str(config["plot_rc_order"] if has_value(config, "plot_rc_order") else require(config, "integration_direction"))
+    direction = normalize_rc_order(config["plot_rc_order"] if has_value(config, "plot_rc_order") else require(config, "integration_direction"))
     commands: list[list[str]] = []
     plot_mean_force = as_bool(config, "plot_mean_force", True)
     plot_free_energy = as_bool(config, "plot_free_energy", True)
