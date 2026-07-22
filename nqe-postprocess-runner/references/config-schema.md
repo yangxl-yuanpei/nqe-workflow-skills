@@ -153,6 +153,13 @@ Optional:
 - `notes`: text added to generated CSV rows.
 - CLI `--dry-run`: print generated child commands without executing them. Use this first for smoke testing and config review.
 
+Execution provenance and freshness:
+
+- After a real run, the runner records `generated_output_status` in `summary.json` or `plot_summary.json`.
+- `generated_output_status` lists child-command outputs discovered from `--output` and `--summary` flags, with path, existence, size, modification time, and whether the file appears fresh for the current run.
+- If an expected generated output is missing or stale, the runner raises an error instead of writing a normal success summary. Do not report numerical results from old CSVs or plots after such a failure.
+- This freshness check is a file-provenance guard only. It does not certify convergence, unit choices, integration direction, TST state selection, or physical correctness.
+
 Output-directory reuse boundary:
 
 - By default, a real runner execution refuses a non-empty `output_dir` before deleting or overwriting known outputs.
@@ -175,7 +182,8 @@ Agent execution rule:
 9. If a TST request includes the word "default", respond with a confirmation checklist rather than a runnable config. Mentioned min/max/free-energy-column/prefactor choices are candidates only until explicitly confirmed.
 10. Run the runner with `--dry-run` first.
 11. Ask for user confirmation if the dry-run commands reveal unexpected paths, units, ordering, convergence columns, state selection, temperature, or prefactor.
-12. Run without `--dry-run` only after the dry-run is accepted.
+12. Run without `--dry-run` only after the dry-run is accepted. Treat confirmation of config values and approval of dry-run child commands as separate review steps.
+13. After real execution, inspect the summary and `generated_output_status` before reporting CSV values, plot paths, or rates. If the output status is missing, stale, or surprising, stop and inspect file timestamps/provenance rather than reading whatever CSV happens to exist.
 
 Per-window discard boundary:
 

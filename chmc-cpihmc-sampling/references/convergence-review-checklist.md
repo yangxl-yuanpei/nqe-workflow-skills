@@ -17,6 +17,8 @@ This checklist is a human-review handoff artifact. It records what the diagnosti
 - step-axis source: real step column/index or row/sample index after skiprows
 - global diagnostic skiprows used before plotting
 - whether auto-equilibration was enabled, and that it was screening only
+- window-health check coverage: whether `check_chmc_window.py` or equivalent checks were run for every intended window
+- acceptance-rate source and review policy: log/user-provided value, `energy-delta-inferred` fallback, missing/TODO, and the user-approved interpretation range if one exists
 
 ### Inventory Summary
 
@@ -30,6 +32,7 @@ Report, at minimum:
 - missing, truncated, or short-row windows
 - `INPUT`/`ALL_INPUT` consistency if checked
 - `OUTPUT` column definition if available
+- acceptance-rate coverage summary: number from log/user value, number inferred from energy deltas, number missing/TODO, and any windows outside the user-approved review range
 
 ### Per-Window Diagnostic Summary
 
@@ -42,6 +45,7 @@ Provide a compact table with one row per window and at least:
 - potential-energy status
 - reaction-coordinate status
 - mean-force status
+- acceptance-rate status and source, for example `log`, `user-provided`, `energy-delta-inferred`, `missing`, or `not checked`
 - notes
 
 Use `eq_index` to mean row/sample index after diagnostic `skiprows` when row-index mode was used. Do not call it simulation step unless a real step column was used.
@@ -88,6 +92,8 @@ End with one of:
 - `UNRESOLVED_REVIEW_REQUIRED`
 
 Also list the exact remaining questions before extraction, such as which mean-force column to use, how to combine multiple mean-force columns, unit scaling, and whether the chosen discard policy has been approved.
+
+If acceptance-rate coverage is missing or only partially reviewed, choose `UNRESOLVED_REVIEW_REQUIRED` unless the user explicitly documents why downstream diagnostic-only extraction may proceed with that limitation. Do not describe the sampling batch as converged or TI-ready from potential-energy and mean-force plots alone.
 
 For left/right mean-force outputs, list the pending or approved extraction policy explicitly:
 

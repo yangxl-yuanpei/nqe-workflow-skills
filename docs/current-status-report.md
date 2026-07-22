@@ -1,6 +1,6 @@
 # NQE Workflow Skills Current Status Report
 
-Last updated: 2026-07-17
+Last updated: 2026-07-22
 
 ## Overall Status
 
@@ -42,9 +42,11 @@ initial DFT-labeled dataset
 - The TI/TST script chain exists and is split into extraction, integration, plotting, and TST-rate computation.
 - `nqe-postprocess-runner` can dry-run or execute a confirmed config in guarded stages. It now includes a preflight guard that rejects runnable configs relying on implicit parser, column, unit, integration, state-selection, temperature, prefactor, or convergence-plot defaults.
 - `nqe-postprocess-runner` now has `stop_after` stage control, optional convergence-screening mode, plot-only mode for existing CSV outputs, and an explicit `per_window_skiprows_file` mechanism for user-reviewed per-window extraction discard overrides. `convergence_plot: false` enables CSV summary-only mode when plotting dependencies are unavailable, and `convergence_use_row_index_as_step: true` supports headerless sampling outputs with no real step column after user approval.
+- `nqe-postprocess-runner` now records generated-output freshness in summaries after real execution. This guards against reporting stale CSVs or plots from an older run, but it remains a provenance check rather than scientific validation.
 - `analyze_phy_quant_convergence.py` supports single-RC demo files, real multi-column `PHY_QUANT` shapes such as `PotEng` plus `MeanForce_0`, and row/sample-index diagnostic x axes for no-step CPIHMC-style tables.
 - `chmc-cpihmc-sampling/references/convergence-review-checklist.md` now standardizes the human-review handoff after convergence diagnostics and before extraction/TI, including suspicious-window rationale, rerun/exclusion/discard decisions, and non-runnable candidate skiprows.
 - `check_chmc_window.py` exists as a CHMC/CPIHMC window health-check helper for acceptance, physical-output row integrity, initial RC adjustment, final RC consistency, convergence screening, and `INPUT`/`ALL_INPUT` comparison. It now resolves relative input/log/physical-output paths under `--window-dir`, reports explicit `Header Inference` warnings when a numeric-first `energy.dat` header is inferred from a sibling window, and fails parsing when no reliable header source is available.
+- CHMC/CPIHMC handoff guidance now treats acceptance-rate coverage, row integrity, and RC consistency as a window-health gate separate from convergence plotting. Acceptance may be parsed from logs, provided by the user, or inferred from `KinEng`/`PotEng` energy deltas as a labeled fallback diagnostic when columns are confirmed.
 - `dpdata-format-conversion` provides inspect, convert, and compare helpers for dpdata-readable systems.
 - `dpdata-format-conversion/README.md` documents a user-confirmed maintainer-local mini example, `../00`, for labeled `abacus/scf -> deepmd/npy` inspection/comparison boundaries. This external example is for local file-shape testing only, may not exist in a fresh clone, and is not a reusable production default.
 - Recorded fresh-agent and smoke batches currently pass: Batch A/B minimal smoke and failure prompts, Batch C changed-skill deep tests, Batch D script-interface smoke, and the targeted dpdata/TI/TST/runner retest.
@@ -76,7 +78,7 @@ initial DFT-labeled dataset
 - All 9 failure-case reference files are now populated. KMC failure cases are boundary-oriented and cover event-network, rate-table, implementation, output-interpretation, and provenance failures without introducing production defaults.
 - Recorded fresh-agent batches pass, including the latest targeted runner/TI-TST and upstream DeepModeling boundary retests, but deeper executable and real-data validation remains incomplete. Do not claim production readiness or exhaustive test coverage.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped `param.json`, `machine.json`, and README files. It is not a real DP-GEN production example.
-- `nqe-postprocess-runner` is still experimental because it needs broader real-data failure recovery validation, not because basic staged execution, targeted fresh-agent failure routing, executable parser/discovery/skiprows negative fixtures, child-script bad-column/truncation fixtures, stale-output refusal, or the latest path/plot/TST boundary checks are missing.
+- `nqe-postprocess-runner` is still experimental because it needs broader real-data failure recovery validation, not because basic staged execution, targeted fresh-agent failure routing, executable parser/discovery/skiprows negative fixtures, child-script bad-column/truncation fixtures, stale-output refusal, same-run output freshness checks, or the latest path/plot/TST boundary checks are missing.
 - `kmc-h2-efficiency` is still teaching-ready. Its boundary references and prompts are stronger, but it lacks an executable schema checker for event networks and rate tables.
 - The repository still lacks target-system-specific production inputs, validated physical parameters, convergence evidence, and provenance records.
 
@@ -104,7 +106,7 @@ Script output remains diagnostic or post-processing output. It is not proof of p
 ## Highest-Priority Next Work
 
 1. Add a minimal KMC schema/static checker if continuing KMC work next. It should check file shape, event/rate labels, required metadata, placeholders, and obvious invalid rates without judging the physical event network.
-2. Extend runner negative validation beyond the current executable fixtures, especially stale partial-output handling and more real-data failure recovery. Output-directory reuse now has an executable refusal fixture and a targeted fresh-agent pass record for the `allow_existing_output_dir` boundary.
+2. Extend runner negative validation beyond the current executable fixtures, especially stale partial-output handling and more real-data failure recovery. Output-directory reuse now has an executable refusal fixture, generated-output freshness is checked after real runs, and a targeted fresh-agent pass record exists for the `allow_existing_output_dir` boundary.
 3. Review the guarded TI-only free-energy profile only if preparing a separate TST-confirmation checklist. TST still requires explicit state selection, free-energy column/unit, temperature, prefactor model, and prefactor units.
 4. Keep dpdata repeatable checks deferred until an environment with dpdata is available; the skill, README example, and populated failure reference already cover the teaching/checking boundary.
 5. Keep README, quickstart, testing guide, status report, and pending-work documents synchronized after every script or skill change.

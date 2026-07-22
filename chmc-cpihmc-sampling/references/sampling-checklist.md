@@ -51,6 +51,8 @@ These examples should not be treated as automatic defaults for new systems.
 - bead-number convergence for CPIHMC
 - abnormal wall/restriction rejection events if walls are used
 
+Acceptance-rate checks should be recorded before claiming a sampling batch is ready for TI. Prefer a code log or an explicitly user-provided acceptance value. If no log was saved, `check_chmc_window.py` can use the `KinEng`/`PotEng` energy-delta fallback when those columns are confirmed; label this as a fallback diagnostic rather than an internal program counter. Do not use any script default threshold as a universal production cutoff.
+
 
 ## Template And Output File Boundaries
 
@@ -93,6 +95,7 @@ For multi-window runs, produce a convergence review checklist before extraction/
 
 Before thermodynamic integration:
 
+- every intended window has a window-health record, including acceptance-rate source/status, row integrity, and final reaction-coordinate consistency, or any missing acceptance evidence is explicitly recorded as a TODO/limitation
 - mean force is available for each window
 - reaction-coordinate grid is documented
 - uncertainties or block statistics are available or marked TODO

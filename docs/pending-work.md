@@ -1,6 +1,6 @@
 # Pending Work
 
-Last updated: 2026-07-17
+Last updated: 2026-07-22
 
 This file tracks work that remains after the current repository consistency pass. It intentionally separates documented repository state from production readiness.
 
@@ -12,6 +12,8 @@ This file tracks work that remains after the current repository consistency pass
 - 9 failure-case references exist; all 9 are populated.
 - `nqe-postprocess-runner` has a basic config example, a convergence-screening config example, staged `stop_after` control for convergence/extraction/integration/plot/all, and a user-reviewed `per_window_skiprows_file` mechanism for per-window extraction discard overrides.
 - `check_chmc_window.py` exists; it is no longer a future script placeholder.
+- CHMC/CPIHMC acceptance-rate coverage is now part of the documented pre-extraction/TI handoff checklist, alongside row integrity and RC consistency. Log-derived, user-provided, and energy-delta-inferred acceptance sources must be recorded separately.
+- Real runner execution now checks generated-output freshness and records `generated_output_status` in the summary, reducing the risk of reporting stale CSVs or plots from previous attempts.
 - `dpgen-active-learning/templates/reference-examples/placeholder-real-example/` contains placeholder-shaped files, but it is not a real DP-GEN example.
 - Manual prompts exist. Recorded fresh-agent and script-smoke batches currently pass; remaining testing work is deeper failure-driven behavior and real-data validation, not a missing baseline pass.
 - Runner negative smoke fixtures exist at `tests/runner_configs/postprocess_missing_defaults.yaml` and `tests/runner_configs/negative_*.yaml`; they are expected to fail and verify implicit-default refusal, nested YAML rejection, invalid boolean rejection, missing-window discovery failure, and invalid per-window skiprows rejection.
@@ -65,6 +67,7 @@ Current state:
 Remaining work:
 
 - Validate acceptance-rate parsing on real logs or outputs.
+- Continue testing the energy-delta fallback on legacy outputs that contain confirmed `KinEng`/`PotEng` columns but no saved log, and record missing acceptance evidence explicitly when fallback is impossible.
 - Validate final-RC and target-RC checks against more real `INPUT`/`ALL_INPUT` examples when `ALL_INPUT` is available.
 - Continue validating initial-RC adjustment diagnostics on more real windows, including multi-RC cases.
 - Connect recurring diagnostic outcomes to `chmc-cpihmc-failure-cases.md`.
@@ -85,11 +88,12 @@ Current state:
 - Real-data dry-run command generation and staged execution through extraction have been exercised on the `../demo` 13-window dataset.
 - Per-window discard command generation and reviewed demo execution have been exercised with explicit `10000`-row overrides for `0.0` and `1.8`.
 - Plot-only command generation has been exercised on reviewed demo mean-force and free-energy CSV outputs.
+- Real execution includes generated-output freshness checking, recorded in `summary.json` or `plot_summary.json`, to prevent stale output files from being reported as current run results.
 
 Remaining work:
 
 - Prompt-level runner failure routing has a targeted fresh-agent pass for missing windows, bad columns, unexpected dry-run commands, child-script failures, per-window discard errors, config parser failures, existing output directories, summary-without-physical-review, and truncated window outputs.
-- Extend executable runner negative validation to the remaining practical failure families, especially stale partial-output handling and real-data recovery. Parser, missing-window, invalid-boolean, invalid-per-window-skiprows, bad-column, truncated-window, and stale-output-dir fixtures already exist.
+- Extend executable runner negative validation to the remaining practical failure families, especially stale partial-output handling and real-data recovery. Parser, missing-window, invalid-boolean, invalid-per-window-skiprows, bad-column, truncated-window, stale-output-dir, and generated-output freshness guards already exist.
 - Review the guarded TI-only free-energy profile before any TST handoff. TST still requires explicit reactant/transition-state selection, free-energy column/unit, temperature, prefactor model, and prefactor units.
 - Consider adding a `--generate-config` or draft-config mode only if it can preserve `parameters_confirmed: false` for unapproved values.
 

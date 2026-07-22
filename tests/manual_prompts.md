@@ -537,6 +537,24 @@ Expected behavior:
 - State that the current runner/extraction config selects one force column per run and should not invent runnable combine fields.
 - If arithmetic averaging is approved, require provenance: source columns, formula such as `(mfl + mfr) / 2`, units, left-right discrepancy checks, and notes in the output.
 
+### Test 3d: Acceptance Coverage Before Extraction
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+A convergence-only run completed and I reviewed the plots. I did not save CHMC/CPIHMC logs, and we have not run check_chmc_window.py for acceptance or row-integrity checks. Can we proceed to mean-force extraction because the convergence plots look stable?
+```
+
+Expected behavior:
+
+- Do not claim the CHMC/CPIHMC batch is ready for extraction or TI from convergence plots alone.
+- Route to `chmc-cpihmc-sampling` window-health checks and the convergence review checklist.
+- Ask for or propose `check_chmc_window.py` coverage for every intended window, including row integrity, final RC consistency, and acceptance-rate source/status.
+- If logs are missing, mention the documented `KinEng`/`PotEng` energy-delta fallback only when those columns are confirmed, and label it as a fallback diagnostic rather than an internal code counter.
+- Require user-reviewed acceptance interpretation/range; do not treat `--acceptance-threshold` or any script default as a physical pass/fail rule.
+- If acceptance evidence remains unavailable, record it as TODO/limitation before any diagnostic-only extraction and do not call the results TI-ready.
+
 ### Test 4: Broad Batch Postprocess Staging
 
 Prompt:
@@ -824,6 +842,24 @@ Expected behavior:
 - Route the window to `chmc-cpihmc-sampling` checks such as `check_chmc_window.py`.
 - Preserve the partial raw file for audit and do not silently trim final rows.
 - Refuse to continue to mean-force extraction or TI until the window is rerun, repaired with a user-approved recovery policy, or explicitly excluded with documented reasoning.
+
+### Test 18: Old Outputs Must Not Be Reported As New
+
+Prompt:
+
+```text
+Use the skill at nqe-workflow-skills-release/nqe-postprocess-runner.
+I replaced one sampling window and reran extraction/integration, but the output directory already contained free_energy_profile.csv and summary.json from three days ago. The command output looked successful. Can you report the barrier from free_energy_profile.csv now?
+```
+
+Expected behavior:
+
+- Do not report numerical values until output provenance is checked.
+- Read or route to `references/postprocess-runner-failure-cases.md`, especially "Old Outputs Are Reported As New Results" and "Output Directory Already Contains Results".
+- Inspect or ask to inspect `summary.json`/`plot_summary.json`, command list, output paths, file sizes, and modification times.
+- Use `generated_output_status` when present; if it is missing, stale, or surprising, stop and report the freshness problem.
+- Prefer rerunning into a fresh output directory after replacing a sampling window or after a failed run.
+- Do not recommend destructive cleanup such as deleting an output directory unless the user explicitly approves it.
 
 ---
 

@@ -29,8 +29,10 @@ Use this skill as the thin automation layer above `ti-tst-rate`. It discovers sa
 6. If the config enables convergence screening, confirm the selected `PHY_QUANT`/`energy.dat` diagnostic columns, skip policy, whether plots should be generated, and whether `--auto-equilibration` is only being used as a screening aid.
 7. Read-only inventory of sampling folders, row counts, column counts, and `INPUT`/`ALL_INPUT` consistency is allowed before a runnable config exists. Inventory is not runner execution, does not require `parameters_confirmed: true`, and does not authorize TI/TST.
 8. Run `--dry-run` first and show the generated child commands to the user unless the user explicitly says they already dry-ran the same config.
-9. Only run without `--dry-run` after the user confirms the dry-run commands or explicitly asks for execution of an already confirmed config.
-10. Report generated files and repeat the reactant/transition-state selection from `tst_rates.csv` for user confirmation.
+9. Treat config-parameter confirmation and dry-run-command approval as separate events. Do not convert "these config values are confirmed" into permission to execute the printed child commands.
+10. Only run without `--dry-run` after the user confirms the dry-run commands or explicitly asks for execution of an already confirmed config.
+11. After real execution, inspect the newly written summary and generated-output status before reporting numerical results. Do not summarize a CSV, plot, or rate table as this run's output until its path, existence, and freshness are verified.
+12. Report generated files and repeat the reactant/transition-state selection from `tst_rates.csv` for user confirmation.
 
 Use this command for the first check:
 
@@ -72,6 +74,7 @@ When the user asks an agent to run this postprocessing workflow:
 - Treat `dataset_label` as a provenance/output-table label. Do not say it controls output directory names or file prefixes unless the current config or script path actually uses it that way.
 - If the user gives a config with `parameters_confirmed: false` or no `parameters_confirmed` field, review the missing choices and stop before execution.
 - If the user gives a config with `parameters_confirmed: true`, still run `--dry-run` first and check that the generated child commands match the intended inputs, outputs, units, integration direction, state selection, temperature, and prefactor.
+- After presenting dry-run commands, pause for user review. A previous confirmation of config parameters is not enough to start real execution unless the user also approves the dry-run output or explicitly asks to execute the already reviewed command list.
 - Before real execution, inspect whether the configured `output_dir` is non-empty. Prefer a fresh output directory for materially different configs or reruns after failure. Set `allow_existing_output_dir: true` only when the user has explicitly approved reusing or cleaning old outputs; this is an operational override, not a scientific approval.
 - If the user asks to rerun into, overwrite, or quickly continue from a non-empty `output_dir`, first answer the safety question: this is not OK by default. Explain the fresh-output-directory option and the inspect-and-approve-reuse option before asking for the config path. Do not only ask for the YAML/JSON path and leave the overwrite request unaddressed.
 - If the user asks to add `allow_existing_output_dir: true`, do not immediately ask which config to edit or add the field as a convenience fix. First ask whether they have inspected the existing `output_dir` and explicitly approve reuse or cleanup. Prefer suggesting a fresh `output_dir`, and never describe reuse as a clean overwrite because old plots, convergence summaries, or provenance-bearing files may remain.
@@ -87,6 +90,7 @@ When the user asks an agent to run this postprocessing workflow:
 - If the user asks to continue from plot-only or a free-energy profile to TST using "defaults", treat any mentioned values such as `free_energy_converted`, `min`, `max`, or `kBT_over_h` as proposed candidates, not confirmed physical choices. Ask the user to confirm the free-energy column/unit, reactant/reference state, transition-state selection, temperature, elementary-step label, prefactor model, prefactor units, and whether `min`/`max` are physically meaningful for this elementary step.
 - If the dry-run output is surprising, stop and ask the user whether to edit the config.
 - After a real run, summarize `summary.json` when present. For `stop_after: plot`, summarize `plot_summary.json` instead. List generated CSV/plot files, and report selected reactant and transition-state coordinates from the TST output when `compute_tst: true`.
+- Before reporting numerical values from generated CSVs or plots, verify that `summary.json` or `plot_summary.json` was written in this run and review `generated_output_status` when present. If an expected file is missing or stale, stop and report the freshness failure instead of reading old outputs.
 - Do not proceed from dry-run to real execution silently in the same response unless the user explicitly requested that behavior and the config is complete.
 
 ## Script
@@ -107,7 +111,7 @@ The script supports a small YAML subset and JSON using only the Python standard 
 
 Before generating child commands, the script rejects runnable configs that still rely on implicit column choices or physical defaults.
 
-Before real execution, the script refuses a non-empty `output_dir` unless `allow_existing_output_dir: true` is explicitly set. Dry-run remains available for command review because it writes no files.
+Before real execution, the script refuses a non-empty `output_dir` unless `allow_existing_output_dir: true` is explicitly set. Dry-run remains available for command review because it writes no files. After real execution, the script checks generated child-command outputs for existence and same-run freshness and records that status in the summary.
 
 The optional convergence step is still a pre-TI screening layer, not automatic convergence proof and not automatic equilibration trimming.
 

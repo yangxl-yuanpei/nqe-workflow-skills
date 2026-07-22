@@ -240,6 +240,28 @@ Agent response:
 4. Rerun dry-run after edits.
 5. Do not proceed from dry-run to real execution silently.
 
+## Dry-Run Approval Is Confused With Config Confirmation
+
+Typical symptoms:
+
+- The user confirms YAML values, and the agent immediately runs the non-dry command after a dry-run.
+- The agent prints many child commands but does not pause for the user to inspect them.
+- The dry-run output has not been checked for paths, columns, ordering, or stage scope, but real execution starts anyway.
+
+Likely causes:
+
+- `parameters_confirmed: true` or user confirmation of config fields was mistaken for approval of generated child commands.
+- A long multi-step session made the agent compress separate review gates into one operation.
+- The user asked for a stage such as convergence screening, but the agent treated that as permission for immediate execution.
+
+Agent response:
+
+1. Separate the approvals: confirmed config values are not the same as approved dry-run commands.
+2. After dry-run, summarize the generated child commands, including stage scope, paths, columns, units, direction, and output locations.
+3. Pause and ask the user whether to execute the reviewed command list.
+4. If the user changes any config value or notices a surprising command, edit the config and rerun dry-run.
+5. Do not run the real command in the same response unless the user explicitly asked for that exact behavior after seeing the dry-run output.
+
 ## Free-Energy Or TST Defaults Are Treated As Physical Choices
 
 Typical symptoms:
@@ -289,6 +311,30 @@ Agent response:
 7. If the user has not provided a config path yet, still answer the overwrite/reuse safety question first. State that direct overwrite is not OK by default and list the recovery options before asking for the YAML/JSON path.
 8. If the user asks to add `allow_existing_output_dir: true`, do not treat that as approval by itself. Ask whether they have inspected the existing outputs and explicitly approve reuse or cleanup. Prefer a fresh `output_dir`, and do not describe reuse as a clean overwrite because old plots or convergence summaries may remain.
 9. Do not report "all windows converged" or "old files were cleanly overwritten" from runner completion alone. Require review of convergence evidence, output-directory contents, summary provenance, and the intended downstream stage before making acceptance claims.
+
+## Old Outputs Are Reported As New Results
+
+Typical symptoms:
+
+- A CSV or plot has an older timestamp than the runner invocation.
+- The agent reports a free-energy barrier, plot, or mean-force table from a previous attempt.
+- The command failed or wrote partial outputs, but old files remain in `output_dir` and look plausible.
+- `summary.json` does not contain the current command list or fresh generated-output status.
+
+Likely causes:
+
+- The output directory was reused after a failed or materially different run.
+- The agent read files from the expected path without checking whether this run regenerated them.
+- A child script exited early, or the runner was not actually run after dry-run.
+
+Agent response:
+
+1. Stop reporting numerical results until file provenance is checked.
+2. Inspect `summary.json` or `plot_summary.json`, command list, output paths, file sizes, and modification times.
+3. Use `generated_output_status` when present; if a file is stale or missing, report that instead of reading old CSV contents.
+4. Prefer a fresh output directory for reruns after failure or after replacing a sampling window.
+5. Do not use destructive cleanup such as deleting an output directory unless the user explicitly approves it; fresh output directories are the safer default.
+6. If old and new outputs are mixed, record the ambiguity and rerun into a clean, user-approved location before drawing conclusions.
 
 ## Summary Exists But Physical Review Is Missing
 

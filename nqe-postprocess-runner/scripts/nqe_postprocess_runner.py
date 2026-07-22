@@ -9,6 +9,7 @@ import json
 import shlex
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -373,6 +374,54 @@ def run(cmd: list[str], dry_run: bool, commands: list[list[str]]) -> None:
         subprocess.run(cmd, check=True)
 
 
+def generated_output_paths(commands: Sequence[Sequence[str]]) -> list[Path]:
+    paths: list[Path] = []
+    for cmd in commands:
+        for index, item in enumerate(cmd[:-1]):
+            if item in {"--output", "--summary"}:
+                paths.append(Path(cmd[index + 1]).expanduser())
+    unique: list[Path] = []
+    seen: set[str] = set()
+    for path in paths:
+        resolved = path.resolve()
+        key = str(resolved)
+        if key not in seen:
+            seen.add(key)
+            unique.append(resolved)
+    return unique
+
+
+def verify_generated_outputs(paths: Sequence[Path], run_started_at: float) -> list[dict[str, Any]]:
+    status: list[dict[str, Any]] = []
+    stale_or_missing: list[str] = []
+    # Some filesystems round mtimes coarsely; this tolerance avoids false stale reports.
+    freshness_cutoff = run_started_at - 2.0
+    for path in paths:
+        exists = path.exists()
+        item: dict[str, Any] = {
+            "path": str(path),
+            "exists": exists,
+            "size_bytes": None,
+            "mtime": None,
+            "fresh_for_this_run": False,
+        }
+        if exists:
+            stat = path.stat()
+            item["size_bytes"] = stat.st_size
+            item["mtime"] = stat.st_mtime
+            item["fresh_for_this_run"] = stat.st_mtime >= freshness_cutoff
+        if not item["fresh_for_this_run"]:
+            stale_or_missing.append(str(path))
+        status.append(item)
+    if stale_or_missing:
+        raise RuntimeError(
+            "Generated output freshness check failed for: "
+            + ", ".join(stale_or_missing)
+            + ". Do not report old or missing outputs as results from this run."
+        )
+    return status
+
+
 def unlink_outputs(paths: Sequence[Path], dry_run: bool) -> None:
     if dry_run:
         return
@@ -457,11 +506,12 @@ def build_convergence_cmd(
         python,
         str(repo_root / "chmc-cpihmc-sampling" / "scripts" / "analyze_phy_quant_convergence.py"),
         "--input", str(window / input_file),
-        "--output", str(output_dir / f"{window.name}.png"),
         "--summary", str(output_dir / f"{window.name}.csv"),
         "--skiprows", str(config.get("convergence_skiprows", 0)),
         "--confirm-parameters",
     ]
+    if as_bool(config, "convergence_plot", True):
+        cmd.extend(["--output", str(output_dir / f"{window.name}.png")])
     for item in columns:
         try:
             index = int(item)
@@ -662,6 +712,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     else:
         unlink_outputs([mean_force, free_energy, rates, summary], args.dry_run)
 
+    run_started_at = time.time()
     commands: list[list[str]] = []
     if run_convergence:
         for window in windows:
@@ -697,6 +748,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         if stop_after == "all" and as_bool(config, "compute_tst", False):
             run(build_tst_cmd(python, scripts, config, free_energy, rates), args.dry_run, commands)
 
+    generated_output_status: list[dict[str, Any]] = []
+    if not args.dry_run:
+        generated_output_status = verify_generated_outputs(generated_output_paths(commands), run_started_at)
+
     notes = [
         "All numerical choices come from the confirmed config.",
         "Convergence diagnostics remain screening outputs; review plots or CSV summaries and do not treat suggested cutoffs as proof of equilibration.",
@@ -724,6 +779,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         },
         "per_window_skiprows": per_window_skiprows,
         "commands": commands,
+        "generated_output_status": generated_output_status,
         "notes": notes,
     }
     if not args.dry_run:
